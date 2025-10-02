@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Portfolio — Daniele</title>
+  <meta name="description" content="Portfolio personale minimalista: progetti, tesi e contatti." />
+  <meta property="og:title" content="Portfolio — Daniele" />
+  <meta property="og:description" content="Progetti, note e contatti." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/cover.jpg" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root{
+      --card-bg:#ffffff;
+      --card-r:24px;
+      --shadow-soft: 0 10px 30px rgba(0,0,0,.08);
+      --border-soft: 1px solid rgba(0,0,0,.06);
+      --text-soft:#6b7280;
+    }
+    body{ background: #f5f7fb; }
+    .neo-card{
+      background: var(--card-bg);
+      border: var(--border-soft);
+      border-radius: var(--card-r);
+      box-shadow: var(--shadow-soft);
+    }
+    .profile-card{ position: relative; overflow: hidden; }
+    .cover{
+      height: 160px;
+      background: url("assets/cover.jpg") center/cover no-repeat;
+      border-top-left-radius: var(--card-r);
+      border-top-right-radius: var(--card-r);
+    }
+    .avatar-wrap{
+      position: absolute; top: 95px; left: 24px;
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      padding: 3px;
+      background: conic-gradient(#8b5cf6, #22c55e, #06b6d4, #f59e0b, #ef4444, #8b5cf6);
+    }
+    .avatar{
+      width: 100%; height: 100%; border-radius: 50%;
+      background: #fff; padding: 4px;
+    }
+    .avatar img{ width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .float-btn{
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(255,255,255,.9);
+      border: var(--border-soft);
+      border-radius: 18px;
+      padding: 6px 10px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(4px);
+    }
+    .stats-pill{
+      position: absolute; left: 50%; transform: translateX(-50%);
+      bottom: -28px;
+      background: #fff; border: var(--border-soft);
+      border-radius: 18px; box-shadow: var(--shadow-soft);
+      padding: 10px 16px;
+    }
+    .muted{ color: var(--text-soft); }
+    .list-dot li{ margin-bottom: .5rem; }
+    .list-dot li::marker{ color:#9ca3af; }
+    footer .social a{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:44px; height:44px; border-radius:12px;
+      background:#fff; border:var(--border-soft); box-shadow: var(--shadow-soft);
+      margin-right:10px; color:#111; text-decoration:none;
+    }
+    /* Responsive tweak: stack pill under card on small screens */
+    @media (max-width: 991.98px){
+      .stats-push{ padding-top: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container py-5">
+    <div class="row g-4 align-items-start">
+      <!-- LEFT: profile card -->
+      <div class="col-12 col-lg-5">
+        <section class="neo-card profile-card">
+          <div class="cover" role="img" aria-label="Sfondo nuvola"></div>
+
+          <button class="float-btn btn btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>
+          </button>
+
+          <div class="avatar-wrap">
+            <div class="avatar">
+              <!-- Sostituisci con la tua immagine -->
+              <img src="assets/avatar.jpg" alt="Ritratto di Daniele">
+            </div>
+          </div>
+
+          <div class="p-4 pt-5 stats-push">
+            <h1 class="h4 mb-1">Daniele</h1>
+            <p class="muted mb-3">Product/Knowledge Designer — Minimalismo, usabilità e sistemi informativi.</p>
+            <p class="mb-0 small muted">Attualmente lavoro su automazioni **Notion**, portfolio docenze e ricerca su FRCM / AM (LPBF).</p>
+          </div>
+
+          <!-- Stats floating pill -->
+          <div class="stats-pill">
+            <div class="d-flex gap-4 small">
+              <div><strong>72.9K</strong> <span class="muted">Likes</span></div>
+              <div><strong>828</strong> <span class="muted">Posts</span></div>
+              <div><strong>342.9K</strong> <span class="muted">Views</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT: about + projects -->
+      <div class="col-12 col-lg-7">
+        <section class="neo-card p-4 p-md-5">
+          <h2 class="h5 mb-3">Ciao, sono Daniele</h2>
+          <p class="muted">
+            Ingegneria, didattica e design dei sistemi informativi. Qui trovi una selezione dei miei lavori e
+            progetti personali. Il sito è volutamente essenziale: poche distrazioni, focus sui contenuti.
+          </p>
+
+          <hr class="my-4">
+
+          <h3 class="h6 text-uppercase letter-spacing-1 mb-3">Progetti principali</h3>
+          <ul class="list-unstyled">
+            <li class="mb-3">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-kanban-fill me-3 fs-5"></i>
+                <div>
+                  <a class="fw-semibold text-decoration-none" href="#progetto-notion">Sistema presenze scolastiche su Notion</a>
+                  <div class="small muted">Tre database collegati (Alunni, Lezioni, Presenze Dettagliate) con automazioni Make.</div>
+                </div>
+              </div>
+            </li>
+            <li class="mb-3">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-journal-text me-3 fs-5"></i>
+                <div>
+                  <a class="fw-semibold text-decoration-none" href="#progetto-frcm">Tesi: Caratterizzazione meccanica FRCM</a>
+                  <div class="small muted">Adesione, modalità di rottura e protocolli sperimentali (pull-off, single-shear, ecc.).</div>
+                </div>
+              </div>
+            </li>
+            <li class="mb-3">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-cpu-fill me-3 fs-5"></i>
+                <div>
+                  <a class="fw-semibold text-decoration-none" href="#progetto-am">Additive Manufacturing — LPBF 316L</a>
+                  <div class="small muted">Revisione bibliografica su VED, porosità e resistenza alla corrosione; confronto trattamenti HIP.</div>
+                </div>
+              </div>
+            </li>
+            <li class="mb-3">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-collection-play-fill me-3 fs-5"></i>
+                <div>
+                  <a class="fw-semibold text-decoration-none" href="#progetto-dashboard">Dashboard tutor & booking</a>
+                  <div class="small muted">Gestione lezioni, pacchetti e pagamenti; integrazione form Notion / Calendly.</div>
+                </div>
+              </div>
+            </li>
+            <li class="mb-1">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-bookshelf me-3 fs-5"></i>
+                <div>
+                  <a class="fw-semibold text-decoration-none" href="#progetto-library">Vetrina digitale — Libri & Articoli</a>
+                  <div class="small muted">Libreria Notion con stati di lettura e automazioni di archiviazione.</div>
+                </div>
+              </div>
+            </li>
+          </ul>
+
+          <hr class="my-4">
+          <div class="row g-3">
+            <div class="col-md">
+              <div class="neo-card p-3">
+                <div class="small muted">Attività recente</div>
+                <ul class="mt-2 list-dot">
+                  <li>Refactor template Notion “Registro Lezioni”.</li>
+                  <li>Analisi curve forza-scorrimento su FRCM.</li>
+                  <li>Bozza capitolo “Corrosione 316L in LPBF”.</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-md">
+              <div class="neo-card p-3">
+                <div class="small muted">Stack</div>
+                <ul class="mt-2 list-dot">
+                  <li>Notion, Make, GitHub Pages</li>
+                  <li>Bootstrap 5, Markdown</li>
+                  <li>LaTeX per documenti tecnici</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-5">
+      <div class="neo-card p-3 d-flex flex-wrap align-items-center justify-content-between">
+        <div class="muted small">© <span id="year"></span> Daniele — Portfolio minimal</div>
+        <div class="social">
+          <a href="https://instagram.com/username" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="https://x.com/username" aria-label="X"><i class="bi bi-twitter-x"></i></a>
+          <a href="https://github.com/username" aria-label="GitHub"><i class="bi bi-github"></i></a>
+          <a href="mailto:hello@example.com" aria-label="Email"><i class="bi bi-envelope-fill"></i></a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
