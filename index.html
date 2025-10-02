@@ -1,31 +1,60 @@
 <!doctype html>
-<html lang="it">
+<html lang="it" dir="ltr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <title>Portfolio — Daniele</title>
-  <meta name="description" content="Portfolio personale minimalista: progetti, tesi e contatti." />
+  <meta name="description" content="Portfolio personale minimalista: progetti, didattica e contatti." />
+  <meta name="keywords" content="portfolio, design, ingegneria, Notion, FRCM, additive manufacturing" />
+
+  <!-- Open Graph -->
   <meta property="og:title" content="Portfolio — Daniele" />
   <meta property="og:description" content="Progetti, note e contatti." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/cover.jpg" />
+  <meta property="og:url" content="https://username.github.io" />
+  <meta property="og:site_name" content="Portfolio — Daniele" />
+
+  <!-- Basic CSP (se usi solo i CDN sotto) -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 img-src 'self' data:;
+                 style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
+                 script-src 'self' https://cdn.jsdelivr.net;
+                 font-src https://cdn.jsdelivr.net 'self';
+                 connect-src 'self';
+                 frame-ancestors 'self';">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
   <style>
     :root{
       --card-bg:#ffffff;
       --card-r:24px;
       --shadow-soft: 0 10px 30px rgba(0,0,0,.08);
       --border-soft: 1px solid rgba(0,0,0,.06);
-      --text-soft:#6b7280;
+      --text-soft:#4b5563; /* contrasto migliore del #6b7280 */
     }
-    body{ background: #f5f7fb; }
+    html,body{ height:100%; }
+    body{ background:#f5f7fb; line-height:1.55; }
+
+    /* Accessibilità: utility sr-only */
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+    .sr-only-focusable:active, .sr-only-focusable:focus{
+      position: static; width:auto; height:auto; margin:0; overflow:visible; clip:auto; padding:.5rem 1rem; background:#fff; border-radius:.5rem; box-shadow:0 0 0 3px rgba(0,0,0,.15);
+    }
+
     .neo-card{
       background: var(--card-bg);
       border: var(--border-soft);
       border-radius: var(--card-r);
       box-shadow: var(--shadow-soft);
+      transition: transform .2s ease, box-shadow .2s ease;
     }
+    .neo-card:hover{ transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0,0,0,.1); }
+
     .profile-card{ position: relative; overflow: hidden; }
     .cover{
       height: 160px;
@@ -33,27 +62,47 @@
       border-top-left-radius: var(--card-r);
       border-top-right-radius: var(--card-r);
     }
-    .avatar-wrap{
-      position: absolute; top: 95px; left: 24px;
-      width: 96px; height: 96px;
-      border-radius: 50%;
-      padding: 3px;
-      background: conic-gradient(#8b5cf6, #22c55e, #06b6d4, #f59e0b, #ef4444, #8b5cf6);
-    }
-    .avatar{
-      width: 100%; height: 100%; border-radius: 50%;
-      background: #fff; padding: 4px;
-    }
-    .avatar img{ width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+    /* Pulsante + (dropdown social) fissato in alto a destra */
     .float-btn{
       position: absolute; top: 12px; right: 12px;
-      background: rgba(255,255,255,.9);
+      z-index: 10;
+      background: rgba(255,255,255,.92);
       border: var(--border-soft);
       border-radius: 18px;
       padding: 6px 10px;
       box-shadow: var(--shadow-soft);
       backdrop-filter: blur(4px);
     }
+
+    /* Avatar pulito (niente ring) */
+    .avatar-wrap{
+      position: absolute; top: 95px; left: 24px;
+      width: 96px; height: 96px; border-radius: 50%;
+      background: transparent;
+    }
+    .avatar{
+      width: 100%; height: 100%; border-radius: 50%;
+      background: #fff; padding: 4px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.12);
+      border: 1px solid rgba(0,0,0,.05);
+    }
+    .avatar img{ width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+    /* Dropdown animazione + stile */
+    .dropdown-menu{
+      transform-origin: top right;
+      opacity: 0;
+      transform: scale(.96) translateY(-2px);
+      transition: opacity .15s ease, transform .18s ease;
+      border-radius: 14px; border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+    .dropdown-menu.show{ opacity:1; transform: scale(1) translateY(0); }
+    .dropdown-item i{ width: 1.2rem; }
+    .dropdown-item small{ color: var(--text-soft); font-size: clamp(.8rem,.95vw,.9rem); }
+    .badge-soft{ background:#f3f4f6; border:1px solid rgba(0,0,0,.06); }
+
     .stats-pill{
       position: absolute; left: 50%; transform: translateX(-50%);
       bottom: -28px;
@@ -62,51 +111,126 @@
       padding: 10px 16px;
     }
     .muted{ color: var(--text-soft); }
-    .list-dot li{ margin-bottom: .5rem; }
-    .list-dot li::marker{ color:#9ca3af; }
+
     footer .social a{
       display:inline-flex; align-items:center; justify-content:center;
       width:44px; height:44px; border-radius:12px;
       background:#fff; border:var(--border-soft); box-shadow: var(--shadow-soft);
       margin-right:10px; color:#111; text-decoration:none;
     }
-    /* Responsive tweak: stack pill under card on small screens */
+
+    /* Responsive piccoli schermi */
+    @media (max-width: 575.98px){
+      .stats-pill{ display:none; }
+      .avatar-wrap{ left: 50%; transform: translateX(-50%); top: 100px; }
+    }
     @media (max-width: 991.98px){
       .stats-push{ padding-top: 36px; }
     }
+
+    /* Migliora leggibilità testo piccolo */
+    small, .small{ font-size: clamp(.9rem, .9rem + .2vw, .98rem); }
   </style>
 </head>
 <body>
-  <main class="container py-5">
+  <!-- Skip link -->
+  <a href="#main-content" class="sr-only sr-only-focusable">Salta al contenuto principale</a>
+
+  <main id="main-content" class="container py-5" role="main">
     <div class="row g-4 align-items-start">
       <!-- LEFT: profile card -->
       <div class="col-12 col-lg-5">
-        <section class="neo-card profile-card">
-          <div class="cover" role="img" aria-label="Sfondo nuvola"></div>
+        <section class="neo-card profile-card" role="banner" aria-label="Profilo">
+          <!-- Dropdown Social (PRIMO figlio, in alto a destra) -->
+          <div class="dropdown">
+            <button class="float-btn btn btn-sm dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                    data-bs-display="static"
+                    data-bs-offset="10,14"
+                    aria-expanded="false"
+                    aria-label="Apri elenco dei miei social">
+              <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
+            </button>
 
-          <button class="float-btn btn btn-sm">
-            <i class="bi bi-plus-lg me-1"></i>
-          </button>
+            <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width: 260px;">
+              <li>
+                <a class="dropdown-item d-flex align-items-start justify-content-between"
+                   href="https://instagram.com/username" target="_blank" rel="noopener"
+                   aria-label="Apri il mio profilo Instagram">
+                  <div class="me-3">
+                    <div><i class="bi bi-instagram me-2" aria-hidden="true"></i>Instagram</div>
+                    <small>Seguimi su Instagram</small>
+                  </div>
+                  <span class="badge rounded-pill badge-soft text-dark" data-followers="72.9k">72.9k</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-start justify-content-between"
+                   href="https://x.com/username" target="_blank" rel="noopener"
+                   aria-label="Apri il mio profilo su X (Twitter)">
+                  <div class="me-3">
+                    <div><i class="bi bi-twitter-x me-2" aria-hidden="true"></i>X (Twitter)</div>
+                    <small>Seguimi su X</small>
+                  </div>
+                  <span class="badge rounded-pill badge-soft text-dark" data-followers="8.2k">8.2k</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-start justify-content-between"
+                   href="https://github.com/username" target="_blank" rel="noopener"
+                   aria-label="Apri il mio profilo GitHub">
+                  <div class="me-3">
+                    <div><i class="bi bi-github me-2" aria-hidden="true"></i>GitHub</div>
+                    <small>Seguimi su GitHub</small>
+                  </div>
+                  <span class="badge rounded-pill badge-soft text-dark" data-followers="120">120</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-start justify-content-between"
+                   href="https://www.linkedin.com/in/username" target="_blank" rel="noopener"
+                   aria-label="Connettiti con me su LinkedIn">
+                  <div class="me-3">
+                    <div><i class="bi bi-linkedin me-2" aria-hidden="true"></i>LinkedIn</div>
+                    <small>Connettiti su LinkedIn</small>
+                  </div>
+                  <span class="badge rounded-pill badge-soft text-dark" data-followers=""></span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-start justify-content-between"
+                   href="mailto:hello@example.com"
+                   aria-label="Scrivimi una email">
+                  <div class="me-3">
+                    <div><i class="bi bi-envelope-fill me-2" aria-hidden="true"></i>Email</div>
+                    <small>Scrivimi</small>
+                  </div>
+                  <span class="badge rounded-pill badge-soft text-dark" data-followers=""></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="cover" role="img" aria-label="Immagine di copertina chiara, texture astratta"></div>
 
           <div class="avatar-wrap">
             <div class="avatar">
-              <!-- Sostituisci con la tua immagine -->
-              <img src="assets/avatar.jpg" alt="Ritratto di Daniele">
+              <img src="assets/avatar.jpg" alt="Ritratto di Daniele" loading="lazy" width="96" height="96">
             </div>
           </div>
 
-          <div class="p-4 pt-5 stats-push">
+          <header class="p-4 pt-5 stats-push">
             <h1 class="h4 mb-1">Daniele</h1>
             <p class="muted mb-3">Product/Knowledge Designer — Minimalismo, usabilità e sistemi informativi.</p>
-            <p class="mb-0 small muted">Attualmente lavoro su automazioni **Notion**, portfolio docenze e ricerca su FRCM / AM (LPBF).</p>
-          </div>
+            <p class="mb-0 small muted">Automazioni Notion, portfolio docenze, ricerca su FRCM / AM (LPBF).</p>
+          </header>
 
-          <!-- Stats floating pill -->
-          <div class="stats-pill">
+          <!-- Statistiche (facoltative) -->
+          <div class="stats-pill" aria-label="Statistiche sintetiche">
             <div class="d-flex gap-4 small">
-              <div><strong>72.9K</strong> <span class="muted">Likes</span></div>
-              <div><strong>828</strong> <span class="muted">Posts</span></div>
-              <div><strong>342.9K</strong> <span class="muted">Views</span></div>
+              <div><strong aria-label="Piaciuti">72.9K</strong> <span class="muted">Likes</span></div>
+              <div><strong aria-label="Post">828</strong> <span class="muted">Posts</span></div>
+              <div><strong aria-label="Visualizzazioni">342.9K</strong> <span class="muted">Views</span></div>
             </div>
           </div>
         </section>
@@ -114,70 +238,49 @@
 
       <!-- RIGHT: about + projects -->
       <div class="col-12 col-lg-7">
-        <section class="neo-card p-4 p-md-5">
-          <h2 class="h5 mb-3">Ciao, sono Daniele</h2>
+        <section class="neo-card p-4 p-md-5" aria-labelledby="intro-title">
+          <h2 id="intro-title" class="h5 mb-3">Ciao, sono Daniele</h2>
           <p class="muted">
             Ingegneria, didattica e design dei sistemi informativi. Qui trovi una selezione dei miei lavori e
             progetti personali. Il sito è volutamente essenziale: poche distrazioni, focus sui contenuti.
           </p>
 
-          <hr class="my-4">
+          <hr class="my-4" aria-hidden="true">
 
-          <h3 class="h6 text-uppercase letter-spacing-1 mb-3">Progetti principali</h3>
-          <ul class="list-unstyled">
-            <li class="mb-3">
-              <div class="d-flex align-items-start">
-                <i class="bi bi-kanban-fill me-3 fs-5"></i>
-                <div>
-                  <a class="fw-semibold text-decoration-none" href="#progetto-notion">Sistema presenze scolastiche su Notion</a>
-                  <div class="small muted">Tre database collegati (Alunni, Lezioni, Presenze Dettagliate) con automazioni Make.</div>
-                </div>
-              </div>
-            </li>
-            <li class="mb-3">
-              <div class="d-flex align-items-start">
-                <i class="bi bi-journal-text me-3 fs-5"></i>
-                <div>
-                  <a class="fw-semibold text-decoration-none" href="#progetto-frcm">Tesi: Caratterizzazione meccanica FRCM</a>
-                  <div class="small muted">Adesione, modalità di rottura e protocolli sperimentali (pull-off, single-shear, ecc.).</div>
-                </div>
-              </div>
-            </li>
-            <li class="mb-3">
-              <div class="d-flex align-items-start">
-                <i class="bi bi-cpu-fill me-3 fs-5"></i>
-                <div>
-                  <a class="fw-semibold text-decoration-none" href="#progetto-am">Additive Manufacturing — LPBF 316L</a>
-                  <div class="small muted">Revisione bibliografica su VED, porosità e resistenza alla corrosione; confronto trattamenti HIP.</div>
-                </div>
-              </div>
-            </li>
-            <li class="mb-3">
-              <div class="d-flex align-items-start">
-                <i class="bi bi-collection-play-fill me-3 fs-5"></i>
-                <div>
-                  <a class="fw-semibold text-decoration-none" href="#progetto-dashboard">Dashboard tutor & booking</a>
-                  <div class="small muted">Gestione lezioni, pacchetti e pagamenti; integrazione form Notion / Calendly.</div>
-                </div>
-              </div>
-            </li>
-            <li class="mb-1">
-              <div class="d-flex align-items-start">
-                <i class="bi bi-bookshelf me-3 fs-5"></i>
-                <div>
-                  <a class="fw-semibold text-decoration-none" href="#progetto-library">Vetrina digitale — Libri & Articoli</a>
-                  <div class="small muted">Libreria Notion con stati di lettura e automazioni di archiviazione.</div>
-                </div>
-              </div>
-            </li>
-          </ul>
+          <h3 class="h6 text-uppercase mb-3" id="progetti-title">Progetti principali</h3>
 
-          <hr class="my-4">
-          <div class="row g-3">
+          <!-- Lista semantica termini/descrizioni -->
+          <dl class="mb-4" aria-labelledby="progetti-title">
+            <dt class="d-flex align-items-start mb-1">
+              <i class="bi bi-kanban-fill me-3 fs-5" aria-hidden="true"></i>
+              <a class="fw-semibold text-decoration-none" href="#progetto-notion">Sistema presenze scolastiche su Notion</a>
+            </dt>
+            <dd class="small muted ms-5">Tre DB collegati (Alunni, Lezioni, Presenze Dettagliate) + automazioni Make.</dd>
+
+            <dt class="d-flex align-items-start mb-1">
+              <i class="bi bi-journal-text me-3 fs-5" aria-hidden="true"></i>
+              <a class="fw-semibold text-decoration-none" href="#progetto-frcm">Tesi: Caratterizzazione meccanica FRCM</a>
+            </dt>
+            <dd class="small muted ms-5">Adesione, modalità di rottura e protocolli (pull-off, single-shear, …).</dd>
+
+            <dt class="d-flex align-items-start mb-1">
+              <i class="bi bi-cpu-fill me-3 fs-5" aria-hidden="true"></i>
+              <a class="fw-semibold text-decoration-none" href="#progetto-am">Additive Manufacturing — LPBF 316L</a>
+            </dt>
+            <dd class="small muted ms-5">VED, porosità, corrosione; confronto trattamenti HIP.</dd>
+
+            <dt class="d-flex align-items-start mb-1">
+              <i class="bi bi-collection-play-fill me-3 fs-5" aria-hidden="true"></i>
+              <a class="fw-semibold text-decoration-none" href="#progetto-dashboard">Dashboard tutor &amp; booking</a>
+            </dt>
+            <dd class="small muted ms-5">Gestione lezioni, pacchetti, pagamenti; Notion/Calendly.</dd>
+          </dl>
+
+          <div class="row g-3" aria-label="Box riepilogo">
             <div class="col-md">
-              <div class="neo-card p-3">
-                <div class="small muted">Attività recente</div>
-                <ul class="mt-2 list-dot">
+              <div class="neo-card p-3" aria-labelledby="attivita-recente">
+                <div id="attivita-recente" class="small muted">Attività recente</div>
+                <ul class="mt-2">
                   <li>Refactor template Notion “Registro Lezioni”.</li>
                   <li>Analisi curve forza-scorrimento su FRCM.</li>
                   <li>Bozza capitolo “Corrosione 316L in LPBF”.</li>
@@ -185,9 +288,9 @@
               </div>
             </div>
             <div class="col-md">
-              <div class="neo-card p-3">
-                <div class="small muted">Stack</div>
-                <ul class="mt-2 list-dot">
+              <div class="neo-card p-3" aria-labelledby="stack-title">
+                <div id="stack-title" class="small muted">Stack</div>
+                <ul class="mt-2">
                   <li>Notion, Make, GitHub Pages</li>
                   <li>Bootstrap 5, Markdown</li>
                   <li>LaTeX per documenti tecnici</li>
@@ -195,26 +298,61 @@
               </div>
             </div>
           </div>
+
+          <!-- Sezioni di ancoraggio per i link (evita link "rotti") -->
+          <section id="progetto-notion" class="pt-4" aria-label="Dettagli: Sistema presenze su Notion"></section>
+          <section id="progetto-frcm" class="pt-4" aria-label="Dettagli: Tesi FRCM"></section>
+          <section id="progetto-am" class="pt-4" aria-label="Dettagli: AM LPBF 316L"></section>
+          <section id="progetto-dashboard" class="pt-4" aria-label="Dettagli: Dashboard tutor & booking"></section>
+
         </section>
       </div>
     </div>
 
     <!-- FOOTER -->
-    <footer class="mt-5">
+    <footer class="mt-5 container" role="contentinfo" aria-label="Informazioni e contatti">
       <div class="neo-card p-3 d-flex flex-wrap align-items-center justify-content-between">
         <div class="muted small">© <span id="year"></span> Daniele — Portfolio minimal</div>
-        <div class="social">
-          <a href="https://instagram.com/username" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-          <a href="https://x.com/username" aria-label="X"><i class="bi bi-twitter-x"></i></a>
-          <a href="https://github.com/username" aria-label="GitHub"><i class="bi bi-github"></i></a>
-          <a href="mailto:hello@example.com" aria-label="Email"><i class="bi bi-envelope-fill"></i></a>
-        </div>
+        <nav class="social" aria-label="Collegamenti social nel footer">
+          <a href="https://instagram.com/username" aria-label="Instagram"><i class="bi bi-instagram" aria-hidden="true"></i></a>
+          <a href="https://x.com/username" aria-label="X (Twitter)"><i class="bi bi-twitter-x" aria-hidden="true"></i></a>
+          <a href="https://github.com/username" aria-label="GitHub"><i class="bi bi-github" aria-hidden="true"></i></a>
+          <a href="mailto:hello@example.com" aria-label="Email"><i class="bi bi-envelope-fill" aria-hidden="true"></i></a>
+        </nav>
       </div>
     </footer>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    (function () {
+      // Anno footer
+      var y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
+
+      // Nasconde i badge follower vuoti in dropdown
+      document.querySelectorAll('[data-followers]').forEach(function (badge) {
+        var v = (badge.getAttribute('data-followers') || '').trim();
+        if (!v) badge.style.display = 'none';
+        else badge.textContent = v;
+      });
+
+      // Scroll smooth per ancore interne (solo se l'ID esiste)
+      document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          var id = this.getAttribute('href');
+          try {
+            if (id && id.length > 1) {
+              var el = document.querySelector(id);
+              if (el) {
+                e.preventDefault();
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true });
+              }
+            }
+          } catch (_) {}
+        });
+      });
+    })();
   </script>
 </body>
 </html>
