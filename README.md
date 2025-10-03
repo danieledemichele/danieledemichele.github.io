@@ -193,5 +193,20 @@ furnished to do so, subject to the following conditions:
 ...
 ```
 (incolla il testo MIT completo)
+---
 
-Happy building! 🎉
+## 🙌 Credits
+
+- **Bootstrap 5.3** e **Bootstrap Icons** via CDN.  
+- Design e sviluppo: **Daniele De Michele**.  
+- Assistenza tecnica e A11y review: ChatGPT.
+
+---
+
+## 📬 Contatti
+
+- LinkedIn: https://www.linkedin.com/in/username  
+- GitHub: https://github.com/username  
+- Email: daniele@danieledemichele.it
+
+---
