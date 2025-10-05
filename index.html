@@ -130,10 +130,20 @@
     }   
 
     /* Mobile */
-    @media (max-width: 575.98px){
-      .avatar-wrap{ left:50%; transform:translateX(-50%); top: 208px; }
-      .cover{ height: 220px; }
-    }
+
+    /* ===== Mobile (≤575.98px): avatar a SINISTRA, no overlapping ===== */
+      @media (max-width: 575.98px){
+        .cover{ height: 220px; }
+
+    /* avatar: niente centramento, resta a sinistra */
+      .avatar-wrap{
+      left: 24px;
+      top: 210px;              /* regola fine se serve: 200–220 */
+      transform: none;
+      width: 100px;            /* leggermente più piccolo del desktop */
+      height: 100px;
+      z-index: 5;              /* sopra la cover */
+      }
   </style>
 </head>
 <body>
