@@ -129,11 +129,6 @@
       line-height: 1.4;
     }   
 
-<<<<<<< HEAD
-    /* Mobile */
-
-=======
->>>>>>> 7a70dc7 (Added modify code mobile)
     /* ===== Mobile (≤575.98px): avatar a SINISTRA, no overlapping ===== */
       @media (max-width: 575.98px){
         .cover{ height: 220px; }
@@ -146,9 +141,6 @@
       width: 100px;            /* leggermente più piccolo del desktop */
       height: 100px;
       z-index: 5;              /* sopra la cover */
-<<<<<<< HEAD
-      }
-=======
     }
     
   /* spingi giù il titolo per non farlo coprire dall'avatar */
@@ -156,7 +148,6 @@
     padding-top: calc(var(--content-pad) + 60px);
   }
 }
->>>>>>> 7a70dc7 (Added modify code mobile)
   </style>
 </head>
 <body>
@@ -195,7 +186,7 @@
                    href="https://x.com/dd3my" target="_blank" rel="noopener"
                    aria-label="Apri il mio profilo su X (Twitter)">
                   <div class="me-3">
-                    <div><i class="bi bi-twitter-x me-2" aria-hidden="true"></i>X (Twitter)</div>
+                    <div><i class="bi bi-twitter-x me-2" aria-hidden="true"></i> Twitter </div>
                     <small>Seguimi su X</small>
                   </div>
                   <span class="badge rounded-pill badge-soft text-dark" data-followers=""></span>
@@ -203,7 +194,7 @@
               </li>
               <li>
                 <a class="dropdown-item d-flex align-items-start justify-content-between"
-                   href="https://github.com/username" target="_blank" rel="noopener"
+                   href="https://github.com/danieledemichele" target="_blank" rel="noopener"
                    aria-label="Apri il mio profilo GitHub">
                   <div class="me-3">
                     <div><i class="bi bi-github me-2" aria-hidden="true"></i>GitHub</div>
@@ -245,10 +236,11 @@
             </div>
           </div>
 
-          <header class="p-4 pt-5">
-            <h1 class="h4 mb-1">I'm Daniele De Michele</h1>
-            <p class="muted mb-3">Product/Knowledge Designer — Minimalismo, usabilità e sistemi informativi.</p>
-            <p class="mb-0 small muted">Automazioni Notion, portfolio docenze, ricerca su FRCM / AM (LPBF).</p>
+          <header class="px-4 pt-5 pb-1">
+            <h1 class="h4 mb-1">Daniele De Michele</h1>
+            <p class="mb-0 small muted">Cagliari, Sardinia - Italy</p>
+            <p class="muted mb-3">A metà tra ingegneria e informatica. Product/Knowledge Designer nel tempo libero. Membro ufficiale della comunità Ubuntu e Ubuntu-it.</p>
+
           </header>
 
           <!-- HR allineata al testo -->
@@ -261,9 +253,10 @@
                 <div class="neo-card p-3" aria-labelledby="attivita-recente">
                   <div id="attivita-recente" class="small muted">Attività recente</div>
                   <ul class="mt-2 mb-0">
-                    <li>Refactor template Notion “Registro Lezioni”.</li>
-                    <li>Analisi curve forza-scorrimento su FRCM.</li>
-                    <li>Bozza capitolo “Corrosione 316L in LPBF”.</li>
+                    <li>Insegnante di Matematica e Fisica in scuola privata</li>
+                    <li>Tutor di Scienza delle Costruzioni at @Unica</li>
+                    <li>Studente in laurea magistrale - Strutture</li>
+                    <li>Ubuntu Member - supporto utenti e stesura newsletter</li>
                   </ul>
                 </div>
               </div>
@@ -271,9 +264,9 @@
                 <div class="neo-card p-3" aria-labelledby="stack-title">
                   <div id="stack-title" class="small muted">Stack</div>
                   <ul class="mt-2 mb-0">
-                    <li>Notion, Make, GitHub Pages</li>
-                    <li>Bootstrap 5, Markdown</li>
-                    <li>LaTeX per documenti tecnici</li>
+                    <li>Html, CSS, LaTeX</li>
+                    <li>Notion, GitHub Pages, Linux Shell</li>
+                    <li>Bootstrap 5, Markdown and more</li>
                   </ul>
                 </div>
               </div>
@@ -291,15 +284,13 @@
       <!-- DESTRA -->
       <div class="col-12 col-lg-6">
         <section class="neo-card p-4 p-md-5" aria-labelledby="intro-title">
-          <h2 id="intro-title" class="h5 mb-3">Ciao, sono Daniele</h2>
+          <h2 id="intro-title" class="h5 mb-3">Progetti principali</h2>
           <p class="muted">
-            Ingegneria, didattica e design dei sistemi informativi. Qui trovi una selezione dei miei lavori e
-            progetti personali. Il sito è volutamente essenziale: poche distrazioni, focus sui contenuti.
+            Unisco ingegneria, informazione e design di processo: trasformo problemi reali (lezioni, presenze, ricerca, booking) in strumenti concreti. 
+            Ogni progetto ha un obiettivo chiaro, uno stack minimo e qualcosa da scaricare/ clonare. Qui sotto trovi i progetti che mantengo e aggiorno.
           </p>
 
           <hr class="my-4" aria-hidden="true">
-
-          <h3 class="h6 text-uppercase mb-3" id="progetti-title">Progetti principali</h3>
 
           <dl class="mb-4" aria-labelledby="progetti-title">
             <dt class="d-flex align-items-start mb-1">
