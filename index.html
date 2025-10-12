@@ -123,7 +123,6 @@
     /* nessuna regola width/max-width/margins qui */
     }
 
-
      /* Footer: stessa larghezza delle card sopra */
     .footer-compact .neo-card .small{
       line-height: 1.4;
@@ -143,11 +142,43 @@
       z-index: 5;              /* sopra la cover */
     }
     
-  /* spingi giù il titolo per non farlo coprire dall'avatar */
-  .profile-card header{
-    padding-top: calc(var(--content-pad) + 60px);
+    /* spingi giù il titolo per non farlo coprire dall'avatar */
+      .profile-card header{
+      padding-top: calc(var(--content-pad) + 60px);
+    }
+
+    /* Card destra: mantieni p-4/p-md-5, riduci SOLO il padding-bottom */
+      .right-card-tight{ padding-bottom: .75rem !important; }
+      @media (min-width: 768px){
+        .right-card-tight{ padding-bottom: 1rem !important; }
+    }
+
+    /* Evita spazio "fantasma": l'ultimo figlio non aggiunge margine extra */
+      .right-card-tight > *:last-child{ margin-bottom: 0 !important; }
+
+    /* Àncore senza spessore (non gonfiano la card) */
+      .anchor{ display:block; height:0; margin:0; padding:0; }
+    }
+
+    /* Card destra: stesse spaziature laterali della sinistra */
+      .right-card-tight{
+    /* mantieni la riduzione di spazio in basso che avevamo già */
+      padding-bottom: .75rem !important;
+    /* uniforma i lati al valore della sinistra */
+      padding-left:  var(--content-pad) !important;  /* = 1.5rem */
+      padding-right: var(--content-pad) !important;
+    }
+    @media (min-width: 768px){
+    .right-card-tight{
+      padding-bottom: 1rem !important;
+      padding-left:  var(--content-pad) !important;
+      padding-right: var(--content-pad) !important;
+    }
+
+    /* le card principali occupano tutta l'altezza disponibile della colonna */
+    .profile-card,
+    .right-card-tight{ min-height: 100%; }
   }
-}
   </style>
 </head>
 <body>
@@ -155,10 +186,10 @@
   <a href="#main-content" class="sr-only sr-only-focusable">Salta al contenuto principale</a>
 
   <main id="main-content" class="container py-5" role="main">
-    <div class="row g-4 align-items-start">
+    <div class="row g-4 align-items-stretch">
       <!-- SINISTRA -->
-      <div class="col-12 col-lg-6">
-        <section class="neo-card profile-card" role="banner" aria-label="Profilo">
+      <div class="col-12 col-lg-6 d-flex">
+        <section class="neo-card profile-card w-100 h-100" role="banner" aria-label="Profilo">
           <!-- Dropdown Social -->
           <div class="dropdown">
             <button class="float-btn btn btn-sm dropdown-toggle"
@@ -270,20 +301,14 @@
                   </ul>
                 </div>
               </div>
-              <div class="col-12">
-                <div class="neo-card p-3" aria-label="Note addizionali">
-                  <div class="small muted">Note</div>
-                  <p class="mb-0">Spazio per aggiornamenti veloci o link rapidi (modificabile o removibile).</p>
-                </div>
-              </div>
             </div>
           </div>
         </section>
       </div>
 
       <!-- DESTRA -->
-      <div class="col-12 col-lg-6">
-        <section class="neo-card p-4 p-md-5 right-card-tight" aria-labelledby="intro-title">
+      <div class="col-12 col-lg-6 d-flex">
+        <section class="neo-card p-4 p-md-5 right-card-tight w-100 h-100" aria-labelledby="intro-title">
           <h2 id="intro-title" class="h5 mb-3">Progetti principali</h2>
           <p class="muted">
             Unisco ingegneria, informazione e design di processo: trasformo problemi reali (lezioni, presenze, ricerca, booking) in strumenti concreti. 
@@ -297,7 +322,7 @@
               <i class="bi bi-kanban-fill me-3 fs-5" aria-hidden="true"></i>
               <a class="fw-semibold text-decoration-none" href="https://danieledemichele.notion.site/Prenota-una-Ripetizione-2692578e0629800c8951c0d60227ac98">Prenota un appuntamento!</a>
             </dt>
-            <dd class="small muted ms-5">Prenota in un solo click: scegli lo slot e blocca la tua lezione.</dd>
+            <dd class="small muted ms-5">Prenota in un solo click: scegli lo slot con Calendly e blocca la tua lezione.</dd>
 
             <dt class="d-flex align-items-start mb-1">
               <i class="bi bi-journal-text me-3 fs-5" aria-hidden="true"></i>
@@ -315,29 +340,28 @@
               <i class="bi bi-collection-play-fill me-3 fs-5" aria-hidden="true"></i>
               <a class="fw-semibold text-decoration-none" href="#progetto-dashboard">Dashboard tutor &amp; booking</a>
             </dt>
-            <dd class="small muted ms-5">Gestione lezioni, pacchetti, pagamenti; Notion/Calendly.</dd>
+            <dd class="small muted ms-5">Gestione lezioni, pacchetti, pagamenti; Notion/.</dd>
 
             <dt class="d-flex align-items-start mb-1">
               <i class="bi bi-collection-play-fill me-3 fs-5" aria-hidden="true"></i>
               <a class="fw-semibold text-decoration-none" href="#progetto-dashboard">Dashboard tutor &amp; booking</a>
             </dt>
             <dd class="small muted ms-5">Gestione lezioni, pacchetti, pagamenti; Notion/Calendly.</dd>
-
-            <dt class="d-flex align-items-start mb-1">
-              <i class="bi bi-collection-play-fill me-3 fs-5" aria-hidden="true"></i>
-              <a class="fw-semibold text-decoration-none" href="#progetto-dashboard">Dashboard tutor &amp; booking</a>
-            </dt>
-            <dd class="small muted ms-5">Gestione lezioni, pacchetti, pagamenti; Notion/Calendly.</dd>
-          </dl>
 
           <hr class="my-4" aria-hidden="true">
 
-          <!-- Ancore -->
-          <section id="progetto-notion" class="pt-4" aria-label="Dettagli: Sistema presenze su Notion"></section>
-          <section id="progetto-frcm" class="pt-4" aria-label="Dettagli: Tesi FRCM"></section>
-          <section id="progetto-am" class="pt-4" aria-label="Dettagli: AM LPBF 316L"></section>
-          <section id="progetto-dashboard" class="pt-4" aria-label="Dettagli: Dashboard tutor & booking"></section>
-        </section>
+          <div class="col-12">
+            <div class="neo-card p-3" aria-label="Note addizionali">
+              <div class="small muted">Note</div>
+              <p class="mb-0">Spazio per aggiornamenti veloci o link rapidi (modificabile o removibile).</p>
+            </div>
+          </div>
+
+          <!-- Ancore piatte (non aggiungono spazio) -->
+          <span id="progetto-notion"    class="anchor" aria-hidden="true"></span>
+          <span id="progetto-frcm"      class="anchor" aria-hidden="true"></span>
+          <span id="progetto-am"        class="anchor" aria-hidden="true"></span>
+          <span id="progetto-dashboard" class="anchor" aria-hidden="true"></span>
       </div>
     </div>
 
