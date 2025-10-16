@@ -128,19 +128,35 @@
       line-height: 1.4;
     }   
 
-    /* ===== Mobile (≤575.98px): avatar a SINISTRA, no overlapping ===== */
-      @media (max-width: 575.98px){
-        .cover{ height: 220px; }
-
-    /* avatar: niente centramento, resta a sinistra */
-      .avatar-wrap{
-      left: 24px;
-      top: 210px;              /* regola fine se serve: 200–220 */
-      transform: none;
-      width: 100px;            /* leggermente più piccolo del desktop */
-      height: 100px;
-      z-index: 5;              /* sopra la cover */
+    /* ===== Mobile (≤575.98px): avatar non invade il testo ===== */
+    @media (max-width: 575.98px){
+    /* Parametri regolabili */
+    :root{
+      --cover-h-mobile: 220px;      /* altezza cover su mobile */
+      --avatar-size-mobile: 104px;  /* dimensione avatar su mobile */
+      --avatar-dip: 36px;           /* QUANTO l'avatar scende sotto la cover (30–44px) */
     }
+
+    .cover{ height: var(--cover-h-mobile); }
+
+    /* Avatar: resta a sinistra, niente centramento */
+    .avatar-wrap{
+      left: 24px;
+      transform: none;
+      width: var(--avatar-size-mobile);
+      height: var(--avatar-size-mobile);
+    /* posizione verticale: top della card = bordo superiore card.
+     Mettiamo l'avatar "appoggiato" alla cover e lo facciamo scendere di --avatar-dip */
+      top: calc(var(--cover-h-mobile) - var(--avatar-dip));
+      z-index: 5;
+    }
+
+    /* Header: pad in alto = quanto l'avatar sporge dentro il testo + un piccolo gap */
+      .profile-card header{
+    /* porzione dell'avatar che entra nel header = avatar_size - avatar_dip */
+      padding-top: calc(var(--content-pad) + (var(--avatar-size-mobile) - var(--avatar-dip)) + 8px);
+    }
+  }
     
     /* spingi giù il titolo per non farlo coprire dall'avatar */
       .profile-card header{
@@ -311,8 +327,8 @@
         <section class="neo-card p-4 p-md-5 right-card-tight w-100 h-100" aria-labelledby="intro-title">
           <h2 id="intro-title" class="h5 mb-3">Progetti principali</h2>
           <p class="muted">
-            Unisco ingegneria, informazione e design di processo: trasformo problemi reali (lezioni, presenze, ricerca, booking) in strumenti concreti. 
-            Ogni progetto ha un obiettivo chiaro, uno stack minimo e qualcosa da scaricare/ clonare. Qui sotto trovi i progetti che mantengo e aggiorno.
+            Unisco ingegneria, informatica, design e informazione per trasformare problemi reali (lezioni, ricerca, booking) in supporto e strumenti concreti. 
+            Ogni progetto ha un obiettivo chiaro, uno stack minimo e qualcosa da scaricare/clonare. Qui sotto trovi i progetti che mantengo e aggiorno.
           </p>
 
           <hr class="my-4" aria-hidden="true">
@@ -322,7 +338,7 @@
               <i class="bi bi-kanban-fill me-3 fs-5" aria-hidden="true"></i>
               <a class="fw-semibold text-decoration-none" href="https://danieledemichele.notion.site/Prenota-una-Ripetizione-2692578e0629800c8951c0d60227ac98">Prenota un appuntamento!</a>
             </dt>
-            <dd class="small muted ms-5">Prenota in un solo click: scegli lo slot con Calendly e blocca la tua lezione.</dd>
+            <dd class="small muted ms-5">Prenota in un solo click: scegli lo slot con Calendly e blocca la tua lezione personale.</dd>
 
             <dt class="d-flex align-items-start mb-1">
               <i class="bi bi-journal-text me-3 fs-5" aria-hidden="true"></i>
@@ -332,7 +348,7 @@
 
             <dt class="d-flex align-items-start mb-1">
               <i class="bi bi-cpu-fill me-3 fs-5" aria-hidden="true"></i>
-              <a class="fw-semibold text-decoration-none" href="#progetto-am">Percorso di laurea triennale</a>
+              <a class="fw-semibold text-decoration-none" href="https://danieledemichele.notion.site/Ingegneria-Civile-Laurea-Triennale-2762578e062980ea9080dce0fea3d63c">Percorso di laurea triennale</a>
             </dt>
             <dd class="small muted ms-5">Base operativa per gli esami della triennale: appunti, libri, riassunti e risorse verificate.</dd>
 
