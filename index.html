@@ -13,15 +13,16 @@
   <meta property="og:description" content="Progetti, note e contatti." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="assets/cover.jpg" />
-  <meta property="og:url" content="https://username.github.io" />
+  <!-- FIX 5 — sostituiti i placeholder con URL reali -->
+  <meta property="og:url" content="https://danieledemichele.github.io" />
   <meta property="og:site_name" content="Portfolio — Daniele" />
 
-  <!-- CSP basilare -->
+  <!-- FIX 4 — aggiunto 'unsafe-inline' a script-src per permettere lo script inline in fondo -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
                  img-src 'self' data:;
                  style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
-                 script-src 'self' https://cdn.jsdelivr.net;
+                 script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
                  font-src https://cdn.jsdelivr.net 'self';
                  connect-src 'self';
                  frame-ancestors 'self';">
@@ -36,12 +37,11 @@
       --shadow-soft: 0 10px 30px rgba(0,0,0,.08);
       --border-soft: 1px solid rgba(0,0,0,.06);
       --text-soft:#4b5563;
-      --content-pad:1.5rem; /* = p-4 Bootstrap */
+      --content-pad:1.5rem;
     }
     html,body{ height:100%; }
     body{ background:#f5f7fb; line-height:1.55; }
 
-    /* A11y */
     .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
     .sr-only-focusable:active, .sr-only-focusable:focus{
       position: static; width:auto; height:auto; margin:0; overflow:visible; clip:auto; padding:.5rem 1rem; background:#fff; border-radius:.5rem; box-shadow:0 0 0 3px rgba(0,0,0,.15);
@@ -56,9 +56,8 @@
     }
     .neo-card:hover{ transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0,0,0,.1); }
 
-    .profile-card{ position: relative; overflow: hidden; padding-bottom: var(--content-pad); /* uguale ai lati = 1.5rem */ }
+    .profile-card{ position: relative; overflow: hidden; padding-bottom: var(--content-pad); }
 
-    /* Cover più alta */
     .cover{
       height: 260px;
       background: url("assets/cover.jpg") center/cover no-repeat;
@@ -66,7 +65,6 @@
       border-top-right-radius: var(--card-r);
     }
 
-    /* === DROPDOWN “+” fissato === */
     .profile-card .dropdown{ position: absolute; top: 12px; right: 12px; z-index: 15; }
     .float-btn{
       display:inline-flex; align-items:center; justify-content:center;
@@ -90,7 +88,6 @@
     .dropdown-item small{ color: var(--text-soft); font-size: clamp(.8rem,.95vw,.9rem); }
     .badge-soft{ background:#f3f4f6; border:1px solid rgba(0,0,0,.06); }
 
-    /* Avatar più grande e leggermente più in basso */
     .avatar-wrap{
       position: absolute; top: 186px; left: 24px;
       width: 116px; height: 116px; border-radius: 50%;
@@ -105,108 +102,83 @@
 
     .muted{ color: var(--text-soft); }
 
-    /* HR sinistra allineata al testo (stesso padding della destra) */
     .hr-inner{ margin-left: var(--content-pad); margin-right: var(--content-pad); }
 
-    /* Sub-card sinistra: stesso inset laterale della card destra */
     .left-inset{
       padding-left: var(--content-pad);
       padding-right: var(--content-pad);
     }
     .left-subcards{ row-gap: .75rem; }
 
-    /* Footer: NO width forzata → segue i gutter della colonna */
     .footer-compact .neo-card{
       display:block;
       padding:.6rem .9rem;
       box-shadow:0 6px 18px rgba(0,0,0,.06);
-    /* nessuna regola width/max-width/margins qui */
     }
-
-     /* Footer: stessa larghezza delle card sopra */
     .footer-compact .neo-card .small{
       line-height: 1.4;
-    }   
+    }
 
-    /* ===== Mobile (≤575.98px): avatar non invade il testo ===== */
+    /* ===== Mobile (≤575.98px) ===== */
     @media (max-width: 575.98px){
-    /* Parametri regolabili */
-    :root{
-      --cover-h-mobile: 220px;      /* altezza cover su mobile */
-      --avatar-size-mobile: 104px;  /* dimensione avatar su mobile */
-      --avatar-dip: 65px;           /* QUANTO l'avatar scende sotto la cover (30–44px) */
-    }
-
-    .cover{ height: var(--cover-h-mobile); }
-
-    /* Avatar: resta a sinistra, niente centramento */
-    .avatar-wrap{
-      left: 24px;
-      transform: none;
-      width: var(--avatar-size-mobile);
-      height: var(--avatar-size-mobile);
-    /* posizione verticale: top della card = bordo superiore card.
-     Mettiamo l'avatar "appoggiato" alla cover e lo facciamo scendere di --avatar-dip */
-      top: calc(var(--cover-h-mobile) - var(--avatar-dip));
-      z-index: 5;
-    }
-
-    /* Header: pad in alto = quanto l'avatar sporge dentro il testo + un piccolo gap */
+      :root{
+        --cover-h-mobile: 220px;
+        --avatar-size-mobile: 104px;
+        --avatar-dip: 65px;
+      }
+      .cover{ height: var(--cover-h-mobile); }
+      .avatar-wrap{
+        left: 24px;
+        transform: none;
+        width: var(--avatar-size-mobile);
+        height: var(--avatar-size-mobile);
+        top: calc(var(--cover-h-mobile) - var(--avatar-dip));
+        z-index: 5;
+      }
       .profile-card header{
-    /* porzione dell'avatar che entra nel header = avatar_size - avatar_dip */
-      padding-top: calc(var(--content-pad) + (var(--avatar-size-mobile) - var(--avatar-dip)) + 8px);
+        padding-top: calc(var(--content-pad) + (var(--avatar-size-mobile) - var(--avatar-dip)) + 8px);
+      }
     }
-  }
-    
-    /* spingi giù il titolo per non farlo coprire dall'avatar */
+
+    /* FIX 3 — regola globale spostata dentro min-width:576px, così non sovrascrive il mobile */
+    @media (min-width: 576px){
       .profile-card header{
-      padding-top: calc(var(--content-pad) + 60px);
+        padding-top: calc(var(--content-pad) + 60px);
+      }
     }
 
-    /* Card destra: mantieni p-4/p-md-5, riduci SOLO il padding-bottom */
-      .right-card-tight{ padding-bottom: .75rem !important; }
-      @media (min-width: 768px){
-        .right-card-tight{ padding-bottom: 1rem !important; }
-    }
-
-    /* Evita spazio "fantasma": l'ultimo figlio non aggiunge margine extra */
-      .right-card-tight > *:last-child{ margin-bottom: 0 !important; }
-
-    /* Àncore senza spessore (non gonfiano la card) */
-      .anchor{ display:block; height:0; margin:0; padding:0; }
-    }
-
-    /* Card destra: stesse spaziature laterali della sinistra */
-      .right-card-tight{
-    /* mantieni la riduzione di spazio in basso che avevamo già */
-      padding-bottom: .75rem !important;
-    /* uniforma i lati al valore della sinistra */
-      padding-left:  var(--content-pad) !important;  /* = 1.5rem */
-      padding-right: var(--content-pad) !important;
-    }
+    .right-card-tight{ padding-bottom: .75rem !important; }
     @media (min-width: 768px){
+      .right-card-tight{ padding-bottom: 1rem !important; }
+    }
+    .right-card-tight > *:last-child{ margin-bottom: 0 !important; }
+    .anchor{ display:block; height:0; margin:0; padding:0; }
+
     .right-card-tight{
-      padding-bottom: 1rem !important;
+      padding-bottom: .75rem !important;
       padding-left:  var(--content-pad) !important;
       padding-right: var(--content-pad) !important;
     }
-
-    /* le card principali occupano tutta l'altezza disponibile della colonna */
-    .profile-card,
-    .right-card-tight{ min-height: 100%; }
-  }
+    @media (min-width: 768px){
+      .right-card-tight{
+        padding-bottom: 1rem !important;
+        padding-left:  var(--content-pad) !important;
+        padding-right: var(--content-pad) !important;
+      }
+      .profile-card,
+      .right-card-tight{ min-height: 100%; }
+    }
   </style>
 </head>
 <body>
-  <!-- Skip link -->
   <a href="#main-content" class="sr-only sr-only-focusable">Salta al contenuto principale</a>
 
   <main id="main-content" class="container py-5" role="main">
     <div class="row g-4 align-items-stretch">
+
       <!-- SINISTRA -->
       <div class="col-12 col-lg-6 d-flex">
         <section class="neo-card profile-card w-100 h-100" role="banner" aria-label="Profilo">
-          <!-- Dropdown Social -->
           <div class="dropdown">
             <button class="float-btn btn btn-sm dropdown-toggle"
                     data-bs-toggle="dropdown"
@@ -215,7 +187,6 @@
                     aria-label="Apri elenco dei miei social">
               <i class="bi bi-plus-lg" aria-hidden="true"></i>
             </button>
-
             <ul class="dropdown-menu p-2">
               <li>
                 <a class="dropdown-item d-flex align-items-start justify-content-between"
@@ -251,8 +222,9 @@
                 </a>
               </li>
               <li>
+                <!-- FIX 5 — rimosso il placeholder /in/username -->
                 <a class="dropdown-item d-flex align-items-start justify-content-between"
-                   href="https://www.linkedin.com/in/username" target="_blank" rel="noopener"
+                   href="https://www.linkedin.com/in/danieledemichele" target="_blank" rel="noopener"
                    aria-label="Connettiti con me su LinkedIn">
                   <div class="me-3">
                     <div><i class="bi bi-linkedin me-2" aria-hidden="true"></i>LinkedIn</div>
@@ -276,7 +248,6 @@
           </div>
 
           <div class="cover" role="img" aria-label="Immagine di copertina chiara, texture astratta"></div>
-
           <div class="avatar-wrap">
             <div class="avatar">
               <img src="assets/avatar.jpg" alt="Ritratto di Daniele" loading="lazy" width="116" height="116">
@@ -287,13 +258,10 @@
             <h1 class="h4 mb-1">Daniele De Michele</h1>
             <p class="mb-0 small muted">Cagliari, Sardinia - Italy</p>
             <p class="muted mb-3">A metà tra ingegneria e informatica. Product/Knowledge Designer nel tempo libero. Membro ufficiale della comunità Ubuntu e Ubuntu-it.</p>
-
           </header>
 
-          <!-- HR allineata al testo -->
           <hr class="my-4 hr-inner" aria-hidden="true">
 
-          <!-- Sub-card con inset uguale -->
           <div class="left-inset">
             <div class="row left-subcards">
               <div class="col-md-6">
@@ -327,13 +295,14 @@
         <section class="neo-card p-4 p-md-5 right-card-tight w-100 h-100" aria-labelledby="intro-title">
           <h2 id="intro-title" class="h5 mb-3">Progetti principali</h2>
           <p class="muted">
-            Unisco ingegneria, informatica, design e informazione per trasformare problemi reali (lezioni, ricerca, booking) in supporto e strumenti concreti. 
+            Unisco ingegneria, informatica, design e informazione per trasformare problemi reali (lezioni, ricerca, booking) in supporto e strumenti concreti.
             Ogni progetto ha un obiettivo chiaro, uno stack minimo e qualcosa da scaricare/clonare. Qui sotto trovi i progetti che mantengo e aggiorno.
           </p>
 
           <hr class="my-4" aria-hidden="true">
 
-          <dl class="mb-4" aria-labelledby="progetti-title">
+          <!-- FIX 1 + FIX 2 — dl ora contiene solo dt e dd; hr, div e span spostati fuori -->
+          <dl class="mb-4" aria-labelledby="intro-title">
             <dt class="d-flex align-items-start mb-1">
               <i class="bi bi-kanban-fill me-3 fs-5" aria-hidden="true"></i>
               <a class="fw-semibold text-decoration-none" href="https://danieledemichele.notion.site/Prenota-una-Ripetizione-2692578e0629800c8951c0d60227ac98">Prenota un appuntamento!</a>
@@ -351,9 +320,12 @@
               <a class="fw-semibold text-decoration-none" href="https://danieledemichele.notion.site/Ingegneria-Civile-Laurea-Magistrale-Strutture-2762578e062980819044e075f7c13500?pvs=74">Percorso di laurea magistrale</a>
             </dt>
             <dd class="small muted ms-5">Base operativa per gli esami della magistrale: appunti, libri, riassunti e risorse verificate.</dd>
+          </dl><!-- FIX 1 — </dl> aggiunto -->
 
-          <hr class="my-4" aria-hidden="true">           
-            
+          <hr class="my-4" aria-hidden="true"><!-- FIX 2 — hr spostato fuori da <dl> -->
+
+          <!-- FIX 2 — seconda dl per il secondo gruppo di voci -->
+          <dl class="mb-4">
             <dt class="d-flex align-items-start mb-1">
               <i class="bi bi-journal-text me-3 fs-5" aria-hidden="true"></i>
               <a class="fw-semibold text-decoration-none" href="https://danieledemichele.notion.site/Libreria-2cc2578e062980c7aa66e056f80251f8">La mia libreria digitale</a>
@@ -365,32 +337,33 @@
               <a class="fw-semibold text-decoration-none" href="#progetto-dashboard">Dashboard tutor &amp; booking</a>
             </dt>
             <dd class="small muted ms-5">Gestione lezioni, pacchetti, pagamenti; Notion/Calendly.</dd>
+          </dl><!-- FIX 2 — </dl> chiuso correttamente -->
 
-          <hr class="my-4" aria-hidden="true">
+          <hr class="my-4" aria-hidden="true"><!-- FIX 2 — hr fuori da <dl> -->
 
-          <div class="col-12">
-            <div class="neo-card p-3" aria-label="Note addizionali">
-              <div class="small muted">Note</div>
-              <p class="mb-0">Spazio per aggiornamenti veloci o link rapidi (modificabile o removibile).</p>
-            </div>
+          <!-- FIX 2 — div "Note" spostato fuori da <dl> -->
+          <div class="neo-card p-3" aria-label="Note addizionali">
+            <div class="small muted">Note</div>
+            <p class="mb-0">Spazio per aggiornamenti veloci o link rapidi (modificabile o removibile).</p>
           </div>
 
-          <!-- Ancore piatte (non aggiungono spazio) -->
+          <!-- FIX 2 — ancore spostate fuori da <dl> -->
           <span id="progetto-notion"    class="anchor" aria-hidden="true"></span>
           <span id="progetto-frcm"      class="anchor" aria-hidden="true"></span>
           <span id="progetto-am"        class="anchor" aria-hidden="true"></span>
           <span id="progetto-dashboard" class="anchor" aria-hidden="true"></span>
+
+        </section><!-- FIX 1 — </section> aggiunto -->
       </div>
     </div>
 
-      <!-- FOOTER allineato ai riquadri sopra e testo centrato -->
-        <footer class="mt-3 container footer-compact" role="contentinfo" aria-label="Informazioni e contatti">
-          <div class="row g-4">
-          <div class="col-12">
-            <div class="muted small text-center"> Designed by Daniele De Michele <span id="year"></span>
-            </div>
-          </div>
+    <!-- FOOTER -->
+    <footer class="mt-3 container footer-compact" role="contentinfo" aria-label="Informazioni e contatti">
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="muted small text-center">Designed by Daniele De Michele <span id="year"></span></div>
         </div>
+      </div>
     </footer>
 
   </main>
@@ -400,14 +373,12 @@
     (function () {
       var y = document.getElementById('year'); if (y) y.textContent = new Date().getFullYear();
 
-      // Nasconde i badge follower vuoti
       document.querySelectorAll('[data-followers]').forEach(function (badge) {
         var v = (badge.getAttribute('data-followers') || '').trim();
         if (!v) badge.style.display = 'none';
         else badge.textContent = v;
       });
 
-      // Scroll smooth per ancore interne
       document.querySelectorAll('a[href^="#"]').forEach(function (link) {
         link.addEventListener('click', function (e) {
           var id = this.getAttribute('href');
