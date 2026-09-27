@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiche e Andamenti - La Mia Libreria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbf8f3;
+            color: #2c2825;
+        }
+        .font-serif { font-family: 'Playfair Display', Georgia, serif; }
+
+        .report-section p + p { margin-top: 0.75rem; }
+        .report-section { scroll-margin-top: 5.5rem; }
+
+        .stat-card {
+            background: linear-gradient(180deg, #ffffff 0%, #fdfbf7 100%);
+            transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -12px rgba(154, 52, 18, 0.18);
+            border-color: rgba(154, 52, 18, 0.35);
+        }
+
+        .quicknav-link {
+            transition: color .15s ease, background-color .15s ease, border-color .15s ease;
+        }
+        .quicknav-link.active {
+            background-color: #9a3412;
+            color: #fff;
+            border-color: #9a3412;
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: #f5f2ec; }
+        ::-webkit-scrollbar-thumb { background: #d6cfc2; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c2b8a5; }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <header class="sticky top-0 z-40 bg-[#fbf8f3]/90 backdrop-blur-sm border-b border-stone-200/80">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+            <a href="index.html" class="flex items-center gap-2 text-xs font-semibold text-stone-500 hover:text-[#9a3412] transition-colors shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Torna alla libreria
+            </a>
+
+            <!-- Quick-nav: pillole per saltare direttamente a una sezione -->
+            <nav id="quickNav" class="hidden md:flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <a href="#sec-andamento" class="quicknav-link text-[11px] font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-500 hover:text-[#9a3412] hover:border-[#9a3412]/40 whitespace-nowrap">Andamento</a>
+                <a href="#sec-tipo" class="quicknav-link text-[11px] font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-500 hover:text-[#9a3412] hover:border-[#9a3412]/40 whitespace-nowrap">Tipologie</a>
+                <a href="#sec-categorie" class="quicknav-link text-[11px] font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-500 hover:text-[#9a3412] hover:border-[#9a3412]/40 whitespace-nowrap">Categorie</a>
+                <a href="#sec-autori" class="quicknav-link text-[11px] font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-500 hover:text-[#9a3412] hover:border-[#9a3412]/40 whitespace-nowrap">Autori</a>
+                <a href="#sec-abbonamenti" class="quicknav-link text-[11px] font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-500 hover:text-[#9a3412] hover:border-[#9a3412]/40 whitespace-nowrap">Abbonamenti</a>
+                <a href="#sec-stato-libri" class="quicknav-link text-[11px] font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-500 hover:text-[#9a3412] hover:border-[#9a3412]/40 whitespace-nowrap">Libri</a>
+            </nav>
+
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-stone-400 shrink-0">Report</span>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+
+        <div>
+            <h1 class="text-3xl sm:text-4xl font-serif font-bold text-stone-900">Statistiche e Andamenti</h1>
+            <p id="reportIntro" class="text-sm text-stone-500 mt-2 max-w-2xl leading-relaxed">Caricamento dei dati in corso...</p>
+        </div>
+
+        <div id="statsLoading" class="text-sm text-stone-400 py-20 text-center">Preparo il report...</div>
+
+        <div id="statsContent" class="hidden space-y-6">
+
+            <!-- Riepilogo numerico rapido -->
+            <div id="statCardsRow" class="grid grid-cols-2 sm:grid-cols-4 gap-4"></div>
+
+            <!-- Layout a griglia (invece di 6 sezioni impilate a piena larghezza,
+                 una per una): raggruppa le sezioni correlate fianco a fianco,
+                 così l'occhio le confronta senza dover scorrere a lungo tra
+                 contenuti sparsi. Ogni scheda è autosufficiente: titolo, grafico
+                 e nota interpretativa, impilati verticalmente al suo interno. -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2">
+
+                <!-- SEZIONE 1: ANDAMENTO NEL TEMPO -->
+                <section id="sec-andamento" class="report-section">
+                    <div class="h-full flex flex-col bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-2xs">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-[#9a3412]"></span>
+                            <h2 class="text-lg font-serif font-bold text-stone-900">Andamento nel tempo</h2>
+                        </div>
+                        <p class="text-xs text-stone-500 mb-4">Articoli letti e libri completati, anno per anno.</p>
+
+                        <div style="position:relative; height:250px;">
+                            <canvas id="chartAndamento"></canvas>
+                        </div>
+                        <div id="narrativeAndamento" class="mt-4 text-sm text-stone-700 leading-relaxed"></div>
+                    </div>
+                </section>
+
+                <!-- SEZIONE 2: DISTRIBUZIONE PER TIPO -->
+                <section id="sec-tipo" class="report-section">
+                    <div class="h-full flex flex-col bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-2xs">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-[#9a3412]"></span>
+                            <h2 class="text-lg font-serif font-bold text-stone-900">Distribuzione per tipo</h2>
+                        </div>
+                        <p class="text-xs text-stone-500 mb-4">Come si suddividono i contenuti della tua libreria.</p>
+
+                        <div style="position:relative; height:250px;">
+                            <canvas id="chartTipo"></canvas>
+                        </div>
+                        <div id="narrativeTipo" class="mt-4 text-sm text-stone-700 leading-relaxed"></div>
+                    </div>
+                </section>
+
+                <!-- SEZIONE 3: CATEGORIE PIÙ LETTE -->
+                <section id="sec-categorie" class="report-section">
+                    <div class="h-full flex flex-col bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-2xs">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-[#9a3412]"></span>
+                            <h2 class="text-lg font-serif font-bold text-stone-900">Categorie più lette</h2>
+                        </div>
+                        <p class="text-xs text-stone-500 mb-4">I generi e gli argomenti che tornano più spesso tra articoli, libri e testi universitari.</p>
+
+                        <div style="position:relative; height:280px;">
+                            <canvas id="chartCategorie"></canvas>
+                        </div>
+                        <div id="narrativeCategorie" class="mt-4 text-sm text-stone-700 leading-relaxed"></div>
+                    </div>
+                </section>
+
+                <!-- SEZIONE 4: AUTORI PIÙ LETTI -->
+                <section id="sec-autori" class="report-section">
+                    <div class="h-full flex flex-col bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-2xs">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-[#9a3412]"></span>
+                            <h2 class="text-lg font-serif font-bold text-stone-900">Autori più letti</h2>
+                        </div>
+                        <p class="text-xs text-stone-500 mb-4">Chi ricorre di più tra i tuoi articoli e libri.</p>
+
+                        <div style="position:relative; height:280px;">
+                            <canvas id="chartAutori"></canvas>
+                        </div>
+                        <div id="narrativeAutori" class="mt-4 text-sm text-stone-700 leading-relaxed"></div>
+                    </div>
+                </section>
+
+                <!-- SEZIONE 5: RIVISTE IN ABBONAMENTO -->
+                <section id="sec-abbonamenti" class="report-section">
+                    <div class="h-full flex flex-col bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-2xs">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-[#9a3412]"></span>
+                            <h2 class="text-lg font-serif font-bold text-stone-900">Riviste in abbonamento</h2>
+                        </div>
+                        <p class="text-xs text-stone-500 mb-4">Numeri e articoli letti per ciascuna rivista abbonata.</p>
+
+                        <div style="position:relative; height:230px;">
+                            <canvas id="chartAbbonamenti"></canvas>
+                        </div>
+                        <div id="narrativeAbbonamenti" class="mt-4 text-sm text-stone-700 leading-relaxed"></div>
+                    </div>
+                </section>
+
+                <!-- SEZIONE 6: STATO DEI LIBRI -->
+                <section id="sec-stato-libri" class="report-section">
+                    <div class="h-full flex flex-col bg-white rounded-3xl border border-stone-200/90 p-5 sm:p-6 shadow-2xs">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-[#9a3412]"></span>
+                            <h2 class="text-lg font-serif font-bold text-stone-900">Stato dei libri</h2>
+                        </div>
+                        <p class="text-xs text-stone-500 mb-4">Quanti libri hai completato, quanti stai leggendo e quanti sono ancora da iniziare.</p>
+
+                        <div style="position:relative; height:230px;">
+                            <canvas id="chartStatoLibri"></canvas>
+                        </div>
+                        <div id="narrativeStatoLibri" class="mt-4 text-sm text-stone-700 leading-relaxed"></div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+        <footer class="pt-10 border-t border-stone-200 text-center text-xs text-stone-400">
+            <p>&copy; 2026 La Mia Libreria · Report generato dai dati locali, nessun invio a server esterni</p>
+            <p class="mt-1 text-[10px] text-stone-400">build: 2026-09-27-rev30</p>
+        </footer>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+    <script>
+        // ---------- Helper di dominio (identici a index.html) ----------
+
+        function isSubscriptionArticle(item) {
+            return item.type === 'articolo' && item.subtype === 'Rivista' && item.inAbbonamento === true;
+        }
+
+        const KNOWN_STATUS_ORDER = ['In progress', 'Not started', 'Completed', 'Reading', 'Want to read', 'Done'];
+        const KNOWN_STATUS_LABELS = {
+            'In progress': 'In lettura',
+            'Not started': 'Da leggere',
+            'Completed': 'Completati',
+            // valori precedenti, mantenuti per compatibilità con eventuali dati non ancora rinominati
+            'Reading': 'In lettura',
+            'Want to read': 'Da leggere',
+            'Done': 'Completati',
+        };
+
+        function isCompletedBookStatus(status) {
+            return status === 'Completed' || status === 'Done';
+        }
+
+        function labelForBookStatus(status) {
+            return KNOWN_STATUS_LABELS[status] || status || 'Non specificato';
+        }
+
+        function extractYear(dateStr) {
+            if (!dateStr) return null;
+            const m = String(dateStr).match(/(\d{4})/);
+            return m ? m[1] : null;
+        }
+
+        function countBy(list, keyFn) {
+            const counts = {};
+            list.forEach(item => {
+                const key = keyFn(item);
+                if (key === null || key === undefined || key === '') return;
+                counts[key] = (counts[key] || 0) + 1;
+            });
+            return counts;
+        }
+
+        function topEntries(counts, n) {
+            return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, n);
+        }
+
+        function pct(part, total) {
+            return total ? Math.round((part / total) * 100) : 0;
+        }
+
+        // Stessa palette e stessa funzione hash usate per i badge categoria nella
+        // pagina principale, così un genere ha sempre lo stesso colore ovunque.
+        const CATEGORY_HEX_PALETTE = [
+            '#3b82f6', // blue-500
+            '#10b981', // emerald-500
+            '#f59e0b', // amber-500
+            '#a855f7', // purple-500
+            '#ec4899', // pink-500
+            '#06b6d4', // cyan-500
+            '#f97316', // orange-500
+            '#84cc16', // lime-500
+            '#6366f1', // indigo-500
+            '#d946ef', // fuchsia-500
+        ];
+
+        function colorForCategoryHex(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+            }
+            return CATEGORY_HEX_PALETTE[hash % CATEGORY_HEX_PALETTE.length];
+        }
+
+        const AUTHOR_PALETTE = ['#0f766e', '#9a3412', '#7c3aed', '#0369a1', '#b45309', '#4d7c0f', '#be123c', '#334155'];
+
+        function categoriesOf(item) {
+            if (Array.isArray(item.categories) && item.categories.length) return item.categories;
+            return item.category ? [item.category] : [];
+        }
+
+        function authorsOf(item) {
+            if (!item.author) return [];
+            return String(item.author).split(',').map(a => a.trim()).filter(Boolean);
+        }
+
+        function statCardHtml(label, value, accent) {
+            return `
+                <div class="stat-card rounded-2xl border border-stone-200/90 p-4 sm:p-5 shadow-2xs">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-stone-400 mb-1">${label}</p>
+                    <p class="text-2xl sm:text-3xl font-serif font-bold" style="color:${accent || '#2c2825'}">${value}</p>
+                </div>
+            `;
+        }
+
+        // ---------- Costruzione del report ----------
+
+        function buildStatCards(items, articlesList, booksList, universityList) {
+            const completedBooks = booksList.filter(b => isCompletedBookStatus(b.status));
+            const completionRate = pct(completedBooks.length, booksList.length);
+            const html = [
+                statCardHtml('Elementi totali', items.length, '#9a3412'),
+                statCardHtml('Articoli letti', articlesList.length, '#0f766e'),
+                statCardHtml('Libri completati', completedBooks.length, '#7c3aed'),
+                statCardHtml('Tasso completamento libri', booksList.length ? `${completionRate}%` : '—', '#b45309'),
+            ].join('');
+            document.getElementById('statCardsRow').innerHTML = html;
+        }
+
+        function buildAndamentoSection(articlesList, booksList) {
+            const articlesByYear = countBy(articlesList, item => extractYear(item.date));
+            const completedBooks = booksList.filter(b => isCompletedBookStatus(b.status));
+            const completedBooksByYear = countBy(completedBooks, item => extractYear(item.date));
+            const allYears = [...new Set([...Object.keys(articlesByYear), ...Object.keys(completedBooksByYear)])].sort();
+
+            new Chart(document.getElementById('chartAndamento'), {
+                type: 'line',
+                data: {
+                    labels: allYears,
+                    datasets: [
+                        { label: 'Articoli letti', data: allYears.map(y => articlesByYear[y] || 0), borderColor: '#0f766e', backgroundColor: '#0f766e22', tension: 0.3, fill: true },
+                        { label: 'Libri completati', data: allYears.map(y => completedBooksByYear[y] || 0), borderColor: '#9a3412', backgroundColor: '#9a341222', tension: 0.3, fill: true },
+                    ],
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } },
+            });
+
+            const narrativeEl = document.getElementById('narrativeAndamento');
+            if (allYears.length === 0) {
+                narrativeEl.innerHTML = '<p>Non ci sono ancora abbastanza date nei tuoi dati per tracciare un andamento nel tempo.</p>';
+                return;
+            }
+
+            const peakArticleYear = topEntries(articlesByYear, 1)[0];
+            const peakBookYear = topEntries(completedBooksByYear, 1)[0];
+            const totalArticles = articlesList.length;
+            const totalCompletedBooks = completedBooks.length;
+
+            const lastYear = allYears[allYears.length - 1];
+            const prevYear = allYears.length > 1 ? allYears[allYears.length - 2] : null;
+            let trendSentence = '';
+            if (prevYear) {
+                const lastCount = articlesByYear[lastYear] || 0;
+                const prevCount = articlesByYear[prevYear] || 0;
+                const diff = lastCount - prevCount;
+                if (diff > 0) {
+                    trendSentence = `Il ${lastYear} è stato in crescita rispetto al ${prevYear}: da ${prevCount} a ${lastCount} articoli${prevCount > 0 ? ` (+${pct(diff, prevCount)}%)` : ''}.`;
+                } else if (diff < 0) {
+                    trendSentence = `Il ${lastYear} segna un rallentamento rispetto al ${prevYear}: da ${prevCount} a ${lastCount} articoli.`;
+                } else {
+                    trendSentence = `Il ${lastYear} è in linea con il ${prevYear}, entrambi a ${lastCount} articoli.`;
+                }
+            }
+
+            narrativeEl.innerHTML = `
+                <p>Nel periodo coperto dai tuoi dati (${allYears[0]}–${lastYear}) risultano <strong>${totalArticles} articoli</strong> e <strong>${totalCompletedBooks} libri completati</strong> in totale.</p>
+                <p>L'anno più prolifico per gli articoli è stato il <strong>${peakArticleYear ? peakArticleYear[0] : '—'}</strong>, con ${peakArticleYear ? peakArticleYear[1] : 0} letture${peakBookYear ? `; per i libri, il picco è nel <strong>${peakBookYear[0]}</strong> con ${peakBookYear[1]} completati` : ''}.</p>
+                ${trendSentence ? `<p>${trendSentence}</p>` : ''}
+            `;
+        }
+
+        function buildTipoSection(articlesList, booksList, universityList) {
+            const palette = ['#9a3412', '#0f766e', '#b45309', '#7c3aed', '#be123c', '#0369a1'];
+
+            const subscriptionArticles = articlesList.filter(isSubscriptionArticle);
+            const regularArticles = articlesList.filter(a => !isSubscriptionArticle(a));
+            const tipoCounts = countBy(regularArticles, a => a.subtype || 'Altro');
+            if (subscriptionArticles.length) tipoCounts['In Abbonamento'] = subscriptionArticles.length;
+            tipoCounts['Libri'] = booksList.length;
+            tipoCounts['Università'] = universityList.length;
+
+            const tipoLabels = Object.keys(tipoCounts).filter(k => tipoCounts[k] > 0);
+            const totalAll = tipoLabels.reduce((s, k) => s + tipoCounts[k], 0);
+
+            new Chart(document.getElementById('chartTipo'), {
+                type: 'doughnut',
+                data: {
+                    labels: tipoLabels,
+                    datasets: [{ data: tipoLabels.map(k => tipoCounts[k]), backgroundColor: palette }],
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } },
+            });
+
+            const narrativeEl = document.getElementById('narrativeTipo');
+            if (totalAll === 0) {
+                narrativeEl.innerHTML = '<p>Nessun contenuto disponibile per calcolare la distribuzione.</p>';
+                return;
+            }
+
+            const sortedEntries = tipoLabels.map(k => [k, tipoCounts[k]]).sort((a, b) => b[1] - a[1]);
+            const [topLabel, topCount] = sortedEntries[0];
+            const restList = sortedEntries.slice(1).map(([k, v]) => `${k} (${v}, ${pct(v, totalAll)}%)`).join(', ');
+
+            narrativeEl.innerHTML = `
+                <p>La tua libreria conta <strong>${totalAll} contenuti</strong> in totale, suddivisi tra articoli, libri e testi universitari.</p>
+                <p>La categoria più numerosa è <strong>${topLabel}</strong>, con ${topCount} elementi — il <strong>${pct(topCount, totalAll)}%</strong> di tutto ciò che hai catalogato.</p>
+                ${restList ? `<p>Seguono: ${restList}.</p>` : ''}
+            `;
+        }
+
+        function buildCategorieSection(articlesList, booksList, universityList) {
+            const allItems = [...articlesList, ...booksList, ...universityList];
+            const counts = {};
+            allItems.forEach(item => {
+                categoriesOf(item).forEach(cat => {
+                    counts[cat] = (counts[cat] || 0) + 1;
+                });
+            });
+
+            const top = topEntries(counts, 8);
+            const narrativeEl = document.getElementById('narrativeCategorie');
+
+            if (top.length === 0) {
+                new Chart(document.getElementById('chartCategorie'), { type: 'bar', data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false } });
+                narrativeEl.innerHTML = '<p>Nessuna categoria disponibile nei tuoi dati.</p>';
+                return;
+            }
+
+            const labels = top.map(([k]) => k);
+            const values = top.map(([, v]) => v);
+            const colors = labels.map(colorForCategoryHex);
+
+            new Chart(document.getElementById('chartCategorie'), {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Elementi', data: values, backgroundColor: colors, borderRadius: 6 }] },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+                },
+            });
+
+            const totalCategorized = Object.values(counts).reduce((a, b) => a + b, 0);
+            const [firstLabel, firstCount] = top[0];
+            const secondText = top[1] ? `, seguita da <strong>${top[1][0]}</strong> (${top[1][1]})` : '';
+            const distinctCount = Object.keys(counts).length;
+
+            narrativeEl.innerHTML = `
+                <p>Tra i tuoi contenuti compaiono <strong>${distinctCount} categorie/generi</strong> diversi.</p>
+                <p>La più letta è <strong>${firstLabel}</strong>, con ${firstCount} elementi${secondText}.</p>
+                <p>Il grafico mostra le prime ${labels.length} categorie su un totale di ${totalCategorized} assegnazioni.</p>
+            `;
+        }
+
+        function buildAutoriSection(articlesList, booksList) {
+            const allItems = [...articlesList, ...booksList];
+            const counts = {};
+            allItems.forEach(item => {
+                authorsOf(item).forEach(author => {
+                    counts[author] = (counts[author] || 0) + 1;
+                });
+            });
+
+            const top = topEntries(counts, 8);
+            const narrativeEl = document.getElementById('narrativeAutori');
+
+            if (top.length === 0) {
+                new Chart(document.getElementById('chartAutori'), { type: 'bar', data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false } });
+                narrativeEl.innerHTML = '<p>Nessun autore disponibile nei tuoi dati.</p>';
+                return;
+            }
+
+            const labels = top.map(([k]) => k);
+            const values = top.map(([, v]) => v);
+            const colors = labels.map((_, i) => AUTHOR_PALETTE[i % AUTHOR_PALETTE.length]);
+
+            new Chart(document.getElementById('chartAutori'), {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Articoli e libri', data: values, backgroundColor: colors, borderRadius: 6 }] },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+                },
+            });
+
+            const distinctAuthors = Object.keys(counts).length;
+            const [firstLabel, firstCount] = top[0];
+            const recurring = Object.values(counts).filter(v => v > 1).length;
+
+            narrativeEl.innerHTML = `
+                <p>Hai letto contenuti di <strong>${distinctAuthors} autori</strong> diversi tra articoli e libri.</p>
+                <p>L'autore che ricorre di più è <strong>${firstLabel}</strong>, con ${firstCount} contenuti letti.</p>
+                <p>${recurring > 0 ? `${recurring} autori compaiono più di una volta nella tua libreria.` : 'La maggior parte degli autori compare una sola volta: la tua libreria è molto varia.'}</p>
+            `;
+        }
+
+        function buildAbbonamentiSection(articlesList) {
+            const subscriptionArticles = articlesList.filter(isSubscriptionArticle);
+            const narrativeEl = document.getElementById('narrativeAbbonamenti');
+
+            if (subscriptionArticles.length === 0) {
+                new Chart(document.getElementById('chartAbbonamenti'), { type: 'bar', data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false } });
+                narrativeEl.innerHTML = '<p>Non risultano ancora articoli marcati "In Abbonamento" (proprietà "Stato Rivista" su Notion). Compilala sugli articoli delle riviste che segui per vederli qui.</p>';
+                return;
+            }
+
+            const byMagazine = {};
+            subscriptionArticles.forEach(item => {
+                const key = item.source || 'Rivista sconosciuta';
+                if (!byMagazine[key]) byMagazine[key] = { articles: 0, issues: new Set() };
+                byMagazine[key].articles += 1;
+                byMagazine[key].issues.add(item.issueNumber || 'senza-numero');
+            });
+
+            const entries = Object.entries(byMagazine).sort((a, b) => b[1].articles - a[1].articles);
+            const labels = entries.map(([k]) => k);
+            const issueCounts = entries.map(([, v]) => v.issues.size);
+            const articleCounts = entries.map(([, v]) => v.articles);
+
+            new Chart(document.getElementById('chartAbbonamenti'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Numeri letti', data: issueCounts, backgroundColor: '#0f766e', borderRadius: 6 },
+                        { label: 'Articoli letti', data: articleCounts, backgroundColor: '#9a3412', borderRadius: 6 },
+                    ],
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+                },
+            });
+
+            const totalIssues = entries.reduce((s, [, v]) => s + v.issues.size, 0);
+            const totalArticles = entries.reduce((s, [, v]) => s + v.articles, 0);
+            const [topMagazine, topData] = entries[0];
+
+            narrativeEl.innerHTML = `
+                <p>Segui <strong>${entries.length} riviste</strong> in abbonamento, per un totale di <strong>${totalIssues} numeri</strong> e <strong>${totalArticles} articoli</strong> letti.</p>
+                <p>Quella che leggi di più è <strong>${topMagazine}</strong>, con ${topData.issues.size} numeri e ${topData.articles} articoli.</p>
+            `;
+        }
+
+        function buildStatoLibriSection(booksList) {
+            const narrativeEl = document.getElementById('narrativeStatoLibri');
+
+            if (booksList.length === 0) {
+                new Chart(document.getElementById('chartStatoLibri'), { type: 'doughnut', data: { labels: [], datasets: [] }, options: { responsive: true, maintainAspectRatio: false } });
+                narrativeEl.innerHTML = '<p>Nessun libro disponibile nei tuoi dati.</p>';
+                return;
+            }
+
+            // Raggruppiamo per etichetta "umana" (In lettura / Da leggere / Completati / ...)
+            // così valori equivalenti provenienti da nomenclature diverse si sommano.
+            const counts = {};
+            booksList.forEach(b => {
+                const label = labelForBookStatus(b.status);
+                counts[label] = (counts[label] || 0) + 1;
+            });
+
+            const labelColors = {
+                'In lettura': '#b45309',
+                'Da leggere': '#78716c',
+                'Completati': '#0f766e',
+            };
+            const fallbackPalette = ['#7c3aed', '#be123c', '#0369a1', '#4d7c0f'];
+
+            const labels = Object.keys(counts);
+            const values = labels.map(l => counts[l]);
+            let fallbackIdx = 0;
+            const colors = labels.map(l => labelColors[l] || fallbackPalette[(fallbackIdx++) % fallbackPalette.length]);
+
+            new Chart(document.getElementById('chartStatoLibri'), {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data: values, backgroundColor: colors }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } },
+            });
+
+            const total = booksList.length;
+            const completed = booksList.filter(b => isCompletedBookStatus(b.status)).length;
+            const completionRate = pct(completed, total);
+            const sorted = labels.map(l => [l, counts[l]]).sort((a, b) => b[1] - a[1]);
+            const [topLabel, topCount] = sorted[0];
+
+            narrativeEl.innerHTML = `
+                <p>Sui <strong>${total} libri</strong> in libreria, il tasso di completamento è del <strong>${completionRate}%</strong> (${completed} completati).</p>
+                <p>Lo stato più diffuso è <strong>${topLabel}</strong>, con ${topCount} libri (${pct(topCount, total)}%).</p>
+            `;
+        }
+
+        // ---------- Quick-nav: evidenzia la sezione attiva durante lo scroll ----------
+
+        function setupQuickNav() {
+            const nav = document.getElementById('quickNav');
+            if (!nav) return;
+            const links = Array.from(nav.querySelectorAll('a'));
+            const sections = links
+                .map(a => document.querySelector(a.getAttribute('href')))
+                .filter(Boolean);
+
+            if (!sections.length) return;
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const id = '#' + entry.target.id;
+                    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === id));
+                });
+            }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+
+            sections.forEach(s => observer.observe(s));
+        }
+
+        // ---------- Caricamento dati e avvio ----------
+
+        fetch('data.json?t=' + Date.now())
+            .then(res => {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(data => {
+                const isWrapped = data && !Array.isArray(data) && Array.isArray(data.items);
+                const items = isWrapped ? data.items : (Array.isArray(data) ? data : []);
+
+                const articlesList = items.filter(i => i.type === 'articolo');
+                const booksList = items.filter(i => i.type === 'libro');
+                const universityList = items.filter(i => i.type === 'universitario');
+
+                document.getElementById('reportIntro').innerText =
+                    `Un riepilogo di come è cresciuta la tua libreria nel tempo — calcolato su ${items.length} elementi salvati.`;
+
+                buildStatCards(items, articlesList, booksList, universityList);
+                buildAndamentoSection(articlesList, booksList);
+                buildTipoSection(articlesList, booksList, universityList);
+                buildCategorieSection(articlesList, booksList, universityList);
+                buildAutoriSection(articlesList, booksList);
+                buildAbbonamentiSection(articlesList);
+                buildStatoLibriSection(booksList);
+
+                document.getElementById('statsLoading').classList.add('hidden');
+                document.getElementById('statsContent').classList.remove('hidden');
+
+                setupQuickNav();
+            })
+            .catch(err => {
+                console.warn('Errore nel caricamento del report:', err);
+                document.getElementById('statsLoading').innerText =
+                    'Non è stato possibile caricare i dati (data.json) o i grafici. Verifica la connessione e che data.json sia nella stessa cartella di questa pagina.';
+            });
+    </script>
+</body>
+</html>

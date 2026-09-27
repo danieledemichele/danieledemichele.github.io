@@ -1,0 +1,2479 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Mia Libreria - Vetrina Letture</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbf8f3;
+            color: #2c2825;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        /* Schede di navigazione Articoli/Libri/Università */
+        .view-tab-btn {
+            color: #78716c; /* stone-500 */
+            border-color: transparent;
+        }
+        .view-tab-btn:hover {
+            color: #9a3412;
+        }
+        .view-tab-btn.active-view-tab {
+            color: #9a3412;
+            border-color: #9a3412;
+        }
+
+        /* Pillole cliccabili di stato libro (In lettura / Da leggere / Completati) */
+        .status-pill-btn {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.4rem 0.9rem;
+            border-radius: 9999px;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #57534e; /* stone-600 */
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+        }
+        .status-pill-btn:hover {
+            background-color: #e7e5e4; /* stone-200 */
+        }
+        .status-pill-btn.active-status-pill {
+            background-color: #9a3412;
+            color: white;
+        }
+
+        /* Riga orizzontale scorrevole per le sotto-sezioni */
+        .horizontal-scroll-row {
+            scrollbar-width: thin;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f4efe6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d8cfc0;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bfae99;
+        }
+
+        /* Smooth slide-fade for carousel */
+        .slide-fade {
+            animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Control toolbar expansion animation */
+        .toolbar-expand {
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Card Hover Effects */
+        .medium-card {
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .medium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 30px -10px rgba(138, 59, 20, 0.12);
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Glassmorphism background */
+        .glass-panel {
+            background: rgba(251, 248, 243, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Corpo dell'articolo (contenuto Notion convertito) nel modal di lettura */
+        #modalContent {
+            font-size: 0.9375rem;
+            line-height: 1.75;
+            color: #44403c; /* stone-700 */
+        }
+        #modalContent p { margin-bottom: 1rem; }
+        #modalContent h3 { font-size: 1.25rem; font-weight: 700; margin: 1.5rem 0 0.75rem; font-family: 'Playfair Display', serif; }
+        #modalContent h4 { font-size: 1.1rem; font-weight: 700; margin: 1.25rem 0 0.6rem; font-family: 'Playfair Display', serif; }
+        #modalContent h5 { font-size: 1rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+        #modalContent ul, #modalContent ol { margin: 0 0 1rem 1.25rem; }
+        #modalContent ul { list-style: disc; }
+        #modalContent ol { list-style: decimal; }
+        #modalContent li { margin-bottom: 0.35rem; }
+        #modalContent blockquote {
+            border-left: 3px solid #9a3412;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #57534e; /* stone-600 */
+        }
+        #modalContent pre {
+            background: #f5f5f4;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        #modalContent hr { border-color: #e7e5e4; margin: 1.5rem 0; }
+        #modalContent img { max-width: 100%; border-radius: 0.75rem; margin-bottom: 1rem; }
+        #modalContent a { color: #9a3412; text-decoration: underline; }
+        #modalContent a.pdf-attachment-link {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            background-color: #fef2e8;
+            border: 1px solid #f3ceac;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #7c2d12;
+        }
+        #modalContent a.pdf-attachment-link:hover { background-color: #fce8d5; }
+        #modalContent .pdf-attachment-icon { font-size: 1.25rem; }
+    </style>
+</head>
+<body class="bg-[#fbf8f3] text-[#2c2825] min-h-screen flex flex-col antialiased selection:bg-amber-100 selection:text-amber-950">
+
+    <header class="sticky top-0 z-40 glass-panel border-b border-stone-200/80 shadow-xs">
+        <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo e Titolo -->
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 bg-[#9a3412] rounded-2xl flex items-center justify-center text-white shadow-md shadow-orange-950/20">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-serif font-bold text-stone-900 tracking-tight">La Mia Libreria</h1>
+                        <p class="text-xs text-stone-500 font-medium hidden sm:block">Vetrina & Archivio personale delle mie letture</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-[1500px] w-full mx-auto px-4 sm:px-6 lg:px-10 py-8 space-y-10">
+
+        <!-- RIQUADRO STATISTICHE "PANORAMICA DELL'ARCHIVIO" -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-[#f4efe6] border border-stone-300/80 rounded-3xl p-6 sm:p-8 shadow-2xs">
+            <div class="max-w-2xl">
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-stone-900 tracking-tight">Panoramica dell'Archivio</h2>
+                <p class="mt-1.5 text-xs sm:text-sm text-stone-600 leading-relaxed">
+                    Questa libreria è il mio archivio personale di letture, costruito e aggiornato nel tempo. Qui raccolgo <strong>articoli, riviste, newsletter, libri e testi universitari</strong> che ho letto, che sto leggendo o che desidero leggere in futuro. La libreria è in continua evoluzione: ogni nuova lettura contribuisce ad arricchire questo spazio, trasformandolo in una raccolta ordinata delle conoscenze, delle idee e delle fonti che hanno accompagnato il mio percorso di studio e di crescita personale. Per navigare tra i contenuti, utilizza le <strong>viste</strong> e i <strong>filtri</strong> disponibili, pensati per rendere la consultazione semplice e intuitiva.
+                </p>
+            </div>
+
+            <!-- 3 Riquadri Bianchi con le metriche -->
+            <div class="flex-shrink-0 w-full lg:w-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                    
+                    <div class="bg-white rounded-2xl p-4 shadow-2xs border border-stone-200/80 min-w-[150px]">
+                        <span class="block text-[11px] font-semibold text-stone-500 mb-0.5">Articoli letti</span>
+                        <span id="statArticleCount" class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">177</span>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 shadow-2xs border border-stone-200/80 min-w-[160px]">
+                        <span class="block text-[11px] font-semibold text-stone-500 mb-0.5">Libri letti</span>
+                        <span id="statTotalTime" class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">0</span>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 shadow-2xs border border-stone-200/80 min-w-[160px]">
+                        <span class="block text-[11px] font-semibold text-stone-500 mb-0.5">Testi universitari</span>
+                        <span id="statTotalWords" class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">0</span>
+                    </div>
+
+                </div>
+                <div class="mt-2.5 text-right">
+                    <span class="text-[11px] text-stone-500 font-medium">Ultimo aggiornamento: <span id="lastUpdateTimestamp">17/09/2026, 08:30:00</span></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEZIONE DUE CAROSELLI AFFIANCATI CON AUTOMAZIONI -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- CAROSELLO 1: ULTIMI 15 ARTICOLI -->
+            <div id="articleCarouselCard" class="bg-[#e4eae7] border border-stone-300/80 rounded-3xl p-6 sm:p-7 relative flex flex-col justify-between shadow-2xs transition-all hover:border-teal-700/40">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-bold tracking-wider text-teal-900 uppercase flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span> Ultimi 20 Articoli Letti
+                        </span>
+                        <span id="articleCarouselCounter" class="text-xs text-stone-500 font-mono font-medium">1 / 20</span>
+                    </div>
+
+                    <!-- Contenitore Slide Articolo -->
+                    <div id="articleSlide" class="slide-fade min-h-[190px]">
+                        <!-- Popolato dinamicamente da JS -->
+                    </div>
+                </div>
+
+                <!-- Pulsanti Navigazione Frecce -->
+                <button id="prevArticleBtn" aria-label="Precedente" class="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 hover:scale-105 active:scale-95 transition-all z-20 focus:outline-none">
+                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+
+                <button id="nextArticleBtn" aria-label="Successivo" class="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 hover:scale-105 active:scale-95 transition-all z-20 focus:outline-none">
+                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+
+                <!-- Indicatori a Pallini (15) -->
+                <div id="articleDots" class="mt-5 flex items-center justify-center gap-1.5 flex-wrap">
+                    <!-- Popolato da JS -->
+                </div>
+            </div>
+
+            <!-- CAROSELLO 2: ULTIMI 5 LIBRI -->
+            <div id="bookCarouselCard" class="bg-[#f2e7e1] border border-stone-300/80 rounded-3xl p-6 sm:p-7 relative flex flex-col justify-between shadow-2xs transition-all hover:border-rose-700/40">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-bold tracking-wider text-rose-900 uppercase flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> Ultimi 10 Libri Letti
+                        </span>
+                        <span id="bookCarouselCounter" class="text-xs text-stone-500 font-mono font-medium">1 / 20</span>
+                    </div>
+
+                    <!-- Contenitore Slide Libro -->
+                    <div id="bookSlide" class="slide-fade min-h-[190px]">
+                        <!-- Popolato dinamicamente da JS -->
+                    </div>
+                </div>
+
+                <!-- Pulsanti Navigazione Frecce -->
+                <button id="prevBookBtn" aria-label="Precedente" class="absolute -left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 hover:scale-105 active:scale-95 transition-all z-20 focus:outline-none">
+                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+
+                <button id="nextBookBtn" aria-label="Successivo" class="absolute -right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-md border border-stone-200 flex items-center justify-center text-stone-700 hover:bg-stone-50 hover:scale-105 active:scale-95 transition-all z-20 focus:outline-none">
+                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+
+                <!-- Indicatori a Pallini (5) -->
+                <div id="bookDots" class="mt-5 flex items-center justify-center gap-1.5">
+                    <!-- Popolato da JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SEZIONE "LETTURE E APPROFONDIMENTI": titolo + controlli, poi quattro schede -->
+        <div id="lettureApprofondimentiSection" class="space-y-5 pt-4">
+            <div class="relative z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-2xl font-serif font-bold text-stone-900">Letture e Approfondimenti</h3>
+                    <p class="text-xs text-stone-500 font-medium">Esplora e visualizza i contenuti salvati</p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="statistiche.html" target="_blank" rel="noopener"
+                       class="flex items-center gap-1.5 text-xs font-semibold px-3.5 py-1.5 bg-white text-stone-700 rounded-xl border border-stone-200 shadow-2xs hover:border-[#9a3412]/40 hover:text-[#9a3412] transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Statistiche
+                    </a>
+
+                    <span id="gridCountBadge" class="text-xs font-semibold px-3.5 py-1.5 bg-white text-stone-700 rounded-xl border border-stone-200 shadow-2xs">
+                        Mostrando 20 elementi
+                    </span>
+
+                    <!-- RIQUADRO DI CONTROLLO MODERNO CON PULSANTE A TRE PUNTINI (...) -->
+                    <div class="relative flex items-center">
+
+                        <!-- Sfondo semi-trasparente dietro ai menu a tendina della toolbar:
+                             evita che si sovrappongano "a vista" alle schede della griglia
+                             sottostante e rende chiaro che il menu è in primo piano.
+                             pointer-events-none: è puramente decorativo, non deve MAI poter
+                             intercettare i click (che siano diretti alle voci del menu sopra
+                             di lui o, cliccando fuori, bubblare fino al listener globale su
+                             document che chiude i menu). -->
+                        <div id="dropdownBackdrop" class="hidden fixed inset-0 z-40 bg-stone-900/10 backdrop-blur-[1px] pointer-events-none"></div>
+
+                        <!-- Toolbar delle Icone a Scomparsa (Nascosta inizialmente) -->
+                        <div id="controlsToolbar" class="toolbar-expand hidden opacity-0 scale-95 relative z-50 flex items-center gap-2 bg-white/90 border border-stone-200/90 rounded-2xl p-1.5 shadow-lg mr-2">
+
+                            <!-- 1. ICONA LENTE DI INGRANDIMENTO (Cerca) -->
+                            <button id="btnToggleSearch" title="Cerca titolo o autore" class="p-2.5 text-stone-600 hover:text-[#9a3412] hover:bg-orange-50 rounded-xl transition-all relative">
+                                <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <span id="searchIndicatorDot" class="hidden absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#9a3412]"></span>
+                            </button>
+
+                            <!-- 3. ICONA FILTRI (Filtri Avanzati Categoria, Anno, Autore) -->
+                            <button id="btnOpenFilters" title="Filtri Avanzati" class="p-2.5 text-stone-600 hover:text-[#9a3412] hover:bg-orange-50 rounded-xl transition-all relative">
+                                <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                                <span id="activeFiltersBadge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-rose-600 ring-2 ring-white"></span>
+                            </button>
+
+                            <!-- 3b. FILTRO RAPIDO: scorciatoie (In Abbonamento, Giornale, Rivista,
+                                 Newsletter, Libri, Università) applicabili con un click.
+                                 z-50 esplicito: senza, questo wrapper (e il menu al suo interno)
+                                 finisce "sotto" il livello esplicito di #dropdownBackdrop (z-40),
+                                 che quindi lo copre e blocca i click sulle voci del menu. -->
+                            <div class="relative z-50">
+                                <button id="btnQuickFilter" title="Filtri rapidi" class="p-2.5 text-stone-600 hover:text-[#9a3412] hover:bg-orange-50 rounded-xl transition-all">
+                                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                                </button>
+
+                                <!-- Dropdown Filtri rapidi -->
+                                <div id="quickFilterDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-200 py-1.5 z-50">
+                                    <button onclick="selectQuickFilter('abbonamento')" class="w-full text-left px-4 py-2 text-xs font-medium text-stone-700 hover:bg-orange-50 hover:text-[#9a3412] flex items-center justify-between">
+                                        <span>In Abbonamento</span>
+                                        <span id="checkQuickAbbonamento" class="hidden text-[#9a3412]">✓</span>
+                                    </button>
+                                    <button onclick="selectQuickFilter('giornale')" class="w-full text-left px-4 py-2 text-xs font-medium text-stone-700 hover:bg-orange-50 hover:text-[#9a3412] flex items-center justify-between">
+                                        <span>Giornale</span>
+                                        <span id="checkQuickGiornale" class="hidden text-[#9a3412]">✓</span>
+                                    </button>
+                                    <button onclick="selectQuickFilter('rivista')" class="w-full text-left px-4 py-2 text-xs font-medium text-stone-700 hover:bg-orange-50 hover:text-[#9a3412] flex items-center justify-between">
+                                        <span>Rivista</span>
+                                        <span id="checkQuickRivista" class="hidden text-[#9a3412]">✓</span>
+                                    </button>
+                                    <button onclick="selectQuickFilter('newsletter')" class="w-full text-left px-4 py-2 text-xs font-medium text-stone-700 hover:bg-orange-50 hover:text-[#9a3412] flex items-center justify-between">
+                                        <span>Newsletter</span>
+                                        <span id="checkQuickNewsletter" class="hidden text-[#9a3412]">✓</span>
+                                    </button>
+                                    <div class="my-1 border-t border-stone-100"></div>
+                                    <button onclick="selectQuickFilter('libro')" class="w-full text-left px-4 py-2 text-xs font-medium text-stone-700 hover:bg-orange-50 hover:text-[#9a3412] flex items-center justify-between">
+                                        <span>Libri</span>
+                                        <span id="checkQuickLibro" class="hidden text-[#9a3412]">✓</span>
+                                    </button>
+                                    <button onclick="selectQuickFilter('universitario')" class="w-full text-left px-4 py-2 text-xs font-medium text-stone-700 hover:bg-orange-50 hover:text-[#9a3412] flex items-center justify-between">
+                                        <span>Università</span>
+                                        <span id="checkQuickUniversitario" class="hidden text-[#9a3412]">✓</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- PULSANTE A TRE PUNTINI (Meatballs menu trigger) -->
+                        <button id="btnThreeDots" aria-label="Menu opzioni e filtri" class="w-11 h-11 bg-white hover:bg-stone-50 border border-stone-200/90 rounded-2xl flex items-center justify-center text-stone-700 shadow-sm hover:border-[#9a3412]/40 transition-all focus:outline-none focus:ring-2 focus:ring-[#9a3412]/20">
+                            <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- BARRA DI RICERCA ESPANDIBILE (Compare quando si clicca la lente) -->
+            <div id="expandableSearchBar" class="hidden transition-all duration-300">
+                <div class="relative max-w-xl ml-auto">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Digita titolo o nome dell'autore per filtrare all'istante..." 
+                        class="block w-full pl-10 pr-10 py-2.5 bg-white border border-stone-300 rounded-2xl text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#9a3412]/20 focus:border-[#9a3412] shadow-xs">
+                    <button id="btnClearSearch" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-stone-400 hover:text-stone-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BADGES FILTRI ATTIVI -->
+            <div id="activeFilterTagsContainer" class="hidden flex flex-wrap items-center justify-end gap-2 text-xs">
+                <span class="text-stone-500 font-medium">Filtri applicati:</span>
+                <div id="activeTagsList" class="flex flex-wrap gap-1.5"></div>
+                <button onclick="resetAllFilters()" class="text-[11px] font-semibold text-[#9a3412] hover:underline ml-2">
+                    Azzera tutto
+                </button>
+            </div>
+
+            <div class="flex items-center gap-1 border-b border-stone-200 flex-wrap">
+                <button id="tabBtnArticoli" onclick="switchViewTab('articoli')" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors">Articoli</button>
+                <button id="tabBtnLibri" onclick="switchViewTab('libri')" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors">Libri</button>
+                <button id="tabBtnUniversita" onclick="switchViewTab('universita')" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors">Università</button>
+                <button id="tabBtnArchivio" onclick="switchViewTab('archivio')" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors">Archivio Completo</button>
+            </div>
+
+            <div id="viewPanelArticoli" class="space-y-7"></div>
+            <div id="viewPanelLibri" class="hidden space-y-5"></div>
+            <div id="viewPanelUniversita" class="hidden"></div>
+
+            <div id="viewPanelArchivio" class="hidden">
+                <!-- Griglia Schede Medie (4 Colonne su schermi grandi per equilibrio ideale) -->
+                <div id="archiveGrid" class="space-y-8">
+                    <!-- Inserito dinamicamente da JS: una sotto-griglia per ogni sezione (Articoli con sotto-sezioni, Libri, Università) -->
+                </div>
+
+                <!-- Messaggio nessun risultato -->
+                <div id="noResultsMsg" class="hidden text-center py-20 bg-white rounded-3xl border border-dashed border-stone-300">
+                    <div class="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-3 text-stone-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h4 class="text-base font-serif font-semibold text-stone-800">Nessun contenuto trovato</h4>
+                    <p class="text-xs text-stone-500 mt-1">Nessun elemento corrisponde ai filtri o ai termini di ricerca attuali.</p>
+                    <button onclick="resetAllFilters()" class="mt-4 px-4 py-2 bg-[#9a3412] text-white rounded-xl text-xs font-semibold hover:bg-[#802a0e] transition-colors shadow-2xs">
+                        Ripristina tutti i filtri
+                    </button>
+                </div>
+
+                <!-- PAGINAZIONE BAR IN BASSO -->
+                <div id="paginationContainer" class="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-stone-200">
+                    <span id="paginationInfo" class="text-xs font-medium text-stone-500">
+                        Mostrando da 1 a 20 di 20 elementi
+                    </span>
+
+                    <div class="flex items-center space-x-1.5" id="paginationButtons">
+                        <!-- Bottoni pagina generati da JS -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- MODAL FILTRI AVANZATI (CATEGORIA, ANNO, AUTORE) -->
+    <div id="filterModal" onclick="if (event.target === this) closeFilterModal()" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-xs transition-opacity">
+        <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-lg w-full p-6 sm:p-8 space-y-6 slide-fade relative">
+            
+            <div class="flex items-center justify-between border-b border-stone-100 pb-4">
+                <div class="flex items-center gap-2">
+                    <div class="p-2 bg-orange-100/80 rounded-xl text-[#9a3412]">
+                        <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-serif font-bold text-stone-900">Filtri Avanzati</h3>
+                </div>
+                <button onclick="closeFilterModal()" class="text-stone-400 hover:text-stone-600 p-1.5 rounded-lg">
+                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs sm:text-sm">
+                
+                <!-- Filtro Categoria / Genere (opzioni popolate da JS dai dati reali) -->
+                <div>
+                    <label class="block font-semibold text-stone-700 mb-1.5">Categoria / Genere</label>
+                    <select id="filterCategory" onchange="updateModalResultCount()" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#9a3412]/20 focus:border-[#9a3412]">
+                        <option value="tutti">Tutte le categorie</option>
+                    </select>
+                </div>
+
+                <!-- Filtro Tipologia (solo Articoli: Giornale/Rivista/Newsletter) — nascosto su Libri/Università -->
+                <div id="filterSubtypeWrapper">
+                    <label class="block font-semibold text-stone-700 mb-1.5">Tipologia articolo</label>
+                    <select id="filterSubtype" onchange="updateModalResultCount()" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#9a3412]/20 focus:border-[#9a3412]">
+                        <option value="tutti">Tutte le tipologie</option>
+                        <option value="Giornale">Giornale</option>
+                        <option value="Rivista">Rivista</option>
+                        <option value="Newsletter">Newsletter</option>
+                    </select>
+                </div>
+
+                <!-- Filtro Anno (opzioni popolate da JS dai dati reali) -->
+                <div>
+                    <label class="block font-semibold text-stone-700 mb-1.5">Anno di lettura</label>
+                    <select id="filterYear" onchange="updateModalResultCount()" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#9a3412]/20 focus:border-[#9a3412]">
+                        <option value="tutti">Tutti gli anni</option>
+                    </select>
+                </div>
+
+                <!-- Filtro Autore -->
+                <div>
+                    <label class="block font-semibold text-stone-700 mb-1.5">Autore specifico</label>
+                    <select id="filterAuthor" onchange="updateModalResultCount()" class="w-full bg-stone-50 border border-stone-300 rounded-xl px-3.5 py-2.5 text-stone-800 focus:outline-none focus:ring-2 focus:ring-[#9a3412]/20 focus:border-[#9a3412]">
+                        <option value="tutti">Tutti gli autori</option>
+                        <!-- Popolato dinamicamente da JS -->
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Pulsanti Modal -->
+            <div class="flex items-center justify-end gap-3 border-t border-stone-100 pt-4">
+                <button onclick="resetModalFilters()" class="px-4 py-2.5 text-stone-600 hover:text-stone-900 font-semibold text-xs rounded-xl hover:bg-stone-100 transition-colors">
+                    Azzera
+                </button>
+                <button id="btnApplyFilters" onclick="applyFilterModal()" class="px-5 py-2.5 bg-[#9a3412] hover:bg-[#802a0e] text-white font-semibold text-xs rounded-xl shadow-md transition-colors">
+                    Applica Filtri
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL DETTAGLIO NUMERO RIVISTA (In Abbonamento) -->
+    <div id="issueModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-xs" onclick="if (event.target === this) closeIssueModal()">
+        <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-2xl w-full max-h-[85vh] slide-fade relative flex flex-col overflow-hidden">
+            <div class="p-6 sm:p-8 border-b border-stone-100 shrink-0 space-y-4">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex items-center gap-4 min-w-0">
+                        <img id="issueModalCover" src="" alt="" onerror="onCoverImgError(this, img => img.classList.add('hidden'))" class="w-16 h-16 object-cover rounded-xl shrink-0">
+                        <div class="min-w-0">
+                            <span id="issueModalSource" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md bg-teal-900/85 text-white inline-block mb-1"></span>
+                            <h3 id="issueModalTitle" class="text-xl font-serif font-bold text-stone-900 truncate"></h3>
+                            <p id="issueModalCount" class="text-xs text-stone-500"></p>
+                            <p id="issueModalDate" class="text-xs text-stone-500"></p>
+                        </div>
+                    </div>
+                    <button onclick="closeIssueModal()" class="text-stone-400 hover:text-stone-600 p-1 rounded-lg shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <p id="issueModalEditorial" class="hidden text-sm text-stone-700 leading-relaxed font-serif italic bg-stone-50 p-4 rounded-xl border border-stone-200/60"></p>
+            </div>
+            <div id="issueModalList" class="overflow-y-auto p-6 sm:p-8 space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DETTAGLIO LETTURA ("Leggi") -->
+    <div id="readerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/50 backdrop-blur-xs" onclick="if (event.target === this) closeReaderModal()">
+        <div class="bg-white rounded-3xl border border-stone-200 shadow-2xl max-w-4xl w-full max-h-[90vh] slide-fade relative flex flex-col overflow-hidden">
+
+            <!-- Barra di avanzamento lettura -->
+            <div class="h-1.5 w-full bg-stone-100 shrink-0">
+                <div id="modalProgressBar" class="h-1.5 bg-[#9a3412] transition-[width] duration-150 ease-out" style="width: 0%"></div>
+            </div>
+
+            <!-- Area scrollabile: qui vive la scrollbar, contenuta dentro il riquadro -->
+            <div id="modalScrollArea" class="overflow-y-auto p-6 sm:p-10 space-y-6">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex flex-wrap items-center gap-1.5 mb-2">
+                            <span id="modalTypeBadge" class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md inline-block"></span>
+                            <div id="modalCategories" class="flex flex-wrap items-center gap-1.5"></div>
+                        </div>
+                        <h3 id="modalTitle" class="text-2xl font-serif font-bold text-stone-900 leading-snug"></h3>
+                        <p id="modalAuthor" class="text-xs font-semibold text-[#9a3412] mt-1"></p>
+                    </div>
+                    <button onclick="closeReaderModal()" class="text-stone-400 hover:text-stone-600 p-1 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4 text-xs text-stone-500 py-2 border-y border-stone-100">
+                    <span id="modalDate"></span>
+                </div>
+
+                <div class="space-y-3">
+                    <img id="modalImage" src="" alt="Cover" onerror="onCoverImgError(this, img => img.classList.add('hidden'))" class="w-full h-52 object-cover rounded-2xl shadow-xs">
+                    <p id="modalExcerpt" class="text-sm text-stone-700 leading-relaxed font-serif italic bg-stone-50 p-4 rounded-xl border border-stone-200/60"></p>
+                    <div id="modalContent"></div>
+                    <div id="modalAttachments" class="space-y-4"></div>
+                </div>
+
+                <div class="flex items-center justify-between border-t border-stone-100 pt-4">
+                    <a id="modalReadLink" href="#" target="_blank" rel="noopener noreferrer"
+                       class="text-[11px] text-stone-400 hover:text-stone-600 underline inline-flex items-center gap-1">
+                        Fonte originale
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                    <span id="modalStatusRow" class="text-xs text-stone-400">Stato: <strong id="modalStatusValue" class="text-emerald-700"></strong></span>
+                </div>
+                <div class="flex justify-end">
+                    <button onclick="closeReaderModal()" class="px-5 py-2 bg-stone-900 text-white hover:bg-stone-800 rounded-xl text-xs font-semibold transition-colors">
+                        Chiudi
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-stone-200/80 py-8 mt-16">
+        <div class="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 text-center text-xs text-stone-500">
+            <p>&copy; 2026 La Mia Libreria · Sincronizzata ed elaborata in tempo reale</p>
+            <p class="mt-1 text-[10px] text-stone-400">build: 2026-09-27-rev38</p>
+        </div>
+    </footer>
+
+    <script>
+        // Dati mock usati come fallback locale se data.json non è raggiungibile
+        // (utile per test offline/anteprima). In produzione i dati reali arrivano
+        // via fetch('data.json') generato dall'export automatico Notion -> git.
+        const fallbackItems = [
+            // --- 5 LIBRI ---
+            {
+                id: "b1",
+                type: "libro",
+                title: "Cybercrime: Attacchi globali e conseguenze locali",
+                author: "Carola Frediani",
+                category: "Cybersecurity",
+                year: "2026",
+                source: "HOEPLI",
+                excerpt: "Da anni si parla di cybercrimine, ma il fenomeno resta un enigma per molti. Un viaggio dettagliato attraverso le minacce informatiche moderne.",
+                words: 48000,
+                readTimeMinutes: 240,
+                date: "12 Set 2026",
+                image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "b2",
+                type: "libro",
+                title: "Sapiens: Da animali a dèi",
+                author: "Yuval Noah Harari",
+                category: "Saggistica",
+                year: "2026",
+                source: "Bompiani",
+                excerpt: "Breve storia dell'umanità. Come una specie insignificante è diventata il padrone assoluto del pianeta Terra attraverso il potere dell'immaginazione collettiva.",
+                words: 110000,
+                readTimeMinutes: 520,
+                date: "28 Ago 2026",
+                image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "b3",
+                type: "libro",
+                title: "Design for the Real World",
+                author: "Victor Papanek",
+                category: "Design",
+                year: "2026",
+                source: "Academy Chicago",
+                excerpt: "Un'analisi critica sul ruolo del designer nella società contemporanea, proponendo un approccio responsabile ed ecologico alla creazione di oggetti.",
+                words: 65000,
+                readTimeMinutes: 310,
+                date: "14 Lug 2026",
+                image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "b4",
+                type: "libro",
+                title: "Zero to One: Note sul futuro delle startup",
+                author: "Peter Thiel",
+                category: "Economia",
+                year: "2026",
+                source: "Crown Business",
+                excerpt: "Il futuro non è qualcosa da attendere, ma da costruire. Come creare aziende che apportano vera innovazione anziché semplice competizione.",
+                words: 42000,
+                readTimeMinutes: 200,
+                date: "02 Giu 2026",
+                image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "b5",
+                type: "libro",
+                title: "L'Arte della Guerra",
+                author: "Sun Tzu",
+                category: "Filosofia",
+                year: "2026",
+                source: "Feltrinelli",
+                excerpt: "Il più antico trattato di strategia militare al mondo, le cui lezioni trovano applicazione moderna nella gestione delle decisioni quotidiane.",
+                words: 25000,
+                readTimeMinutes: 120,
+                date: "18 Mag 2026",
+                image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+
+            // --- 15 ARTICOLI ---
+            {
+                id: "a1",
+                type: "articolo",
+                subtype: "Giornale",
+                title: "La bacheca del terrore: come gli agenti hanno 'complottato'",
+                author: "Guerini",
+                category: "Cybersecurity",
+                year: "2026",
+                source: "NEWSLETTER · WEB",
+                excerpt: "Un viaggio dettagliato in una serie di scambi all'interno di un forum che ha sollevato dubbi sulle strategie di sicurezza collettiva.",
+                words: 3450,
+                readTimeMinutes: 14,
+                date: "16 Set 2026",
+                image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a2",
+                type: "articolo",
+                subtype: "Rivista",
+                title: "L'impatto dei modelli LLM sull'architettura software moderna",
+                author: "Tech Review",
+                category: "Tecnologia",
+                year: "2026",
+                source: "MEDIUM · TECH",
+                excerpt: "Come la proliferazione delle intelligenze artificiali generative sta ridisegnando i pattern di sviluppo back-end e microservizi.",
+                words: 2800,
+                readTimeMinutes: 11,
+                date: "15 Set 2026",
+                image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a3",
+                type: "articolo",
+                subtype: "Newsletter",
+                title: "Minimalismo digitale: Strategie pratiche di concentrazione",
+                author: "Cal Newport",
+                category: "Saggistica",
+                year: "2026",
+                source: "BLOG · PRODUTTIVITÀ",
+                excerpt: "Riconquistare l'attenzione in un mondo iper-connesso attraverso blocchi di lavoro profondo e disintossicazione da notifiche.",
+                words: 1950,
+                readTimeMinutes: 8,
+                date: "11 Set 2026",
+                image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a4",
+                type: "articolo",
+                subtype: "Giornale",
+                title: "Il futuro delle città pedonali e il modello dei 15 minuti",
+                author: "Urbania Journal",
+                category: "Design",
+                year: "2026",
+                source: "URBANISTICA",
+                excerpt: "Ripensare gli spazi urbani per ridurre l'impronta ecologica, restituendo la priorità ai pedoni e alla vita di quartiere.",
+                words: 4100,
+                readTimeMinutes: 16,
+                date: "09 Set 2026",
+                image: "https://images.unsplash.com/photo-1477959858617-67f30ac4ce78?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a5",
+                type: "articolo",
+                subtype: "Rivista",
+                title: "Perché le interfacce utente stanno diventando tutte uguali",
+                author: "UX Collective",
+                category: "Design",
+                year: "2026",
+                source: "DESIGN · WEB",
+                excerpt: "Un'indagine su come i principali design system aziendali abbiano uniformato l'esperienza visiva del Web contemporaneo.",
+                words: 3100,
+                readTimeMinutes: 12,
+                date: "05 Set 2026",
+                image: "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a6",
+                type: "articolo",
+                subtype: "Newsletter",
+                title: "Fisica quantistica: spiegazione intuitiva dell'entanglement",
+                author: "Quantum Mag",
+                category: "Scienza",
+                year: "2025",
+                source: "SCIENZA",
+                excerpt: "Spiegare il fenomeno delle particelle correlate a distanza attraverso semplici metafore visive e concetti accessibili.",
+                words: 5200,
+                readTimeMinutes: 22,
+                date: "01 Dic 2025",
+                image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a7",
+                type: "articolo",
+                subtype: "Giornale",
+                title: "Geopolitica dei semiconduttori e le nuove rotte dei chip",
+                author: "Limes Digest",
+                category: "Economia",
+                year: "2025",
+                source: "ECONOMIA",
+                excerpt: "Come la corsa ai semiconduttori ad alte prestazioni sta ridefinendo le alleanze industriali tra Ovest ed Est.",
+                words: 6100,
+                readTimeMinutes: 25,
+                date: "25 Nov 2025",
+                image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a8",
+                type: "articolo",
+                subtype: "Rivista",
+                title: "Breve storia del font Helvetica e del modernismo svizzero",
+                author: "Typography Today",
+                category: "Design",
+                year: "2025",
+                source: "TIPOGRAFIA",
+                excerpt: "Dalla fonderia Haas al dominio globale nei loghi aziendali: l'incredibile viaggio di uno dei caratteri più amati al mondo.",
+                words: 2400,
+                readTimeMinutes: 9,
+                date: "20 Ott 2025",
+                image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a9",
+                type: "articolo",
+                subtype: "Newsletter",
+                title: "Come funziona la memoria a lungo termine durante lo studio",
+                author: "Brain & Mind",
+                category: "Neuroscienze",
+                year: "2025",
+                source: "NEUROSCIENZE",
+                excerpt: "I meccanismi molecolari del consolidamento mnemonico e le tecniche di ripasso dilazionato più efficaci secondo i ricercatori.",
+                words: 3800,
+                readTimeMinutes: 15,
+                date: "15 Set 2025",
+                image: "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a10",
+                type: "articolo",
+                subtype: "Giornale",
+                title: "La rinascita dei dischi in vinile nell'era dello streaming",
+                author: "Sound Culture",
+                category: "Saggistica",
+                year: "2025",
+                source: "CULTURA",
+                excerpt: "Perché le generazioni più giovani stanno riscoprendo i supporti analogici pur avendo tutto Spotify a portata di tap.",
+                words: 2900,
+                readTimeMinutes: 10,
+                date: "10 Ago 2025",
+                image: "https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a11",
+                type: "articolo",
+                subtype: "Rivista",
+                title: "Guida essenziale all'architettura Rust e gestione memoria",
+                author: "Dev Weekly",
+                category: "Tecnologia",
+                year: "2025",
+                source: "PROGRAMMAZIONE",
+                excerpt: "Il concetto di ownership e borrowing spiegato senza complicazioni, per comprendere il linguaggio più amato dagli sviluppatori.",
+                words: 4700,
+                readTimeMinutes: 18,
+                date: "05 Lug 2025",
+                image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a12",
+                type: "articolo",
+                subtype: "Newsletter",
+                title: "Evoluzione del caffè espresso: ingegneria e filtrazione",
+                author: "Barista Magazine",
+                source: "CULTURA",
+                category: "Saggistica",
+                year: "2024",
+                excerpt: "L'ingegneria dietro la perfetta estrazione dell'espresso e le variabili di temperatura, macinatura e pressione.",
+                words: 2100,
+                readTimeMinutes: 8,
+                date: "01 Giu 2024",
+                image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a13",
+                type: "articolo",
+                subtype: "Giornale",
+                title: "Psicologia dei colori nell'interfaccia e conversioni",
+                author: "Design Labs",
+                category: "Design",
+                year: "2024",
+                source: "UX RESEARCH",
+                excerpt: "Come le tonalità cromatiche influenzano subconsciamente le decisioni d'acquisto e la permanenza degli utenti sulle piattaforme.",
+                words: 3300,
+                readTimeMinutes: 13,
+                date: "28 Mag 2024",
+                image: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a14",
+                type: "articolo",
+                subtype: "Rivista",
+                title: "I segreti dell'esplorazione spaziale con i Rover Marziani",
+                author: "Astro Science",
+                category: "Scienza",
+                year: "2024",
+                source: "AEROSPACE",
+                excerpt: "Le sfide ingegneristiche per inviare comandi con ritardo di trasmissione radio tra la Terra e il pianeta rosso.",
+                words: 5800,
+                readTimeMinutes: 23,
+                date: "20 Apr 2024",
+                image: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            },
+            {
+                id: "a15",
+                type: "articolo",
+                subtype: "Newsletter",
+                title: "La filosofia dello Stoicismo applicata al lavoro moderno",
+                author: "Mindset Daily",
+                category: "Filosofia",
+                year: "2024",
+                source: "FILOSOFIA",
+                excerpt: "Concentrarsi unicamente su ciò che è sotto il nostro diretto controllo per eliminare l'ansia e la frenesia lavorativa.",
+                words: 3600,
+                readTimeMinutes: 14,
+                date: "15 Gen 2024",
+                image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+                url: "#"
+            }
+        ];
+
+        let items = [];
+        let articlesList = [];
+        let booksList = [];
+        let completedBooksList = [];
+        let universityList = [];
+        let recentArticles = [];
+        let recentBooks = [];
+
+        let currentArticleIdx = 0;
+        let currentBookIdx = 0;
+        let articleTimer = null;
+        let bookTimer = null;
+
+        // Control Toolbar & Filter States
+        let toolbarExpanded = false;
+        let searchVisible = false;
+
+        let activeType = 'tutti'; // 'tutti', 'libro', 'articolo'
+        let activeViewTab = 'articoli'; // 'articoli', 'libri', 'universita'
+        let activeCategory = 'tutti';
+        let activeYear = 'tutti';
+        let activeAuthor = 'tutti';
+        let activeSubtype = 'tutti'; // 'tutti', 'Giornale', 'Rivista', 'Newsletter' (solo articoli)
+        let activeAbbonamentoOnly = false; // filtro rapido: solo articoli "In Abbonamento"
+        let searchQuery = '';
+
+        let currentPage = 1;
+        let pageSize = 20; // Default: 20 per page
+
+        function calculateStats() {
+            document.getElementById('statArticleCount').innerText = articlesList.length;
+            document.getElementById('statTotalTime').innerText = completedBooksList.length;
+            document.getElementById('statTotalWords').innerText = universityList.length;
+        }
+
+        function renderArticleSlide(index) {
+            const item = recentArticles[index];
+            if (!item) return;
+
+            const container = document.getElementById('articleSlide');
+            container.classList.remove('slide-fade');
+            void container.offsetWidth;
+            container.classList.add('slide-fade');
+
+            container.innerHTML = `
+                <div class="flex flex-col sm:flex-row gap-5 items-stretch h-full">
+                    ${item.image
+                        ? `<img src="${item.image}" alt="${item.title}" data-item-type="articolo" data-fallback-url="${item.imageFallback || ''}" onerror="onCoverImgError(this)" class="w-full sm:w-40 h-44 sm:h-48 object-cover rounded-2xl shadow-xs border border-stone-300/70 flex-shrink-0">`
+                        : `<div class="w-full sm:w-40 h-44 sm:h-48 flex items-center justify-center rounded-2xl shadow-xs border border-stone-300/70 flex-shrink-0 ${placeholderColorForType('articolo')}">${placeholderIconForType('articolo')}</div>`
+                    }
+                    <div class="flex-grow flex flex-col justify-between py-1">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-100/90 px-2.5 py-0.5 rounded-md">${item.source}</span>
+                                <span class="text-[10px] font-medium text-stone-500">${item.date}</span>
+                            </div>
+                            <h4 class="text-lg font-serif font-bold text-stone-900 leading-snug line-clamp-2">${item.title}</h4>
+                            <p class="text-xs font-semibold text-[#9a3412] mt-0.5 mb-2">${item.author}</p>
+                        </div>
+                        
+                        <div>
+                            <button onclick="openReaderModal('${item.id}')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#9a3412] hover:bg-[#802a0e] text-white font-semibold rounded-xl text-xs transition-colors shadow-2xs">
+                                <span>📖 Leggi</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('articleCarouselCounter').innerText = `${index + 1} / ${recentArticles.length}`;
+            updateArticleDots(index);
+        }
+
+        function renderBookSlide(index) {
+            const item = recentBooks[index];
+            if (!item) return;
+
+            const container = document.getElementById('bookSlide');
+            container.classList.remove('slide-fade');
+            void container.offsetWidth;
+            container.classList.add('slide-fade');
+
+            container.innerHTML = `
+                <div class="flex flex-col sm:flex-row gap-5 items-stretch h-full">
+                    ${item.image
+                        ? `<img src="${item.image}" alt="${item.title}" data-item-type="libro" data-fallback-url="${item.imageFallback || ''}" onerror="onCoverImgError(this)" class="w-full sm:w-40 h-44 sm:h-48 object-cover rounded-2xl shadow-xs border border-stone-300/70 flex-shrink-0">`
+                        : `<div class="w-full sm:w-40 h-44 sm:h-48 flex items-center justify-center rounded-2xl shadow-xs border border-stone-300/70 flex-shrink-0 ${placeholderColorForType('libro')}">${placeholderIconForType('libro')}</div>`
+                    }
+                    <div class="flex-grow flex flex-col justify-between py-1">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-rose-800 bg-rose-100/90 px-2.5 py-0.5 rounded-md">LIBRO · ${item.source}</span>
+                                <span class="text-[10px] font-medium text-stone-500">${item.date}</span>
+                            </div>
+                            <h4 class="text-lg font-serif font-bold text-stone-900 leading-snug line-clamp-2">${item.title}</h4>
+                            <p class="text-xs font-semibold text-[#9a3412] mt-0.5 mb-1.5">${item.author}</p>
+                            ${item.excerpt ? `<p class="text-xs text-stone-600 leading-snug line-clamp-2">${item.excerpt}</p>` : ''}
+                        </div>
+                        
+                        <div>
+                            <button onclick="openReaderModal('${item.id}')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#9a3412] hover:bg-[#802a0e] text-white font-semibold rounded-xl text-xs transition-colors shadow-2xs">
+                                <span>📖 Leggi</span>
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('bookCarouselCounter').innerText = `${index + 1} / ${recentBooks.length}`;
+            updateBookDots(index);
+        }
+
+        function renderDots() {
+            const articleDotsContainer = document.getElementById('articleDots');
+            articleDotsContainer.innerHTML = recentArticles.map((_, i) => `
+                <button onclick="goToArticleSlide(${i})" aria-label="Slide ${i+1}" class="w-2 h-2 rounded-full transition-all ${i === 0 ? 'bg-[#9a3412] w-4' : 'bg-stone-300 hover:bg-stone-400'}"></button>
+            `).join('');
+
+            const bookDotsContainer = document.getElementById('bookDots');
+            bookDotsContainer.innerHTML = recentBooks.map((_, i) => `
+                <button onclick="goToBookSlide(${i})" aria-label="Book slide ${i+1}" class="w-2.5 h-2.5 rounded-full transition-all ${i === 0 ? 'bg-[#9a3412] w-5' : 'bg-stone-300 hover:bg-stone-400'}"></button>
+            `).join('');
+        }
+
+        function updateArticleDots(activeIdx) {
+            const dots = document.getElementById('articleDots').children;
+            Array.from(dots).forEach((dot, i) => {
+                if (i === activeIdx) {
+                    dot.className = "w-4 h-2 rounded-full bg-[#9a3412] transition-all";
+                } else {
+                    dot.className = "w-2 h-2 rounded-full bg-stone-300 hover:bg-stone-400 transition-all";
+                }
+            });
+        }
+
+        function updateBookDots(activeIdx) {
+            const dots = document.getElementById('bookDots').children;
+            Array.from(dots).forEach((dot, i) => {
+                if (i === activeIdx) {
+                    dot.className = "w-5 h-2.5 rounded-full bg-[#9a3412] transition-all";
+                } else {
+                    dot.className = "w-2.5 h-2.5 rounded-full bg-stone-300 hover:bg-stone-400 transition-all";
+                }
+            });
+        }
+
+        function nextArticle() {
+            currentArticleIdx = (currentArticleIdx + 1) % recentArticles.length;
+            renderArticleSlide(currentArticleIdx);
+        }
+
+        function prevArticle() {
+            currentArticleIdx = (currentArticleIdx - 1 + recentArticles.length) % recentArticles.length;
+            renderArticleSlide(currentArticleIdx);
+        }
+
+        function goToArticleSlide(i) {
+            currentArticleIdx = i;
+            renderArticleSlide(currentArticleIdx);
+        }
+
+        function nextBook() {
+            currentBookIdx = (currentBookIdx + 1) % recentBooks.length;
+            renderBookSlide(currentBookIdx);
+        }
+
+        function prevBook() {
+            currentBookIdx = (currentBookIdx - 1 + recentBooks.length) % recentBooks.length;
+            renderBookSlide(currentBookIdx);
+        }
+
+        function goToBookSlide(i) {
+            currentBookIdx = i;
+            renderBookSlide(currentBookIdx);
+        }
+
+        function startAutoPlay() {
+            articleTimer = setInterval(nextArticle, 4000);
+            bookTimer = setInterval(nextBook, 5000);
+        }
+
+        // Frecce prev/next dei caroselli (in precedenza presenti solo visivamente, non collegate)
+        document.getElementById('prevArticleBtn').addEventListener('click', prevArticle);
+        document.getElementById('nextArticleBtn').addEventListener('click', nextArticle);
+        document.getElementById('prevBookBtn').addEventListener('click', prevBook);
+        document.getElementById('nextBookBtn').addEventListener('click', nextBook);
+
+        // Pausa dell'autoplay al passaggio del mouse, ripresa quando esce
+        const articleCarouselCard = document.getElementById('articleCarouselCard');
+        articleCarouselCard.addEventListener('mouseenter', () => clearInterval(articleTimer));
+        articleCarouselCard.addEventListener('mouseleave', () => {
+            clearInterval(articleTimer);
+            articleTimer = setInterval(nextArticle, 4000);
+        });
+
+        const bookCarouselCard = document.getElementById('bookCarouselCard');
+        bookCarouselCard.addEventListener('mouseenter', () => clearInterval(bookTimer));
+        bookCarouselCard.addEventListener('mouseleave', () => {
+            clearInterval(bookTimer);
+            bookTimer = setInterval(nextBook, 5000);
+        });
+
+        const btnThreeDots = document.getElementById('btnThreeDots');
+        const controlsToolbar = document.getElementById('controlsToolbar');
+
+        btnThreeDots.addEventListener('click', () => {
+            toolbarExpanded = !toolbarExpanded;
+            if (toolbarExpanded) {
+                controlsToolbar.classList.remove('hidden');
+                setTimeout(() => {
+                    controlsToolbar.classList.remove('opacity-0', 'scale-95');
+                    controlsToolbar.classList.add('opacity-100', 'scale-100');
+                }, 10);
+            } else {
+                controlsToolbar.classList.remove('opacity-100', 'scale-100');
+                controlsToolbar.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    controlsToolbar.classList.add('hidden');
+                }, 300);
+                closeDropdowns();
+            }
+        });
+
+        // 1. Search toggle
+        const btnToggleSearch = document.getElementById('btnToggleSearch');
+        const expandableSearchBar = document.getElementById('expandableSearchBar');
+        const searchInput = document.getElementById('searchInput');
+
+        btnToggleSearch.addEventListener('click', () => {
+            searchVisible = !searchVisible;
+            if (searchVisible) {
+                expandableSearchBar.classList.remove('hidden');
+                searchInput.focus();
+            } else {
+                expandableSearchBar.classList.add('hidden');
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim();
+            document.getElementById('btnClearSearch').classList.toggle('hidden', searchQuery === '');
+            document.getElementById('searchIndicatorDot').classList.toggle('hidden', searchQuery === '');
+            currentPage = 1;
+            groupPages = {};
+            renderActiveViewTab();
+            updateActiveFilterTags();
+        });
+
+        function clearSearch() {
+            searchQuery = '';
+            searchInput.value = '';
+            document.getElementById('btnClearSearch').classList.add('hidden');
+            document.getElementById('searchIndicatorDot').classList.add('hidden');
+            currentPage = 1;
+            groupPages = {};
+            renderActiveViewTab();
+            updateActiveFilterTags();
+        }
+
+        // Il selettore Tipo (Solo Libri/Articoli/Università) come menu a sé è
+        // stato rimosso dalla toolbar: le scorciatoie Libri/Università nel menu
+        // "Filtri rapidi" coprono lo stesso bisogno. selectTypeFilter resta come
+        // funzione interna (usata da selectQuickFilter e da goToArchiveFiltered).
+        function selectTypeFilter(type) {
+            activeType = type;
+
+            currentPage = 1;
+            groupPages = {};
+            renderActiveViewTab();
+            updateActiveFilterTags();
+            updateQuickFilterVisual();
+        }
+
+        // Filtro rapido "In Abbonamento": mostra solo gli articoli di riviste
+        // abbonate, in qualsiasi vista ci si trovi (Articoli, Archivio...).
+        // Passare true/false forza lo stato invece di alternarlo (usato da
+        // removeFilter() quando si toglie il tag dai filtri applicati).
+        function toggleAbbonamentoFilter(forceValue) {
+            activeAbbonamentoOnly = typeof forceValue === 'boolean' ? forceValue : !activeAbbonamentoOnly;
+            updateQuickFilterVisual();
+
+            currentPage = 1;
+            groupPages = {};
+            renderActiveViewTab();
+            updateActiveFilterTags();
+        }
+
+        // Menu unico di scorciatoie: In Abbonamento (indipendente, si somma agli
+        // altri filtri), Giornale/Rivista/Newsletter (agiscono sulla Tipologia
+        // articolo, un solo valore alla volta) e Libri/Università (agiscono sul
+        // filtro Tipo, un solo valore alla volta). Cliccare un'opzione già
+        // attiva la disattiva (torna a "tutti").
+        function selectQuickFilter(kind) {
+            closeDropdowns();
+
+            if (kind === 'abbonamento') {
+                toggleAbbonamentoFilter();
+                return;
+            }
+
+            const subtypeMap = { giornale: 'Giornale', rivista: 'Rivista', newsletter: 'Newsletter' };
+            if (subtypeMap[kind]) {
+                const value = subtypeMap[kind];
+                activeSubtype = (activeSubtype === value) ? 'tutti' : value;
+                document.getElementById('filterSubtype').value = activeSubtype;
+
+                currentPage = 1;
+                groupPages = {};
+                renderActiveViewTab();
+                updateActiveFilterTags();
+                updateQuickFilterVisual();
+                return;
+            }
+
+            if (kind === 'libro' || kind === 'universitario') {
+                selectTypeFilter(activeType === kind ? 'tutti' : kind);
+            }
+        }
+
+        function updateQuickFilterVisual() {
+            const btn = document.getElementById('btnQuickFilter');
+            const anyActive = activeAbbonamentoOnly || activeSubtype !== 'tutti' ||
+                activeType === 'libro' || activeType === 'universitario';
+            if (btn) {
+                btn.classList.toggle('bg-orange-100', anyActive);
+                btn.classList.toggle('text-[#9a3412]', anyActive);
+            }
+
+            const checks = {
+                checkQuickAbbonamento: activeAbbonamentoOnly,
+                checkQuickGiornale: activeSubtype === 'Giornale',
+                checkQuickRivista: activeSubtype === 'Rivista',
+                checkQuickNewsletter: activeSubtype === 'Newsletter',
+                checkQuickLibro: activeType === 'libro',
+                checkQuickUniversitario: activeType === 'universitario',
+            };
+            Object.entries(checks).forEach(([id, active]) => {
+                const el = document.getElementById(id);
+                if (el) el.classList.toggle('hidden', !active);
+            });
+        }
+
+        // 3. Filter modal
+        const btnOpenFilters = document.getElementById('btnOpenFilters');
+        const filterModal = document.getElementById('filterModal');
+
+        btnOpenFilters.addEventListener('click', () => {
+            populateFilterOptions();
+            filterModal.classList.remove('hidden');
+            closeDropdowns();
+        });
+
+        function closeFilterModal() {
+            filterModal.classList.add('hidden');
+        }
+
+        // Riempie le tendine Categoria/Anno/Autore leggendo i valori REALMENTE
+        // presenti nei dati (invece di un elenco fisso in HTML, che andava
+        // facilmente fuori sincrono con le categorie/anni effettivi in Notion).
+        function populateFilterOptions() {
+            const categories = new Set();
+            const years = new Set();
+            const authors = new Set();
+
+            items.forEach(item => {
+                categoriesOf(item).forEach(c => categories.add(c));
+                if (item.year) years.add(item.year);
+                authorsOf(item).forEach(a => authors.add(a));
+            });
+
+            const sortedCategories = Array.from(categories).sort((a, b) => a.localeCompare(b, 'it'));
+            const sortedYears = Array.from(years).sort().reverse();
+            const sortedAuthors = Array.from(authors).sort((a, b) => a.localeCompare(b, 'it'));
+
+            const categorySelect = document.getElementById('filterCategory');
+            categorySelect.innerHTML = `<option value="tutti">Tutte le categorie</option>` +
+                sortedCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+            const yearSelect = document.getElementById('filterYear');
+            yearSelect.innerHTML = `<option value="tutti">Tutti gli anni</option>` +
+                sortedYears.map(y => `<option value="${y}">${y}</option>`).join('');
+
+            const authorSelect = document.getElementById('filterAuthor');
+            authorSelect.innerHTML = `<option value="tutti">Tutti gli autori</option>` +
+                sortedAuthors.map(a => `<option value="${a}">${a}</option>`).join('');
+
+            categorySelect.value = activeCategory;
+            yearSelect.value = activeYear;
+            authorSelect.value = activeAuthor;
+            document.getElementById('filterSubtype').value = activeSubtype;
+
+            // La Tipologia (Giornale/Rivista/Newsletter) ha senso solo per gli
+            // articoli: la nascondiamo quando si sta guardando Libri o Università.
+            const subtypeRelevant = activeViewTab === 'articoli' || activeViewTab === 'archivio';
+            document.getElementById('filterSubtypeWrapper').classList.toggle('hidden', !subtypeRelevant);
+
+            updateModalResultCount();
+        }
+
+        // Conteggio "live" nel pulsante Applica: calcola quanti elementi
+        // risulterebbero con le scelte correnti nella modale (non ancora
+        // confermate), così si vede l'effetto prima di applicare.
+        function computeModalPreviewCount() {
+            const category = document.getElementById('filterCategory').value;
+            const year = document.getElementById('filterYear').value;
+            const author = document.getElementById('filterAuthor').value;
+            const subtype = document.getElementById('filterSubtype').value;
+
+            return items.filter(item => {
+                const isArchivableBook = item.type !== 'libro' || isCompletedBookStatus(item.status);
+                const matchesType = activeType === 'tutti' || item.type === activeType;
+                const matchesCategory = category === 'tutti' || categoriesOf(item).includes(category);
+                const matchesYear = year === 'tutti' || item.year === year;
+                const matchesAuthor = author === 'tutti' || authorsOf(item).includes(author);
+                const matchesSubtype = subtype === 'tutti' || item.type !== 'articolo' || item.subtype === subtype;
+                const matchesAbbonamento = !activeAbbonamentoOnly || isSubscriptionArticle(item);
+                const matchesSearch = searchQuery === '' ||
+                    item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    item.author.toLowerCase().includes(searchQuery.toLowerCase());
+                return isArchivableBook && matchesType && matchesCategory && matchesYear && matchesAuthor && matchesSubtype && matchesAbbonamento && matchesSearch;
+            }).length;
+        }
+
+        function updateModalResultCount() {
+            const btn = document.getElementById('btnApplyFilters');
+            if (!btn) return;
+            btn.textContent = `Applica Filtri (${computeModalPreviewCount()})`;
+        }
+
+        function applyFilterModal() {
+            activeCategory = document.getElementById('filterCategory').value;
+            activeYear = document.getElementById('filterYear').value;
+            activeAuthor = document.getElementById('filterAuthor').value;
+            activeSubtype = document.getElementById('filterSubtype').value;
+
+            closeFilterModal();
+            currentPage = 1;
+            groupPages = {};
+            renderActiveViewTab();
+            updateActiveFilterTags();
+            updateQuickFilterVisual();
+        }
+
+        function resetModalFilters() {
+            document.getElementById('filterCategory').value = 'tutti';
+            document.getElementById('filterYear').value = 'tutti';
+            document.getElementById('filterAuthor').value = 'tutti';
+            document.getElementById('filterSubtype').value = 'tutti';
+            updateModalResultCount();
+        }
+
+        // 3b. Quick filter dropdown
+        const btnQuickFilter = document.getElementById('btnQuickFilter');
+        const quickFilterDropdown = document.getElementById('quickFilterDropdown');
+        const dropdownBackdrop = document.getElementById('dropdownBackdrop');
+
+        btnQuickFilter.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const willOpen = quickFilterDropdown.classList.contains('hidden');
+            quickFilterDropdown.classList.toggle('hidden', !willOpen);
+            dropdownBackdrop.classList.toggle('hidden', !willOpen);
+        });
+
+        function closeDropdowns() {
+            quickFilterDropdown.classList.add('hidden');
+            dropdownBackdrop.classList.add('hidden');
+        }
+
+        document.addEventListener('click', closeDropdowns);
+
+        // Un elemento può avere più categorie/generi (campo "categories"): qui
+        // torniamo sempre un array, con "category" (la prima) come ripiego per
+        // i dati più vecchi che non hanno ancora il campo esteso.
+        function categoriesOf(item) {
+            if (Array.isArray(item.categories) && item.categories.length) return item.categories;
+            return item.category ? [item.category] : [];
+        }
+
+        // Idem per gli autori: "Autore1, Autore2" diventa ["Autore1", "Autore2"],
+        // così il filtro trova un elemento anche se non è il primo autore elencato.
+        function authorsOf(item) {
+            if (!item.author) return [];
+            return String(item.author).split(',').map(a => a.trim()).filter(Boolean);
+        }
+
+        // Filtri "trasversali" (categoria, anno, autore, tipologia, ricerca, solo
+        // abbonamenti): si applicano sia alla vista Archivio Completo sia alle
+        // viste Articoli/Libri/Università, che finora li ignoravano del tutto.
+        // Il filtro Tipo/Tutti resta invece specifico dell'Archivio, dato che le
+        // altre viste sono già implicitamente scoped a un tipo dalla scheda stessa.
+        function matchesCommonFilters(item) {
+            const matchesCategory = activeCategory === 'tutti' || categoriesOf(item).includes(activeCategory);
+            const matchesYear = activeYear === 'tutti' || item.year === activeYear;
+            const matchesAuthor = activeAuthor === 'tutti' || authorsOf(item).includes(activeAuthor);
+            // La tipologia (Giornale/Rivista/Newsletter) esiste solo per gli
+            // articoli: applicarla anche a libri/università li farebbe
+            // sparire del tutto ogni volta che il filtro resta impostato
+            // passando a quelle viste.
+            const matchesSubtype = activeSubtype === 'tutti' || item.type !== 'articolo' || item.subtype === activeSubtype;
+            const matchesAbbonamento = !activeAbbonamentoOnly || isSubscriptionArticle(item);
+            const matchesSearch = searchQuery === '' ||
+                item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.author.toLowerCase().includes(searchQuery.toLowerCase());
+
+            return matchesCategory && matchesYear && matchesAuthor && matchesSubtype && matchesAbbonamento && matchesSearch;
+        }
+
+        function getFilteredItems() {
+            return items.filter(item => {
+                const isArchivableBook = item.type !== 'libro' || isCompletedBookStatus(item.status);
+                const matchesType = activeType === 'tutti' || item.type === activeType;
+                return isArchivableBook && matchesType && matchesCommonFilters(item);
+            });
+        }
+
+        function hasActiveFilters() {
+            return activeCategory !== 'tutti' || activeYear !== 'tutti' || activeAuthor !== 'tutti' ||
+                activeSubtype !== 'tutti' || activeAbbonamentoOnly || searchQuery !== '';
+        }
+
+        // Ordine fisso dei gruppi nell'archivio: prima i libri, poi università, poi articoli per tipologia
+        const TOP_LEVEL_ORDER = ['Articoli', 'Libri', 'Università'];
+        const ARTICLE_SUBTYPE_ORDER = ['Giornale', 'Rivista', 'Newsletter', 'Altro'];
+
+        // Un articolo va nel gruppo "In Abbonamento" quando la proprietà Notion
+        // "Stato Rivista" è valorizzata su "Abbonamento" — quindi per aggiungere
+        // una nuova rivista in abbonamento basta compilare quella proprietà in
+        // Notion, senza bisogno di toccare il codice.
+        function isSubscriptionArticle(item) {
+            return item.type === 'articolo' && item.subtype === 'Rivista' && item.inAbbonamento === true;
+        }
+
+        let issuesIndex = {}; // id numero -> { source, issueNumber, cover, articles }
+
+        function buildIssuesFromArticles(subscriptionArticles) {
+            const map = {};
+            subscriptionArticles.forEach(item => {
+                const key = `${item.source}__${item.issueNumber || 'senza-numero'}`;
+                if (!map[key]) {
+                    map[key] = { id: key, source: item.source, issueNumber: item.issueNumber, cover: '', coverFallback: '', date: '', editorial: '', articles: [] };
+                }
+                map[key].articles.push(item);
+                if (!map[key].cover && item.image) {
+                    map[key].cover = item.image;
+                    map[key].coverFallback = item.imageFallback || '';
+                }
+            });
+            const issues = Object.values(map);
+
+            // Se il numero esiste nel database Abbonamenti, i suoi dati ufficiali
+            // (copertina, data di pubblicazione, editoriale) hanno la precedenza
+            // su quanto dedotto dai soli articoli.
+            const officialByKey = {};
+            notionIssues.forEach(rec => {
+                officialByKey[`${rec.source}__${rec.issueNumber || 'senza-numero'}`] = rec;
+            });
+            issues.forEach(issue => {
+                const official = officialByKey[issue.id];
+                if (official) {
+                    if (official.cover) issue.cover = official.cover;
+                    if (official.date) issue.date = official.date;
+                    issue.editorial = official.editorial || '';
+                }
+            });
+
+            issues.forEach(issue => { issuesIndex[issue.id] = issue; });
+
+            // Ordiniamo i numeri dal più recente: guardiamo la data dell'articolo
+            // più recente contenuto in ciascun numero (e la usiamo anche come
+            // "data di pubblicazione" mostrata sulla card, se non già impostata
+            // dal record ufficiale).
+            issues.forEach(issue => {
+                if (issue.date) return;
+                const sorted = [...issue.articles].sort(byDateDesc);
+                issue.date = sorted[0] ? sorted[0].date : '';
+            });
+            issues.sort((a, b) => {
+                const latest = list => Math.max(...list.articles.map(x => parseItalianDateForSort(x.date)));
+                return latest(b) - latest(a);
+            });
+            return issues;
+        }
+
+        function issueCardHtml(issue) {
+            const coverHtml = issue.cover
+                ? `<img src="${issue.cover}" alt="${issue.source} numero ${issue.issueNumber}" data-item-type="articolo" data-fallback-url="${issue.coverFallback || ''}" onerror="onCoverImgError(this)" class="w-full h-32 object-cover">`
+                : `<div class="w-full h-32 flex items-center justify-center bg-teal-50">${placeholderIconFor({ type: 'articolo' })}</div>`;
+
+            return `
+                <div class="medium-card bg-white rounded-2xl border border-stone-200/90 p-3.5 flex flex-col justify-between shadow-2xs hover:border-[#9a3412]/40 transition-all cursor-pointer" onclick="openIssueModal('${issue.id}')">
+                    <div>
+                        <div class="relative mb-3 overflow-hidden rounded-xl bg-stone-100">
+                            ${coverHtml}
+                            <span class="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md backdrop-blur-md shadow-xs bg-teal-900/85 text-white">
+                                ${issue.source}
+                            </span>
+                        </div>
+                        <h4 class="font-serif font-bold text-stone-900 text-sm leading-snug mb-1.5">Numero ${issue.issueNumber || '—'}</h4>
+                        <p class="text-xs font-semibold text-[#9a3412] truncate mb-2">${issue.articles.length} articoli</p>
+                    </div>
+
+                    <div class="pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs text-stone-400 font-medium">
+                        <div class="flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span>${issue.date || '—'}</span>
+                        </div>
+                        <span class="text-[#9a3412] font-semibold flex items-center gap-1 text-xs pointer-events-none">
+                            <span>Leggi</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openIssueModal(issueId) {
+            const issue = issuesIndex[issueId];
+            if (!issue) return;
+
+            const coverEl = document.getElementById('issueModalCover');
+            coverEl.dataset.fallbackStage = '0';
+            coverEl.dataset.fallbackUrl = issue.coverFallback || '';
+            coverEl.classList.toggle('hidden', !issue.cover);
+            coverEl.src = issue.cover || '';
+            document.getElementById('issueModalSource').innerText = issue.source;
+            document.getElementById('issueModalTitle').innerText = `Numero ${issue.issueNumber || '—'}`;
+            document.getElementById('issueModalCount').innerText = `${issue.articles.length} articoli`;
+            document.getElementById('issueModalDate').innerText = `Pubblicato il ${issue.date || '—'}`;
+
+            const editorialEl = document.getElementById('issueModalEditorial');
+            if (issue.editorial) {
+                editorialEl.innerText = issue.editorial;
+                editorialEl.classList.remove('hidden');
+            } else {
+                editorialEl.innerText = '';
+                editorialEl.classList.add('hidden');
+            }
+
+            const sortedArticles = [...issue.articles].sort(byDateDesc);
+            document.getElementById('issueModalList').innerHTML = sortedArticles.map(article => `
+                <button onclick="closeIssueModal(); openReaderModal('${article.id}')" class="w-full text-left flex items-center justify-between gap-3 p-3 rounded-xl hover:bg-stone-50 border border-stone-100 transition-colors">
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-stone-800 truncate">${article.title}</p>
+                        <p class="text-xs text-stone-500 mb-1">${article.author}</p>
+                        ${article.excerpt ? `<p class="text-xs text-stone-400 line-clamp-2">${article.excerpt}</p>` : ''}
+                    </div>
+                    <span class="text-[#9a3412] shrink-0">
+                        <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </span>
+                </button>
+            `).join('');
+
+            document.getElementById('issueModal').classList.remove('hidden');
+        }
+
+        function closeIssueModal() {
+            document.getElementById('issueModal').classList.add('hidden');
+        }
+
+        function topLevelKeyFor(item) {
+            if (item.type === 'libro') return 'Libri';
+            if (item.type === 'universitario') return 'Università';
+            return 'Articoli';
+        }
+
+        function groupByKey(list, keyFn, order) {
+            const groups = {};
+            list.forEach(item => {
+                const key = keyFn(item);
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(item);
+            });
+            return order
+                .filter(key => groups[key] && groups[key].length > 0)
+                .map(key => ({ key, items: groups[key] }));
+        }
+
+        function groupItemsBySection(list) {
+            return groupByKey(list, topLevelKeyFor, TOP_LEVEL_ORDER).map(section => {
+                if (section.key !== 'Articoli') return section;
+                return {
+                    ...section,
+                    subsections: groupByKey(section.items, item => item.subtype || 'Altro', ARTICLE_SUBTYPE_ORDER),
+                };
+            });
+        }
+
+        // ---------- Sezione "Esplora per Vista" (Articoli / Libri / Università) ----------
+
+        let groupPages = {}; // chiave gruppo -> pagina corrente (1-based)
+        const GROUP_PAGE_SIZE = 12;
+
+        function setGroupPage(groupKey, page, totalPages) {
+            groupPages[groupKey] = Math.min(Math.max(1, page), totalPages);
+            renderActiveViewTab();
+        }
+
+        function horizontalRowHtml(title, groupKey, sortedItems, renderCardFn) {
+            renderCardFn = renderCardFn || cardHtml;
+            if (sortedItems.length === 0) return '';
+            const totalPages = Math.max(1, Math.ceil(sortedItems.length / GROUP_PAGE_SIZE));
+            const currentPage = Math.min(groupPages[groupKey] || 1, totalPages);
+            const startIdx = (currentPage - 1) * GROUP_PAGE_SIZE;
+            const visibleItems = sortedItems.slice(startIdx, startIdx + GROUP_PAGE_SIZE);
+            const rangeStart = startIdx + 1;
+            const rangeEnd = startIdx + visibleItems.length;
+
+            const pagerHtml = totalPages > 1 ? `
+                <div class="flex items-center gap-2">
+                    <span class="text-[11px] text-stone-400 whitespace-nowrap">${rangeStart}–${rangeEnd} di ${sortedItems.length}</span>
+                    <button onclick="setGroupPage('${groupKey}', ${currentPage - 1}, ${totalPages})" ${currentPage === 1 ? 'disabled' : ''}
+                        class="w-7 h-7 flex items-center justify-center rounded-lg border border-stone-200 text-stone-500 hover:bg-stone-50 hover:text-[#9a3412] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent">
+                        <svg class="w-3.5 h-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button onclick="setGroupPage('${groupKey}', ${currentPage + 1}, ${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}
+                        class="w-7 h-7 flex items-center justify-center rounded-lg border border-stone-200 text-stone-500 hover:bg-stone-50 hover:text-[#9a3412] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent">
+                        <svg class="w-3.5 h-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            ` : '';
+
+            return `
+                <div>
+                    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                        <div class="flex items-center gap-2">
+                            <h5 class="text-sm font-bold uppercase tracking-wider text-stone-700">${title}</h5>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 bg-stone-100 text-stone-500 rounded-md">${sortedItems.length}</span>
+                        </div>
+                        ${pagerHtml}
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        ${visibleItems.map(item => renderCardFn(item)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderViewTabArticoli() {
+            const panel = document.getElementById('viewPanelArticoli');
+
+            const filteredArticles = articlesList.filter(matchesCommonFilters);
+            const regularArticles = filteredArticles.filter(item => !isSubscriptionArticle(item));
+            const bySubtype = groupByKey(regularArticles, item => item.subtype || 'Altro', ARTICLE_SUBTYPE_ORDER);
+
+            const subscriptionArticles = filteredArticles.filter(isSubscriptionArticle);
+            const issues = buildIssuesFromArticles(subscriptionArticles);
+
+            if (bySubtype.length === 0 && issues.length === 0) {
+                const filtersActive = hasActiveFilters();
+                panel.innerHTML = filtersActive
+                    ? `<p class="text-sm text-stone-500 py-6 text-center">Nessun articolo corrisponde ai filtri attuali. <button onclick="resetAllFilters()" class="text-[#9a3412] font-semibold hover:underline">Azzera i filtri</button></p>`
+                    : `<p class="text-sm text-stone-500 py-6 text-center">Nessun articolo disponibile.</p>`;
+                return;
+            }
+
+            const regularRowsHtml = bySubtype.map(group => {
+                const sorted = [...group.items].sort(byDateDesc);
+                return horizontalRowHtml(group.key, `articoli-${group.key}`, sorted);
+            }).join('');
+
+            const subscriptionRowHtml = horizontalRowHtml('In Abbonamento', 'articoli-InAbbonamento', issues, issueCardHtml);
+
+            panel.innerHTML = regularRowsHtml + subscriptionRowHtml;
+        }
+
+        let activeBookStatusFilter = null; // 'Reading', 'Want to read', 'Done'
+
+        function selectBookStatusFilter(status) {
+            activeBookStatusFilter = status;
+            renderViewTabLibri();
+        }
+
+        const KNOWN_STATUS_ORDER = ['In progress', 'Not started', 'Completed', 'Reading', 'Want to read', 'Done'];
+        const KNOWN_STATUS_LABELS = {
+            'In progress': 'In lettura',
+            'Not started': 'Da leggere',
+            'Completed': 'Completati',
+            // valori precedenti, mantenuti per compatibilità con eventuali dati non ancora rinominati
+            'Reading': 'In lettura',
+            'Want to read': 'Da leggere',
+            'Done': 'Completati',
+        };
+
+        function isCompletedBookStatus(status) {
+            return status === 'Completed' || status === 'Done';
+        }
+
+        function labelForBookStatus(status) {
+            return KNOWN_STATUS_LABELS[status] || status;
+        }
+
+        function renderViewTabLibri() {
+            const panel = document.getElementById('viewPanelLibri');
+
+            const filteredBooks = booksList.filter(matchesCommonFilters);
+
+            if (filteredBooks.length === 0) {
+                const filtersActive = hasActiveFilters();
+                panel.innerHTML = booksList.length === 0
+                    ? `<p class="text-sm text-stone-500 py-6 text-center">Nessun libro disponibile.</p>`
+                    : filtersActive
+                        ? `<p class="text-sm text-stone-500 py-6 text-center">Nessun libro corrisponde ai filtri attuali. <button onclick="resetAllFilters()" class="text-[#9a3412] font-semibold hover:underline">Azzera i filtri</button></p>`
+                        : `<p class="text-sm text-stone-500 py-6 text-center">Nessun libro disponibile.</p>`;
+                return;
+            }
+
+            const byStatusMap = {};
+            filteredBooks.forEach(b => {
+                const key = b.status || 'Senza stato';
+                if (!byStatusMap[key]) byStatusMap[key] = [];
+                byStatusMap[key].push(b);
+            });
+
+            // L'ordine mostra prima gli stati conosciuti (In lettura/Da leggere/Completati,
+            // nell'ordine richiesto), poi eventuali altri valori trovati nei dati che non
+            // corrispondono esattamente a quelli attesi — così nessun libro sparisce
+            // silenziosamente solo perché lo stato in Notion è scritto in modo diverso.
+            const distinctStatuses = Object.keys(byStatusMap);
+            const knownPresent = KNOWN_STATUS_ORDER.filter(s => distinctStatuses.includes(s));
+            const unknownPresent = distinctStatuses.filter(s => !KNOWN_STATUS_ORDER.includes(s));
+            const statusOrder = [...knownPresent, ...unknownPresent];
+
+            // Stato attivo di default: il primo che abbia effettivamente dei libri,
+            // così non si apre su una vista vuota.
+            if (!activeBookStatusFilter || !statusOrder.includes(activeBookStatusFilter)) {
+                activeBookStatusFilter = statusOrder.find(s => byStatusMap[s] && byStatusMap[s].length > 0) || statusOrder[0];
+            }
+
+            // Pillole cliccabili per ogni stato realmente presente nei dati.
+            const pillsHtml = `
+                <div class="flex items-center gap-2 flex-wrap">
+                    ${statusOrder.map(status => `
+                        <button onclick="selectBookStatusFilter('${status}')" class="status-pill-btn ${activeBookStatusFilter === status ? 'active-status-pill' : ''}">
+                            ${labelForBookStatus(status)} <span class="opacity-60">${(byStatusMap[status] || []).length}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            const activeItems = byStatusMap[activeBookStatusFilter] || [];
+            const label = labelForBookStatus(activeBookStatusFilter);
+            const sorted = [...activeItems].sort((a, b) => (a.author || '').localeCompare(b.author || '', 'it', { sensitivity: 'base' }));
+
+            const rowHtml = activeItems.length > 0
+                ? horizontalRowHtml(label, `libri-${activeBookStatusFilter}`, sorted)
+                : `<p class="text-sm text-stone-500 py-10 text-center">Nessun libro in questo stato.</p>`;
+
+            panel.innerHTML = pillsHtml + rowHtml;
+        }
+
+        function renderViewTabUniversita() {
+            const panel = document.getElementById('viewPanelUniversita');
+
+            const filteredUniversity = universityList.filter(matchesCommonFilters);
+
+            if (filteredUniversity.length === 0) {
+                const filtersActive = hasActiveFilters();
+                panel.innerHTML = universityList.length === 0
+                    ? `<p class="text-sm text-stone-500 py-6 text-center">Nessun testo universitario disponibile.</p>`
+                    : filtersActive
+                        ? `<p class="text-sm text-stone-500 py-6 text-center">Nessun testo corrisponde ai filtri attuali. <button onclick="resetAllFilters()" class="text-[#9a3412] font-semibold hover:underline">Azzera i filtri</button></p>`
+                        : `<p class="text-sm text-stone-500 py-6 text-center">Nessun testo universitario disponibile.</p>`;
+                return;
+            }
+
+            const sorted = [...filteredUniversity].sort((a, b) => a.title.localeCompare(b.title));
+            panel.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                    ${sorted.map(item => cardHtml(item)).join('')}
+                </div>
+            `;
+        }
+
+        function renderActiveViewTab() {
+            if (activeViewTab === 'articoli') renderViewTabArticoli();
+            else if (activeViewTab === 'libri') renderViewTabLibri();
+            else if (activeViewTab === 'universita') renderViewTabUniversita();
+            else renderArchiveGrid();
+        }
+
+        function switchViewTab(tab) {
+            activeViewTab = tab;
+
+            document.getElementById('viewPanelArticoli').classList.toggle('hidden', tab !== 'articoli');
+            document.getElementById('viewPanelLibri').classList.toggle('hidden', tab !== 'libri');
+            document.getElementById('viewPanelUniversita').classList.toggle('hidden', tab !== 'universita');
+            document.getElementById('viewPanelArchivio').classList.toggle('hidden', tab !== 'archivio');
+
+            document.getElementById('tabBtnArticoli').classList.toggle('active-view-tab', tab === 'articoli');
+            document.getElementById('tabBtnLibri').classList.toggle('active-view-tab', tab === 'libri');
+            document.getElementById('tabBtnUniversita').classList.toggle('active-view-tab', tab === 'universita');
+            document.getElementById('tabBtnArchivio').classList.toggle('active-view-tab', tab === 'archivio');
+
+            renderActiveViewTab();
+        }
+
+        // Nota: lo stato del libro (bookStatus) non è filtrabile dall'Archivio Completo,
+        // che mostra solo i completati; qui serve solo per portare l'utente sulla
+        // tipologia/tipo corretti, il "vedi tutti" per Reading/Want to read non
+        // troverà quegli elementi nell'archivio (che è "solo letti" per scelta).
+        function goToArchiveFiltered(type, subtype) {
+            switchViewTab('archivio');
+            selectTypeFilter(type);
+            activeSubtype = subtype || 'tutti';
+            document.getElementById('filterSubtype').value = activeSubtype;
+            currentPage = 1;
+            renderArchiveGrid();
+            updateActiveFilterTags();
+            document.getElementById('lettureApprofondimentiSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function badgeColorFor(item) {
+            if (item.type === 'libro') return 'bg-rose-900/85 text-white';
+            if (item.type === 'universitario') return 'bg-amber-900/85 text-white';
+            return 'bg-teal-900/85 text-white'; // articoli
+        }
+
+        function badgeSoftColorFor(item) {
+            if (item.type === 'libro') return 'bg-rose-100 text-rose-800';
+            if (item.type === 'universitario') return 'bg-amber-100 text-amber-800';
+            return 'bg-teal-100 text-teal-800'; // articoli
+        }
+
+        function badgeLabelFor(item) {
+            if (item.subtype) return item.subtype;
+            if (item.type === 'universitario') return 'Università';
+            if (item.type === 'libro') return 'Libro';
+            return item.type;
+        }
+
+        // Sfondo e icona per la copertina "placeholder" quando l'elemento non ha un'immagine
+        function placeholderColorForType(type) {
+            if (type === 'libro') return 'bg-rose-50';
+            if (type === 'universitario') return 'bg-amber-50';
+            return 'bg-teal-50'; // articoli
+        }
+
+        function placeholderIconForType(type) {
+            const colorClass = type === 'libro' ? 'text-rose-300' : type === 'universitario' ? 'text-amber-300' : 'text-teal-300';
+            if (type === 'libro' || type === 'universitario') {
+                // Icona libro
+                return `<svg class="w-10 h-10 ${colorClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>`;
+            }
+            // Icona articolo/giornale
+            return `<svg class="w-10 h-10 ${colorClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2zM7 8h10M7 12h10M7 16h6"></path></svg>`;
+        }
+
+        function placeholderColorFor(item) {
+            return placeholderColorForType(item.type);
+        }
+
+        function placeholderIconFor(item) {
+            return placeholderIconForType(item.type);
+        }
+
+        // Le cover primarie (item.image) puntano al worker Cloudflare
+        // "libreria-covers", che ad ogni richiesta va a prendere un URL fresco
+        // da Notion (gli URL S3 di Notion scadono circa un'ora dopo essere
+        // stati restituiti dall'API). Se anche il worker non risponde (down,
+        // Notion irraggiungibile, token scaduto...), c'è una seconda via di
+        // fuga: item.imageFallback, una copia scaricata al momento
+        // dell'export e versionata nel repository accanto a data.json. Solo
+        // se ANCHE quella fallisce mostriamo l'icona di ripiego generica.
+        //
+        // Stadio 0 -> 1: prova imageFallback (se presente e non già tentato).
+        // Stadio 1 -> fine: icona/colore di ripiego (o la callback custom
+        // passata da chi chiama, usata per i due <img> persistenti dei modal).
+        function onCoverImgError(imgEl, finalFallback) {
+            const stage = imgEl.dataset.fallbackStage || '0';
+            const fallbackUrl = imgEl.dataset.fallbackUrl || '';
+
+            if (stage === '0' && fallbackUrl) {
+                imgEl.dataset.fallbackStage = '1';
+                imgEl.src = fallbackUrl;
+                return;
+            }
+
+            if (finalFallback) {
+                finalFallback(imgEl);
+                return;
+            }
+            applyPlaceholderFallback(imgEl);
+        }
+
+        function applyPlaceholderFallback(imgEl) {
+            const type = imgEl.dataset.itemType || 'articolo';
+            const sizeClasses = imgEl.className.replace(/object-cover/g, '').trim();
+            const wrapper = document.createElement('div');
+            wrapper.className = `${sizeClasses} flex items-center justify-center ${placeholderColorForType(type)}`;
+            wrapper.innerHTML = placeholderIconForType(type);
+            imgEl.replaceWith(wrapper);
+        }
+
+        const CATEGORY_COLOR_PALETTE = [
+            'bg-blue-100 text-blue-700',
+            'bg-emerald-100 text-emerald-700',
+            'bg-amber-100 text-amber-700',
+            'bg-purple-100 text-purple-700',
+            'bg-pink-100 text-pink-700',
+            'bg-cyan-100 text-cyan-700',
+            'bg-orange-100 text-orange-700',
+            'bg-lime-100 text-lime-700',
+            'bg-indigo-100 text-indigo-700',
+            'bg-fuchsia-100 text-fuchsia-700',
+        ];
+
+        function colorForCategory(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+            }
+            return CATEGORY_COLOR_PALETTE[hash % CATEGORY_COLOR_PALETTE.length];
+        }
+
+        function cardHtml(item) {
+            return `
+                <div class="medium-card bg-white rounded-2xl border border-stone-200/90 p-3.5 flex flex-col justify-between shadow-2xs hover:border-[#9a3412]/40 transition-all cursor-pointer" onclick="openReaderModal('${item.id}')">
+                    <div>
+                        <!-- Copertina (o icona di fallback se manca l'immagine) -->
+                        <div class="relative mb-3 overflow-hidden rounded-xl bg-stone-100">
+                            ${item.image
+                                ? `<img src="${item.image}" alt="${item.title}" data-item-type="${item.type}" data-fallback-url="${item.imageFallback || ''}" onerror="onCoverImgError(this)" class="w-full h-32 object-cover">`
+                                : `<div class="w-full h-32 flex items-center justify-center ${placeholderColorFor(item)}">${placeholderIconFor(item)}</div>`
+                            }
+                            <span class="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md backdrop-blur-md shadow-xs ${badgeColorFor(item)}">
+                                ${badgeLabelFor(item)}
+                            </span>
+                            <span class="absolute bottom-2 right-2 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-stone-900/70 text-white backdrop-blur-xs">
+                                ${item.category}
+                            </span>
+                        </div>
+
+                        <!-- Titolo e Autore -->
+                        <h4 class="text-sm font-serif font-bold text-stone-900 line-clamp-2 leading-snug mb-1.5">${item.title}</h4>
+                        <p class="text-xs font-semibold text-[#9a3412] truncate mb-2">${item.author}</p>
+                    </div>
+
+                    <!-- Footer Scheda -->
+                    <div class="pt-2.5 border-t border-stone-100 flex items-center justify-between text-xs text-stone-400 font-medium">
+                        <div class="flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span>${item.date}</span>
+                        </div>
+                        <span class="text-[#9a3412] font-semibold flex items-center gap-1 text-xs pointer-events-none">
+                            <span>Leggi</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderArchiveGrid() {
+            const grid = document.getElementById('archiveGrid');
+            const noResults = document.getElementById('noResultsMsg');
+            const paginationContainer = document.getElementById('paginationContainer');
+
+            const filtered = getFilteredItems();
+
+            // Aggiorna Badge Conteggio
+            document.getElementById('gridCountBadge').innerText = `Mostrando ${filtered.length} elementi`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                paginationContainer.classList.add('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            paginationContainer.classList.remove('hidden');
+
+            // Calcola paginazione
+            const totalPages = Math.ceil(filtered.length / pageSize);
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const startIndex = (currentPage - 1) * pageSize;
+            const paginatedItems = filtered.slice(startIndex, startIndex + pageSize);
+
+            // Raggruppa gli elementi della pagina corrente: Articoli (con sotto-sezioni
+            // Giornale/Rivista/Newsletter), Libri, Università — in quest'ordine.
+            const sections = groupItemsBySection(paginatedItems);
+
+            const cardsGrid = items => `
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+                    ${items.map(item => cardHtml(item)).join('')}
+                </div>
+            `;
+
+            grid.innerHTML = sections.map(section => `
+                <div>
+                    <div class="flex items-center gap-2 mb-3.5">
+                        <h5 class="text-sm font-bold uppercase tracking-wider text-stone-700">${section.key}</h5>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 bg-stone-100 text-stone-500 rounded-md">${section.items.length}</span>
+                        <div class="flex-grow border-t border-stone-200"></div>
+                    </div>
+                    ${section.subsections
+                        ? section.subsections.map(sub => `
+                            <div class="mb-6 last:mb-0">
+                                <div class="flex items-center gap-2 mb-3 pl-1">
+                                    <h6 class="text-xs font-bold uppercase tracking-wider text-stone-500">${sub.key}</h6>
+                                    <span class="text-[10px] font-semibold px-2 py-0.5 bg-stone-100 text-stone-500 rounded-md">${sub.items.length}</span>
+                                    <div class="flex-grow border-t border-stone-100"></div>
+                                </div>
+                                ${cardsGrid(sub.items)}
+                            </div>
+                        `).join('')
+                        : cardsGrid(section.items)
+                    }
+                </div>
+            `).join('');
+
+            renderPaginationControls(filtered.length, totalPages);
+        }
+
+        // Calcola un elenco compatto di pagine da mostrare, es: 1 ... 8 9 [10] 11 12 ... 76
+        function getPaginationRange(current, total, delta = 2) {
+            const pages = [];
+            for (let i = 1; i <= total; i++) {
+                if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+                    pages.push(i);
+                }
+            }
+            const withDots = [];
+            let prev = null;
+            for (const p of pages) {
+                if (prev !== null) {
+                    if (p - prev === 2) {
+                        withDots.push(prev + 1);
+                    } else if (p - prev > 2) {
+                        withDots.push('...');
+                    }
+                }
+                withDots.push(p);
+                prev = p;
+            }
+            return withDots;
+        }
+
+        function renderPaginationControls(totalItems, totalPages) {
+            const start = (currentPage - 1) * pageSize + 1;
+            const end = Math.min(currentPage * pageSize, totalItems);
+            document.getElementById('paginationInfo').innerText = `Mostrando da ${start} a ${end} di ${totalItems} elementi`;
+
+            const btnContainer = document.getElementById('paginationButtons');
+            if (totalPages <= 1) {
+                btnContainer.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="px-3 py-1.5 rounded-lg border border-stone-200 text-stone-300 cursor-not-allowed text-xs"' : 'class="px-3 py-1.5 rounded-lg border border-stone-200 text-stone-600 hover:bg-stone-50 text-xs font-semibold"'}>
+                    &larr; Prev
+                </button>
+            `;
+
+            getPaginationRange(currentPage, totalPages).forEach(p => {
+                if (p === '...') {
+                    html += `<span class="w-8 h-8 flex items-center justify-center text-stone-400 text-xs">…</span>`;
+                } else if (p === currentPage) {
+                    html += `<button class="w-8 h-8 rounded-lg bg-[#9a3412] text-white font-bold text-xs shadow-xs">${p}</button>`;
+                } else {
+                    html += `<button onclick="changePage(${p})" class="w-8 h-8 rounded-lg border border-stone-200 hover:bg-stone-50 text-stone-600 text-xs font-semibold">${p}</button>`;
+                }
+            });
+
+            html += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled class="px-3 py-1.5 rounded-lg border border-stone-200 text-stone-300 cursor-not-allowed text-xs"' : 'class="px-3 py-1.5 rounded-lg border border-stone-200 text-stone-600 hover:bg-stone-50 text-xs font-semibold"'}>
+                    Next &rarr;
+                </button>
+            `;
+
+            btnContainer.innerHTML = html;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderArchiveGrid();
+            window.scrollTo({ top: document.getElementById('archiveGrid').offsetTop - 120, behavior: 'smooth' });
+        }
+
+        function updateActiveFilterTags() {
+            const container = document.getElementById('activeFilterTagsContainer');
+            const tagsList = document.getElementById('activeTagsList');
+            const activeFiltersBadge = document.getElementById('activeFiltersBadge');
+
+            const activeFilters = [];
+
+            if (activeType !== 'tutti') activeFilters.push({ key: 'type', label: `Tipo: ${activeType}` });
+            if (activeCategory !== 'tutti') activeFilters.push({ key: 'category', label: `Categoria: ${activeCategory}` });
+            if (activeYear !== 'tutti') activeFilters.push({ key: 'year', label: `Anno: ${activeYear}` });
+            if (activeAuthor !== 'tutti') activeFilters.push({ key: 'author', label: `Autore: ${activeAuthor}` });
+            if (activeSubtype !== 'tutti') activeFilters.push({ key: 'subtype', label: `Tipologia: ${activeSubtype}` });
+            if (activeAbbonamentoOnly) activeFilters.push({ key: 'abbonamento', label: 'Solo In Abbonamento' });
+            if (searchQuery !== '') activeFilters.push({ key: 'search', label: `Ricerca: "${searchQuery}"` });
+
+            if (activeFilters.length > 0) {
+                container.classList.remove('hidden');
+                activeFiltersBadge.classList.remove('hidden');
+                tagsList.innerHTML = activeFilters.map(f => `
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-100/80 text-[#9a3412] font-medium rounded-lg text-[11px]">
+                        ${f.label}
+                        <button onclick="removeFilter('${f.key}')" class="hover:text-stone-900 font-bold">&times;</button>
+                    </span>
+                `).join('');
+            } else {
+                container.classList.add('hidden');
+                activeFiltersBadge.classList.add('hidden');
+            }
+        }
+
+        function removeFilter(key) {
+            if (key === 'type') selectTypeFilter('tutti');
+            if (key === 'category') activeCategory = 'tutti';
+            if (key === 'year') activeYear = 'tutti';
+            if (key === 'author') activeAuthor = 'tutti';
+            if (key === 'subtype') activeSubtype = 'tutti';
+            if (key === 'abbonamento') toggleAbbonamentoFilter(false);
+            if (key === 'search') clearSearch();
+
+            currentPage = 1;
+            groupPages = {};
+            renderActiveViewTab();
+            updateActiveFilterTags();
+            updateQuickFilterVisual();
+        }
+
+        function resetAllFilters() {
+            activeType = 'tutti';
+            activeCategory = 'tutti';
+            activeYear = 'tutti';
+            activeAuthor = 'tutti';
+            activeSubtype = 'tutti';
+            activeAbbonamentoOnly = false;
+            searchQuery = '';
+            searchInput.value = '';
+
+            document.getElementById('btnClearSearch').classList.add('hidden');
+            document.getElementById('searchIndicatorDot').classList.add('hidden');
+            document.getElementById('filterCategory').value = 'tutti';
+            document.getElementById('filterYear').value = 'tutti';
+            document.getElementById('filterAuthor').value = 'tutti';
+            document.getElementById('filterSubtype').value = 'tutti';
+            updateQuickFilterVisual();
+
+            currentPage = 1;
+            groupPages = {};
+            renderActiveViewTab();
+            updateActiveFilterTags();
+        }
+
+        function openReaderModal(itemId) {
+            const item = items.find(i => i.id === itemId);
+            if (!item) return;
+
+            const modal = document.getElementById('readerModal');
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalAuthor').innerText = item.author;
+
+            const dateLabel = item.type === 'articolo' ? 'Pubblicato il' : 'Letto il';
+            document.getElementById('modalDate').innerText = `${dateLabel} ${item.date}`;
+
+            // Corpo reale della pagina Notion (se disponibile). L'excerpt fa
+            // solo da ripiego quando il corpo non è stato esportato/è vuoto.
+            const modalContentEl = document.getElementById('modalContent');
+            const modalExcerptEl = document.getElementById('modalExcerpt');
+            const modalImageEl = document.getElementById('modalImage');
+            const hasBody = item.content_html && item.content_html.trim() !== '';
+
+            // La cover resta sempre visibile in cima (se presente). Se però il
+            // corpo della pagina contiene la STESSA immagine, la rimuoviamo
+            // solo da lì per evitare di vederla due volte.
+            modalImageEl.dataset.fallbackStage = '0';
+            modalImageEl.dataset.fallbackUrl = item.imageFallback || '';
+            modalImageEl.dataset.itemType = item.type || 'articolo';
+            modalImageEl.classList.toggle('hidden', !item.image);
+            modalImageEl.src = item.image || '';
+
+            if (hasBody) {
+                const temp = document.createElement('div');
+                temp.innerHTML = item.content_html;
+                if (item.image) {
+                    temp.querySelectorAll('img').forEach(img => {
+                        if (img.getAttribute('src') === item.image) img.remove();
+                    });
+                }
+                modalContentEl.innerHTML = temp.innerHTML;
+                modalContentEl.classList.remove('hidden');
+                modalExcerptEl.classList.add('hidden');
+            } else {
+                modalContentEl.innerHTML = '';
+                modalContentEl.classList.add('hidden');
+                modalExcerptEl.innerText = item.excerpt ? `"${item.excerpt}"` : 'Nessun contenuto disponibile per questo elemento.';
+                modalExcerptEl.classList.remove('hidden');
+            }
+
+            const readLink = document.getElementById('modalReadLink');
+            const hasRealUrl = item.url && item.url !== '#';
+            readLink.href = hasRealUrl ? item.url : '#';
+            readLink.classList.toggle('hidden', !hasRealUrl);
+            readLink.classList.toggle('pointer-events-none', !hasRealUrl);
+
+            const badge = document.getElementById('modalTypeBadge');
+            badge.innerText = badgeLabelFor(item);
+            badge.className = `text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md inline-block ${badgeColorFor(item).replace('/85', '/10').replace('text-white', item.type === 'libro' ? 'text-rose-800' : item.type === 'universitario' ? 'text-amber-800' : 'text-teal-800')}`;
+
+            const categoriesEl = document.getElementById('modalCategories');
+            const categoryList = (item.categories && item.categories.length) ? item.categories : (item.category ? [item.category] : []);
+            categoriesEl.innerHTML = categoryList.map(cat =>
+                `<span class="text-[10px] font-semibold px-2.5 py-1 rounded-md ${colorForCategory(cat)}">${cat}</span>`
+            ).join('');
+
+            renderModalAttachments(item);
+
+            const statusRow = document.getElementById('modalStatusRow');
+            if (item.type === 'libro' && item.status) {
+                document.getElementById('modalStatusValue').innerText = labelForBookStatus(item.status);
+                statusRow.classList.remove('hidden');
+            } else {
+                statusRow.classList.add('hidden');
+            }
+
+            modal.classList.remove('hidden');
+
+            // Barra di avanzamento lettura: azzerata a ogni apertura, poi
+            // aggiornata in base allo scroll dell'area contenuti.
+            const scrollArea = document.getElementById('modalScrollArea');
+            const progressBar = document.getElementById('modalProgressBar');
+            scrollArea.scrollTop = 0;
+
+            function updateReadingProgress() {
+                const scrollable = scrollArea.scrollHeight - scrollArea.clientHeight;
+                const pct = scrollable <= 0 ? 100 : (scrollArea.scrollTop / scrollable) * 100;
+                progressBar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+            }
+
+            scrollArea.onscroll = updateReadingProgress;
+            updateReadingProgress();
+        }
+
+        function closeReaderModal() {
+            document.getElementById('readerModal').classList.add('hidden');
+            // Fermiamo un eventuale lettore epub attivo, per non tenerlo in memoria inutilmente
+            currentEpubRendition = null;
+        }
+
+        // ---------- Allegati: PDF (iframe) ed EPUB (epub.js caricato al bisogno) ----------
+
+        let epubJsLoadPromise = null;
+        let currentEpubRendition = null;
+        let epubAttachmentCounter = 0;
+
+        function ensureEpubJsLoaded() {
+            if (window.ePub) return Promise.resolve();
+            if (epubJsLoadPromise) return epubJsLoadPromise;
+            epubJsLoadPromise = new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js';
+                script.onload = resolve;
+                script.onerror = () => reject(new Error('Impossibile caricare il lettore EPUB'));
+                document.head.appendChild(script);
+            });
+            return epubJsLoadPromise;
+        }
+
+        async function openEpubReader(url, viewerId, statusId) {
+            const statusEl = document.getElementById(statusId);
+            const viewerEl = document.getElementById(viewerId);
+            statusEl.innerText = 'Carico il lettore e-book...';
+            try {
+                await ensureEpubJsLoaded();
+                viewerEl.innerHTML = '';
+                viewerEl.classList.remove('hidden');
+                const book = ePub(url);
+                const rendition = book.renderTo(viewerEl, { width: '100%', height: 420 });
+                await rendition.display();
+                currentEpubRendition = rendition;
+                statusEl.innerText = '';
+            } catch (err) {
+                console.warn('Errore apertura EPUB:', err);
+                statusEl.innerText = 'Non è stato possibile aprire l\'e-book qui. Prova ad aprirlo con il link diretto qui sotto.';
+            }
+        }
+
+        function epubPrevPage() { if (currentEpubRendition) currentEpubRendition.prev(); }
+        function epubNextPage() { if (currentEpubRendition) currentEpubRendition.next(); }
+
+        function attachmentBlockHtml(attachment, index) {
+            const safeUrl = attachment.url;
+
+            if (attachment.type === 'pdf') {
+                return `
+                    <div class="border border-stone-200 rounded-2xl overflow-hidden">
+                        <div class="px-4 py-2.5 bg-stone-50 border-b border-stone-200 flex items-center justify-between text-xs">
+                            <span class="font-semibold text-stone-700">📄 ${attachment.name}</span>
+                            <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="text-[#9a3412] hover:underline font-semibold">Apri a schermo intero ↗</a>
+                        </div>
+                        <iframe src="${safeUrl}" class="w-full" style="height:65vh; border:none;"></iframe>
+                    </div>
+                `;
+            }
+
+            if (attachment.type === 'epub') {
+                const viewerId = `epubViewer-${index}`;
+                const statusId = `epubStatus-${index}`;
+                return `
+                    <div class="border border-stone-200 rounded-2xl overflow-hidden">
+                        <div class="px-4 py-2.5 bg-stone-50 border-b border-stone-200 flex items-center justify-between text-xs flex-wrap gap-2">
+                            <span class="font-semibold text-stone-700">📖 ${attachment.name}</span>
+                            <div class="flex items-center gap-3">
+                                <button onclick="openEpubReader('${safeUrl}', '${viewerId}', '${statusId}')" class="text-[#9a3412] hover:underline font-semibold">Leggi qui</button>
+                                <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="text-stone-500 hover:underline">Apri file ↗</a>
+                            </div>
+                        </div>
+                        <p id="${statusId}" class="text-xs text-stone-500 px-4 py-2"></p>
+                        <div id="${viewerId}" class="hidden" style="height:420px;"></div>
+                        <div class="flex items-center justify-between px-4 py-2 bg-stone-50 border-t border-stone-200">
+                            <button onclick="epubPrevPage()" class="text-xs font-semibold text-stone-600 hover:text-[#9a3412]">‹ Pagina precedente</button>
+                            <button onclick="epubNextPage()" class="text-xs font-semibold text-stone-600 hover:text-[#9a3412]">Pagina successiva ›</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Altri tipi di file: solo link diretto
+            return `
+                <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 p-3 border border-stone-200 rounded-xl text-sm font-semibold text-stone-700 hover:bg-stone-50">
+                    📎 ${attachment.name}
+                </a>
+            `;
+        }
+
+        function renderModalAttachments(item) {
+            const container = document.getElementById('modalAttachments');
+            currentEpubRendition = null;
+
+            if (!item.attachments || item.attachments.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = item.attachments.map((att, idx) => attachmentBlockHtml(att, idx)).join('');
+        }
+
+        let notionIssues = []; // record ufficiali dal database Abbonamenti (editoriale, copertina, data)
+
+        function setItemsAndDerive(data) {
+            const isWrapped = data && !Array.isArray(data) && Array.isArray(data.items);
+            items = isWrapped ? data.items : (Array.isArray(data) ? data : []);
+            notionIssues = (isWrapped && Array.isArray(data.issues)) ? data.issues : [];
+
+            articlesList = items.filter(i => i.type === 'articolo');
+            booksList = items.filter(i => i.type === 'libro'); // tutti gli stati: reading/want to read/done
+            completedBooksList = booksList.filter(b => isCompletedBookStatus(b.status));
+            universityList = items.filter(i => i.type === 'universitario');
+
+            // Caroselli "recenti": max 20 elementi, ordinati dal più recente.
+            // I libri universitari restano fuori (sezione a parte). Il carosello
+            // libri considera solo quelli completati (letti), non in corso o da leggere.
+            recentArticles = [...articlesList].sort(byDateDesc).slice(0, 20);
+            recentBooks = [...completedBooksList].sort(byDateDesc).slice(0, 10);
+        }
+
+        const MESI_IT_MAP = {
+            gen: 0, feb: 1, mar: 2, apr: 3, mag: 4, giu: 5,
+            lug: 6, ago: 7, set: 8, ott: 9, nov: 10, dic: 11,
+        };
+
+        // Converte le date già formattate in italiano ("12 Set 2026", "Set 2026", "2026")
+        // in un timestamp, per poter ordinare i contenuti dal più recente. Se il formato
+        // non è riconosciuto, ritorna 0 (finisce in fondo all'ordinamento).
+        function parseItalianDateForSort(dateStr) {
+            if (!dateStr) return 0;
+            const s = dateStr.trim();
+
+            let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); // "12/09/2026"
+            if (m) return new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1])).getTime();
+
+            m = s.match(/^(\d{4})$/); // "2026" (usato come proxy per i libri universitari)
+            if (m) return new Date(Number(m[1]), 0, 1).getTime();
+
+            return 0;
+        }
+
+        function byDateDesc(a, b) {
+            return parseItalianDateForSort(b.date) - parseItalianDateForSort(a.date);
+        }
+
+        function startApp() {
+            calculateStats();
+            renderDots();
+            renderArticleSlide(0);
+            renderBookSlide(0);
+            document.getElementById('tabBtnArticoli').classList.add('active-view-tab');
+            renderActiveViewTab();
+            renderArchiveGrid();
+            startAutoPlay();
+        }
+
+        function showLoadError() {
+            const grid = document.getElementById('archiveGrid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-16 text-stone-500 text-sm">
+                        Impossibile caricare <code class="px-1 bg-stone-100 rounded">data.json</code>.
+                        Verifica che il file esista accanto a questa pagina.
+                    </div>
+                `;
+            }
+        }
+
+        async function init() {
+            try {
+                // cache-bust per evitare che il browser mostri dati stantii
+                const res = await fetch('data.json?t=' + Date.now());
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                setItemsAndDerive(data);
+                startApp();
+            } catch (err) {
+                console.warn('data.json non disponibile, uso i dati di fallback locali:', err);
+                // In fase di test locale (es. apertura diretta del file, niente data.json ancora
+                // pubblicato) ricadiamo sui dati mock così la pagina resta comunque navigabile.
+                setItemsAndDerive(fallbackItems);
+                if (items.length === 0) {
+                    showLoadError();
+                } else {
+                    startApp();
+                }
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
