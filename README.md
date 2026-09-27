@@ -29,10 +29,48 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 │   ├── avatar.jpg
 │   ├── cover.jpg
 │   └── screenshot.jpg            # opzionale
+├── libreria/                     # vedi sezione "La Mia Libreria" più sotto
+│   ├── index.html
+│   ├── statistiche.html
+│   ├── data.json
+│   └── covers/
+├── CNAME
+├── LICENSE
 └── README.md
 ```
 
 > Puoi aggiungere `styles.css` o `scripts.js` se preferisci estrarre lo stile/JS dall’HTML.
+
+---
+
+## 📚 La Mia Libreria (`/libreria`)
+
+Sezione self-hosted, separata dal resto del portfolio, che sostituisce la vecchia pagina Notion pubblica. È una vetrina e archivio personale delle letture (libri, articoli, riviste in abbonamento, testi universitari), con una pagina di statistiche dedicata.
+
+- **Live**: <https://www.danieledemichele.it/libreria/> · statistiche: <https://www.danieledemichele.it/libreria/statistiche.html>
+- **`libreria/index.html`** — vetrina + archivio, filtri (categoria, anno, autore, tipologia, ricerca, scorciatoie rapide) e viste per Articoli / Libri / Università / Archivio Completo. Pagina singola, self-contained (Tailwind CDN + JS vanilla), nessuna build.
+- **`libreria/statistiche.html`** — report con grafici Chart.js (andamento nel tempo, distribuzione per tipo, categorie e autori più letti, riviste in abbonamento, stato dei libri).
+- **`libreria/data.json`** — i dati mostrati dalle due pagine sopra. **Non si modifica a mano**: viene rigenerato dallo script `export_libreria.py` (vedi sotto) e va semplicemente committato quando cambia.
+- **`libreria/covers/`** — copertine dei singoli elementi, scaricate in locale durante l'export: è la via di fuga se il link "fresco" (vedi sotto) non risponde.
+
+### Da dove arrivano i dati
+
+`export_libreria.py` (script esterno, **non versionato in questo repo**) legge tre database Notion — Books List, Books University, Articles List — e genera `libreria/data.json`. Per aggiornare la libreria online:
+
+1. Lancia lo script con il tuo `NOTION_TOKEN` (e, se configurato, `--worker-base-url` per il proxy cover — vedi sotto).
+2. Copia il `data.json` generato (e le eventuali nuove cover in `covers/`) dentro `libreria/` in questo repo.
+3. Commit + push su `main`: GitHub Pages ripubblica automaticamente.
+
+**Log dell'aggiornamento**: ogni esecuzione dello script scrive due file nella cartella `logs/` accanto al `data.json` generato (percorso configurabile con `--log-dir`, di norma **fuori da questo repo**, dove lo script viene lanciato):
+- `export.log` — attività della run (pagine trovate per database, cover scaricate, esito finale).
+- `export_errors.log` — solo warning/errori (retry Notion, cover non scaricate, singole pagine Notion malformate saltate, eccezioni impreviste con traceback completo). Comodo per capire subito cosa è andato storto senza scorrere il log generale, ed evitare di ripetere lo stesso errore al giro successivo.
+
+### Copertine sempre aggiornate
+
+Gli URL dei file caricati su Notion scadono circa un'ora dopo essere stati restituiti dall'API, quindi un `data.json` statico che li contenga direttamente smetterebbe presto di mostrare le immagini. Ogni elemento ha perciò due campi immagine, con doppia via di fuga:
+1. **`image`** — se è configurato un Cloudflare Worker (`libreria-covers-worker/`, anch'esso esterno a questo repo), è la sua rotta `/cover/<page_id>`, che ad ogni richiesta va a riprendere un link fresco da Notion.
+2. **`imageFallback`** — la copia locale in `libreria/covers/`, usata dalla pagina se il worker (o Notion) non rispondono.
+3. Se anche questa manca, la pagina mostra un'icona segnaposto generica in base al tipo di contenuto.
 
 ---
 
