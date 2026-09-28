@@ -28,18 +28,33 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 ├── assets/
 │   ├── avatar.jpg
 │   ├── cover.jpg
-│   └── screenshot.jpg            # opzionale
+│   ├── screenshot.jpg            # opzionale
+│   └── favicon.svg / favicon.ico / favicon-16.png / favicon-32.png / apple-touch-icon.png
 ├── libreria/                     # vedi sezione "La Mia Libreria" più sotto
 │   ├── index.html
 │   ├── statistiche.html
 │   ├── data.json
-│   └── covers/
+│   ├── covers/
+│   ├── favicon-libreria.svg / .ico / -16.png / -32.png / apple-touch-icon-libreria.png
+│   └── favicon-statistiche.svg / .ico / -16.png / -32.png / apple-touch-icon-statistiche.png
 ├── CNAME
 ├── LICENSE
 └── README.md
 ```
 
 > Puoi aggiungere `styles.css` o `scripts.js` se preferisci estrarre lo stile/JS dall’HTML.
+
+### 🔖 Favicon
+
+Ogni pagina ha la propria favicon, per distinguerla subito tra le schede del browser:
+
+| Pagina | Icona | File |
+|---|---|---|
+| `index.html` (portfolio) | monogramma "D" su cerchio scuro | `assets/favicon.*` |
+| `libreria/index.html` | libro chiuso con segnalibro | `libreria/favicon-libreria.*` |
+| `libreria/statistiche.html` | istogramma a barre | `libreria/favicon-statistiche.*` |
+
+Ogni set include un `.svg` (usato dai browser moderni), un `.ico` multi-risoluzione (fallback), due `.png` (16×16 e 32×32) e un `apple-touch-icon.png` (180×180, per l'aggiunta alla home screen su iOS). Per cambiare un'icona basta rigenerare il set e sovrascrivere i file: gli `<link rel="icon">` nell'`<head>` di ciascuna pagina restano invariati.
 
 ---
 
