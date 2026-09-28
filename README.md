@@ -67,18 +67,28 @@ Sezione self-hosted, separata dal resto del portfolio, che sostituisce la vecchi
 - **`libreria/statistiche.html`** — report con grafici Chart.js (andamento nel tempo, distribuzione per tipo, categorie e autori più letti, riviste in abbonamento, stato dei libri).
 - **`libreria/data.json`** — i dati mostrati dalle due pagine sopra. **Non si modifica a mano**: viene rigenerato dallo script `export_libreria.py` (vedi sotto) e va semplicemente committato quando cambia.
 - **`libreria/covers/`** — copertine dei singoli elementi, scaricate in locale durante l'export: è la via di fuga se il link "fresco" (vedi sotto) non risponde.
+- **`libreria/export_cache.json`** — stato incrementale dell'export (vedi sotto): da committare insieme a `data.json`.
 
 ### Da dove arrivano i dati
 
 `export_libreria.py` (script esterno, **non versionato in questo repo**) legge tre database Notion — Books List, Books University, Articles List — e genera `libreria/data.json`. Per aggiornare la libreria online:
 
-1. Lancia lo script con il tuo `NOTION_TOKEN` (e, se configurato, `--worker-base-url` per il proxy cover — vedi sotto).
-2. Copia il `data.json` generato (e le eventuali nuove cover in `covers/`) dentro `libreria/` in questo repo.
-3. Commit + push su `main`: GitHub Pages ripubblica automaticamente.
+1. Posizionati dentro `libreria/` (o passa un `--output` che punti lì) e lancia lo script con il tuo `NOTION_TOKEN` (e, se configurato, `--worker-base-url` per il proxy cover — vedi sotto): `cd libreria/ && python3 export_libreria.py --output data.json`. In un solo comando genera `data.json`, scarica le cover nuove/mancanti in `covers/` e aggiorna `export_cache.json` — nessun passaggio separato.
+2. Commit + push su `main` di `data.json`, `covers/` ed `export_cache.json`: GitHub Pages ripubblica automaticamente.
 
 **Log dell'aggiornamento**: ogni esecuzione dello script scrive due file nella cartella `logs/` accanto al `data.json` generato (percorso configurabile con `--log-dir`, di norma **fuori da questo repo**, dove lo script viene lanciato):
 - `export.log` — attività della run (pagine trovate per database, cover scaricate, esito finale).
 - `export_errors.log` — solo warning/errori (retry Notion, cover non scaricate, singole pagine Notion malformate saltate, eccezioni impreviste con traceback completo). Comodo per capire subito cosa è andato storto senza scorrere il log generale, ed evitare di ripetere lo stesso errore al giro successivo.
+
+### Cache incrementale (`export_cache.json`)
+
+Man mano che la libreria cresce, rileggere da capo il corpo di ogni singola pagina Notion (blocchi, autori collegati) ad ogni esecuzione diventerebbe sempre più lento. Lo script tiene quindi una cache accanto a `data.json` — **`export_cache.json`** — che associa ad ogni pagina la sua ultima modifica su Notion (`last_edited_time`, tracciato automaticamente da Notion stesso, senza bisogno di compilare a mano una data) e il relativo elemento già pronto.
+
+Ad ogni run: le pagine con `last_edited_time` invariato vengono riusate così come sono (niente richiami API per i blocchi o per gli autori); solo le pagine nuove o modificate da davvero vengono rielaborate; le pagine cancellate da Notion spariscono da sole sia da `data.json` sia dalla cache. Il file va **committato insieme a `data.json`**, altrimenti la prossima esecuzione (es. da un'altra macchina) riparte da zero una volta sola — non è un errore, solo una run più lenta del solito.
+
+- `--no-cache` — ignora la cache e rielabora tutte le pagine da zero (es. per un controllo completo).
+- `--force-covers` — ririscarica anche le cover già presenti in locale; disattiva automaticamente anche la cache per quella run.
+- `--cache-file` — percorso della cache, se non va bene il default (`export_cache.json` accanto al file di output).
 
 ### Copertine sempre aggiornate
 
