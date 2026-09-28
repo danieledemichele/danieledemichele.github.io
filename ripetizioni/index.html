@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prenota una Ripetizione · Daniele De Michele</title>
+    <meta name="description" content="Prenota una ripetizione privata con Daniele De Michele: scegli giorno e orario dal calendario e ricevi subito la conferma via email.">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Prenota una Ripetizione · Daniele De Michele">
+    <meta property="og:description" content="Scegli giorno e orario dal calendario e ricevi subito la conferma via email.">
+    <meta property="og:url" content="https://danieledemichele.it/ripetizioni/">
+    <meta property="og:image" content="https://danieledemichele.it/assets/cover.jpg">
+    <meta property="og:locale" content="it_IT">
+
+    <!-- Favicon -->
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../assets/favicon.ico" sizes="any">
+    <link rel="icon" href="../assets/favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="../assets/favicon-16.png" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+
+    <!-- Tailwind CSS e font: identici a libreria/index.html e libreria/statistiche.html -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== Palette base (terracotta/crema, come la libreria) ===== */
+        :root {
+            --bg: #fbf8f3;
+            --text: #2c2825;
+            --muted: #57534e;
+            --soft: #f4efe6;
+            --border: #e2dcd2;
+            --accent: #9a3412;
+            --accent-hover: #7c2d12;
+
+            /* Ritaglio del fondo grigio interno di Calendly (solo desktop ≥1280px).
+               Linea grigia residua → aumenta --cal-crop di 1-2px; bordo del calendario tagliato → diminuisci. */
+            --cal-crop: 66px;
+            --cal-visible: 612px;
+        }
+
+        /* ===== Toni delle singole card (mix come nella libreria) ===== */
+        .theme-oceano { --soft: #e9eef7; --border: #d3dcea; --accent: #1e3a8a; --accent-hover: #172554; --muted: #4b5567; }
+        .theme-salvia { --soft: #e4eae7; --border: #cfdad4; --accent: #2f5d50; --accent-hover: #1f3d36; --muted: #526159; }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); }
+        ::selection { background: #fde68a; color: #451a03; }
+        .font-serif { font-family: 'Playfair Display', Georgia, serif; }
+        .text-muted { color: var(--muted); }
+        .text-accent { color: var(--accent); }
+        .text-accent-strong { color: var(--accent-hover); }
+
+        .glass-panel {
+            background: rgba(251, 248, 243, 0.82);
+            backdrop-filter: saturate(1.4) blur(14px);
+            -webkit-backdrop-filter: saturate(1.4) blur(14px);
+        }
+
+        /* ===== Card ===== */
+        .card {
+            border-radius: 1.75rem;
+            border: 1px solid var(--border);
+            background: var(--soft);
+            box-shadow: 0 1px 2px rgba(28, 25, 23, .04), 0 18px 40px -28px rgba(28, 25, 23, .28);
+            transition: border-color .25s ease, box-shadow .25s ease;
+        }
+        .card:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+        .card-white { background: #fff; }
+
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: .5rem;
+            font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+            color: var(--accent);
+        }
+        .eyebrow::before { content: ""; width: .5rem; height: .5rem; border-radius: 9999px; background: currentColor; }
+
+        /* Chip informative */
+        .chip {
+            display: inline-flex; align-items: center; gap: .4rem;
+            font-size: .75rem; font-weight: 600; color: var(--accent-hover);
+            background: rgba(255,255,255,.7); border: 1px solid var(--border);
+            padding: .35rem .75rem; border-radius: 9999px;
+        }
+        .chip svg { width: .9rem; height: .9rem; color: var(--accent); }
+
+        .logo-badge { background: var(--accent); box-shadow: 0 8px 18px -8px rgba(154, 52, 18, .6); }
+        .btn-accent { background: var(--accent); color: #fff; transition: background .2s ease, transform .2s ease; }
+        .btn-accent:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .link-accent { color: var(--accent); font-weight: 600; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent); text-underline-offset: 3px; }
+        .link-accent:hover { text-decoration-color: var(--accent); }
+        .back-link { color: var(--muted); }
+        .back-link:hover { color: var(--accent); background: rgba(255,255,255,.7); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #f4efe6; }
+        ::-webkit-scrollbar-thumb { background: #d8cfc0; border-radius: 4px; }
+
+        /* ===== Nota bene: righe con icona ===== */
+        .note-item { display: flex; gap: .75rem; align-items: flex-start; }
+        .note-icon {
+            flex-shrink: 0; width: 1.75rem; height: 1.75rem; border-radius: .6rem;
+            display: grid; place-items: center; background: #fff; color: var(--accent);
+            border: 1px solid var(--border);
+        }
+        .note-icon svg { width: .95rem; height: .95rem; }
+
+        /* ===== Stepper verticale con linea di collegamento ===== */
+        .stepper { position: relative; }
+        .stepper::before {
+            content: ""; position: absolute; left: 1rem; top: 1.25rem; bottom: 1.25rem; width: 2px;
+            background: color-mix(in srgb, var(--accent) 22%, transparent); border-radius: 2px;
+        }
+        .step-num {
+            position: relative; z-index: 1;
+            flex-shrink: 0; width: 2rem; height: 2rem; border-radius: .7rem;
+            background: var(--accent); color: #fff; font-weight: 700; font-size: .8rem;
+            display: grid; place-items: center;
+            box-shadow: 0 0 0 4px var(--soft), 0 6px 14px -6px color-mix(in srgb, var(--accent) 70%, transparent);
+        }
+        .step-body { padding-left: 3rem; }
+        .field-chip {
+            display: inline-block; font-size: .75rem; font-weight: 500; color: var(--accent-hover);
+            background: #fff; border: 1px solid var(--border); padding: .2rem .6rem; border-radius: .5rem;
+        }
+
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .chevron { transform: rotate(180deg); }
+        .chevron { transition: transform .2s ease; }
+
+        /* ===== Calendly =====
+           Il fondo grigio è disegnato dentro l'iframe di Calendly e non si può colorare da fuori:
+           su desktop allarghiamo l'iframe di --cal-crop per lato e nascondiamo l'eccedenza. */
+        .cal-frame { position: relative; overflow: hidden; flex-grow: 1; }
+        .calendly-inline-widget { min-width: 320px; height: 1000px; }
+        @media (min-width: 1280px) {
+            .cal-frame { height: var(--cal-visible); flex-grow: 0; }
+            .cal-frame .calendly-inline-widget {
+                width: calc(100% + 2 * var(--cal-crop));
+                height: calc(var(--cal-visible) + 2 * var(--cal-crop) + 60px);
+                margin: calc(-1 * var(--cal-crop)) 0 0 calc(-1 * var(--cal-crop));
+            }
+        }
+
+        .skeleton { animation: pulse 1.6s ease-in-out infinite; background: #f4efe6; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+
+        .fade-in { animation: fadeIn .35s cubic-bezier(.16,1,.3,1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-stone-200/70">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="logo-badge w-10 h-10 rounded-xl flex items-center justify-center text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <div class="leading-tight">
+                        <h1 class="text-lg sm:text-xl font-serif font-bold tracking-tight">Prenota una Ripetizione</h1>
+                        <p class="text-[11px] text-muted font-medium hidden sm:block">Lezioni private · prenotazione online</p>
+                    </div>
+                </div>
+                <a href="/" class="back-link text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 rounded-full px-3 py-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span class="hidden sm:inline">Torna al sito</span><span class="sm:hidden">Home</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-grow max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8 space-y-5 lg:space-y-6">
+
+        <!-- Conferma prenotazione -->
+        <div id="bookingConfirmed" class="hidden fade-in card theme-salvia p-5 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl btn-accent flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div>
+                <h2 class="font-serif font-bold text-lg text-accent-strong">Prenotazione confermata!</h2>
+                <p class="text-sm text-muted">Riceverai a breve un'email con i dettagli della lezione e il link per cancellarla o riprogrammarla.</p>
+            </div>
+        </div>
+
+        <!-- RIGA 1: introduzione + nota bene -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 items-stretch">
+
+            <section class="card p-6 sm:p-7 flex flex-col gap-4">
+                <span class="eyebrow">Ripetizioni private</span>
+                <div>
+                    <h2 class="text-2xl sm:text-[1.75rem] leading-tight font-serif font-bold tracking-tight">Scegli quando fare lezione</h2>
+                    <p class="mt-2 text-sm text-muted leading-relaxed max-w-xl">
+                        Segui i passaggi e scegli giorno e orario direttamente dal calendario: vedrai solo gli slot ancora liberi.
+                    </p>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-auto">
+                    <span class="chip">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Lezioni da 1 ora
+                    </span>
+                    <span class="chip">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.9 5.3a2 2 0 002.2 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        Conferma immediata via email
+                    </span>
+                    <span class="chip">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.6m15.4 2A8 8 0 004.6 9M4.6 9H9m11 11v-5h-.6m0 0a8 8 0 01-15.4-2m15.4 2H15"></path></svg>
+                        Cancelli o sposti quando vuoi
+                    </span>
+                </div>
+                <a href="#calendario" class="lg:hidden self-start inline-flex items-center gap-2 btn-accent text-sm font-semibold rounded-full px-5 py-2.5">
+                    Vai al calendario
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                </a>
+            </section>
+
+            <section class="card theme-oceano p-6 sm:p-7 flex flex-col gap-4">
+                <span class="eyebrow">Nota bene</span>
+                <div class="space-y-3 text-sm text-muted leading-relaxed">
+                    <div class="note-item">
+                        <span class="note-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></span>
+                        <p>Gli slot prenotati non saranno più visibili agli altri utenti.</p>
+                    </div>
+                    <div class="note-item">
+                        <span class="note-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"></path></svg></span>
+                        <p>In caso di imprevisti, nell'email di conferma trovi il link per <strong class="text-accent-strong">cancellare o riprogrammare</strong> la lezione.</p>
+                    </div>
+                    <div class="note-item">
+                        <span class="note-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.4-4 8-9 8a9.9 9.9 0 01-4.3-.9L3 20l1.4-3.7A7.6 7.6 0 013 12c0-4.4 4-8 9-8s9 3.6 9 8z"></path></svg></span>
+                        <p>Hai un dubbio prima di prenotare? Scrivimi a <a href="mailto:daniele@danieledemichele.it" class="link-accent">daniele@danieledemichele.it</a>.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- RIGA 2: istruzioni + calendario -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 items-stretch">
+
+            <!-- ISTRUZIONI -->
+            <section class="card theme-salvia p-6 sm:p-7">
+                <span class="eyebrow mb-5">Come prenotare</span>
+
+                <ol class="stepper space-y-1 lg:space-y-4">
+                    <li>
+                        <details class="step" open>
+                            <summary class="flex items-center gap-4 py-1">
+                                <span class="step-num">1</span>
+                                <span class="font-semibold flex-grow text-accent-strong">Seleziona il giorno</span>
+                                <svg class="chevron w-4 h-4 text-muted lg:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </summary>
+                            <p class="step-body pt-1 text-sm text-muted leading-relaxed">Scegli dal calendario la data in cui vuoi fare lezione: sono visibili solo i giorni con orari disponibili.</p>
+                        </details>
+                    </li>
+                    <li>
+                        <details class="step" open>
+                            <summary class="flex items-center gap-4 py-1">
+                                <span class="step-num">2</span>
+                                <span class="font-semibold flex-grow text-accent-strong">Scegli l'orario</span>
+                                <svg class="chevron w-4 h-4 text-muted lg:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </summary>
+                            <p class="step-body pt-1 text-sm text-muted leading-relaxed">Clicca su uno degli orari liberi. Ogni lezione dura <strong class="text-accent-strong">1 ora</strong>: per farne due, ripeti la prenotazione sullo slot successivo.</p>
+                        </details>
+                    </li>
+                    <li>
+                        <details class="step" open>
+                            <summary class="flex items-center gap-4 py-1">
+                                <span class="step-num">3</span>
+                                <span class="font-semibold flex-grow text-accent-strong">Inserisci i tuoi dati</span>
+                                <svg class="chevron w-4 h-4 text-muted lg:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </summary>
+                            <div class="step-body pt-2 flex flex-wrap gap-1.5">
+                                <span class="field-chip">Nome e cognome</span>
+                                <span class="field-chip">Email</span>
+                                <span class="field-chip">Telefono</span>
+                                <span class="field-chip">Materia e argomento</span>
+                                <span class="field-chip">Difficoltà che incontri nello studio</span>
+                            </div>
+                        </details>
+                    </li>
+                    <li>
+                        <details class="step" open>
+                            <summary class="flex items-center gap-4 py-1">
+                                <span class="step-num">4</span>
+                                <span class="font-semibold flex-grow text-accent-strong">Conferma la prenotazione</span>
+                                <svg class="chevron w-4 h-4 text-muted lg:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </summary>
+                            <p class="step-body pt-1 text-sm text-muted leading-relaxed">Clicca su <em>Programma evento</em>: riceverai subito un'email di conferma con tutti i dettagli della lezione.</p>
+                        </details>
+                    </li>
+                </ol>
+            </section>
+
+            <!-- CALENDARIO -->
+            <section id="calendario" class="scroll-mt-20 card card-white theme-oceano overflow-hidden flex flex-col">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-stone-100">
+                    <span class="eyebrow">Calendario disponibilità</span>
+                    <span class="chip !py-1">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        1 ora
+                    </span>
+                </div>
+
+                <div class="cal-frame">
+                    <div id="calendlySkeleton" class="absolute inset-0 p-8 space-y-4 pointer-events-none z-10 bg-white">
+                        <div class="skeleton h-6 w-48 rounded-lg"></div>
+                        <div class="skeleton h-64 w-full rounded-2xl"></div>
+                        <div class="skeleton h-10 w-2/3 rounded-xl"></div>
+                        <p class="text-xs text-muted text-center pt-2">Caricamento del calendario…</p>
+                    </div>
+                    <!-- hide_event_type_details / hide_gdpr_banner: rimuovono riquadro evento e banner cookie interni.
+                         I parametri colore vengono applicati solo con un piano Calendly a pagamento. -->
+                    <div class="calendly-inline-widget"
+                         data-url="https://calendly.com/daniele-danieledemichele/ripetizioni?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=9a3412&text_color=2c2825&background_color=ffffff"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="border-t border-stone-200/70 py-6 mt-10">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-1 text-xs text-muted">
+            <p>&copy; 2026 Daniele De Michele · Prenotazioni gestite tramite Calendly</p>
+            <p class="text-[10px] opacity-70">Calendly può impostare cookie tecnici per il funzionamento della prenotazione.</p>
+        </div>
+    </footer>
+
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <script>
+        // Passi: sempre aperti su desktop; su mobile resta aperto solo il primo.
+        (function () {
+            const mq = window.matchMedia('(min-width: 1024px)');
+            const steps = document.querySelectorAll('details.step');
+            const sync = () => steps.forEach((d, i) => { d.open = mq.matches ? true : i === 0; });
+            sync();
+            mq.addEventListener('change', sync);
+            steps.forEach(d => d.querySelector('summary').addEventListener('click', e => { if (mq.matches) e.preventDefault(); }));
+        })();
+
+        // Nasconde lo skeleton quando l'iframe di Calendly ha caricato.
+        (function () {
+            const widget = document.querySelector('.calendly-inline-widget');
+            const skeleton = document.getElementById('calendlySkeleton');
+            const obs = new MutationObserver(() => {
+                const iframe = widget.querySelector('iframe');
+                if (iframe) {
+                    iframe.addEventListener('load', () => skeleton.remove(), { once: true });
+                    obs.disconnect();
+                }
+            });
+            obs.observe(widget, { childList: true, subtree: true });
+            setTimeout(() => { if (skeleton.isConnected) skeleton.remove(); }, 8000);
+        })();
+
+        // Conferma dopo la prenotazione (evento Calendly, disponibile anche nel piano gratuito).
+        window.addEventListener('message', e => {
+            if (e.origin !== 'https://calendly.com' || !e.data || e.data.event !== 'calendly.event_scheduled') return;
+            document.getElementById('bookingConfirmed').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
