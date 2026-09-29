@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ingegneria Civile · Laurea Triennale · Daniele De Michele</title>
+    <title>Ingegneria Civile · Triennale e Magistrale · Daniele De Michele</title>
     <meta name="description" content="Le materie del corso di laurea triennale in Ingegneria Civile, anno per anno: docenti, CFU, semestre, modalità d'esame e materiale di studio.">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Ingegneria Civile · Laurea Triennale">
-    <meta property="og:description" content="Materie, docenti, CFU e materiale di studio del percorso triennale, con modulo di richiesta supporto.">
+    <meta property="og:title" content="Ingegneria Civile · Triennale e Magistrale">
+    <meta property="og:description" content="Materie, docenti, CFU e materiale di studio della laurea triennale e magistrale (Strutture), con modulo di richiesta supporto.">
     <meta property="og:url" content="https://danieledemichele.it/triennale/">
     <meta property="og:image" content="https://danieledemichele.it/assets/cover.jpg">
     <meta property="og:locale" content="it_IT">
@@ -96,6 +96,13 @@
         ::-webkit-scrollbar-track { background: #f4efe6; }
         ::-webkit-scrollbar-thumb { background: #d8cfc0; border-radius: 4px; }
 
+        /* ===== Schede corso (stesse della libreria: Articoli/Libri/Università) ===== */
+        .view-tab-btn { color: #78716c; border-color: transparent; }
+        .view-tab-btn:hover { color: #9a3412; }
+        .view-tab-btn.active-view-tab { color: #9a3412; border-color: #9a3412; }
+        .view-tab-btn .tab-count { font-size: .65rem; font-weight: 700; padding: .1rem .45rem; border-radius: 9999px; background: #f4efe6; color: #78716c; margin-left: .35rem; }
+        .view-tab-btn.active-view-tab .tab-count { background: #9a3412; color: #fff; }
+
         /* ===== Barra filtri ===== */
         .seg { display: inline-flex; padding: .25rem; gap: .25rem; border-radius: 9999px; background: rgba(255,255,255,.75); border: 1px solid var(--border); }
         .seg button { font-size: .8rem; font-weight: 600; color: var(--muted); padding: .4rem .9rem; border-radius: 9999px; transition: background .2s ease, color .2s ease; white-space: nowrap; }
@@ -170,7 +177,7 @@
                     </div>
                     <div class="leading-tight">
                         <h1 class="text-lg sm:text-xl font-serif font-bold tracking-tight">Ingegneria Civile</h1>
-                        <p class="text-[11px] text-muted font-medium hidden sm:block">Laurea triennale · materie e materiale di studio</p>
+                        <p class="text-[11px] text-muted font-medium hidden sm:block">Triennale e Magistrale · materie e materiale di studio</p>
                     </div>
                 </div>
                 <a href="/" class="back-link text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 rounded-full px-3 py-1.5">
@@ -187,11 +194,17 @@
             <!-- ===================== SINISTRA: MATERIE ===================== -->
             <div class="lg:col-span-8 space-y-5 lg:space-y-6 min-w-0">
 
+                <!-- Schede corso -->
+                <nav class="flex items-center gap-1 border-b border-stone-200 overflow-x-auto" id="courseTabs" aria-label="Corso di laurea">
+                    <button type="button" data-corso="triennale" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap">Laurea Triennale<span class="tab-count"></span></button>
+                    <button type="button" data-corso="magistrale" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap">Magistrale · Strutture<span class="tab-count"></span></button>
+                </nav>
+
                 <!-- Intro + filtri -->
                 <section class="card p-6 sm:p-7 flex flex-col gap-5">
                     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                         <div>
-                            <span class="eyebrow">Percorso di laurea triennale</span>
+                            <span class="eyebrow" id="courseEyebrow"></span>
                             <h2 class="mt-2 text-2xl sm:text-[1.75rem] leading-tight font-serif font-bold tracking-tight">Le materie, anno per anno</h2>
                             <p class="mt-2 text-sm text-muted leading-relaxed max-w-xl">
                                 Per ogni insegnamento trovi docenti, CFU, semestre e modalità d'esame. Apri il <strong class="text-accent-strong">materiale</strong> oppure, se ti serve una mano, usa <em>Chiedi</em> per compilare il modulo già sulla materia giusta.
@@ -202,10 +215,6 @@
 
                     <div class="flex flex-col md:flex-row md:items-center gap-3">
                         <div class="seg overflow-x-auto max-w-full" role="group" aria-label="Filtra per anno" id="yearFilter">
-                            <button type="button" data-year="all" aria-pressed="true">Tutti</button>
-                            <button type="button" data-year="1" aria-pressed="false">1° anno</button>
-                            <button type="button" data-year="2" aria-pressed="false">2° anno</button>
-                            <button type="button" data-year="3" aria-pressed="false">3° anno</button>
                         </div>
                         <div class="flex gap-2 md:ml-auto">
                             <select id="semFilter" class="field pr-8" aria-label="Filtra per semestre">
@@ -322,7 +331,7 @@
            url:     link al materiale (es. sottopagina Notion). Vuoto = "In arrivo".
            moduli:  per i corsi integrati; ogni modulo può avere il suo url.
            ===================================================================== */
-        const MATERIE = [
+        const TRIENNALE = [
             // ---------- 1° ANNO ----------
             { anno: 1, nome: "Analisi 2", docenti: ["Vernier", "Ragnedda"], cfu: 9, sem: "2", prove: ["Scritto", "Orale"], url: "" },
             { anno: 1, nome: "Chimica", docenti: ["Delogu"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], url: "" },
@@ -358,6 +367,37 @@
             { anno: 3, nome: "Tecnica delle Costruzioni", docenti: ["Pani", "Meloni", "Mistretta"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], url: "" },
             { anno: 3, nome: "Tirocinio", docenti: ["Valdes"], cfu: 3, sem: "2", prove: ["Pratico"], url: "" },
         ];
+
+        const MAGISTRALE = [
+            // ---------- 1° ANNO ----------
+            { anno: 1, nome: "Costruzioni in Acciaio", docenti: ["Fenu"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], url: "" },
+            { anno: 1, nome: "Modelli e Metodi Matematici", docenti: ["Zuddas"], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
+            { anno: 1, nome: "Pianificazione dei Trasporti", docenti: ["Meloni"], cfu: 6, sem: "2", prove: ["Orale", "Pratico"], url: "" },
+            { anno: 1, nome: "Scienza delle Costruzioni 2", docenti: ["Cazzani"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 1, nome: "Sovrastrutture di Strade, Ferrovie e Aeroporti", docenti: ["Coni"], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
+            { anno: 1, nome: "Sperimentazione e Collaudo delle Strutture", docenti: ["Meloni D."], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
+            { anno: 1, nome: "Strade 2", docenti: ["Coni"], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
+            { anno: 1, nome: "Tecnica Urbanistica", docenti: ["Campagna"], cfu: 6, sem: "1", prove: ["Pratico", "Orale"], url: "" },
+
+            // ---------- 2° ANNO ----------
+            { anno: 2, nome: "Calcolo Automatico delle Strutture", docenti: ["Meloni D."], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
+            { anno: 2, nome: "Complementi di Scienza delle Costruzioni 2", docenti: ["Brun"], cfu: 6, sem: "2", prove: ["Scritto", "Orale", "Pratico"], url: "" },
+            { anno: 2, nome: "Dinamica delle Strutture", docenti: ["Porcu"], cfu: 6, sem: "1", prove: ["Pratico", "Orale"], url: "" },
+            { anno: 2, nome: "Fondazioni", docenti: ["Soccodato"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], url: "" },
+            { anno: 2, nome: "Laboratorio di Strutture", docenti: ["De Nicolo"], cfu: 6, sem: "", prove: [], url: "" },
+            { anno: 2, nome: "Laboratorio di Riqualificazione Strutturale", docenti: ["Concu", "Meloni D.", "Mistretta"], cfu: 6, sem: "", prove: [], url: "" },
+            { anno: 2, nome: "Tecnica delle Costruzioni 2", docenti: ["Concu"], cfu: 6, sem: "2", prove: ["Orale"], url: "" },
+            { anno: 2, nome: "Bacini", docenti: ["Montaldo"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 2, nome: "Sismica delle Strutture", docenti: ["Porcu"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], url: "" },
+            { anno: 2, nome: "Ponti", docenti: ["Mistretta"], cfu: 6, sem: "2", prove: ["Orale", "Pratico"], url: "" },
+            { anno: 2, nome: "Sicurezza 2", docenti: ["Dentoni"], cfu: 6, sem: "2", prove: [], url: "" },
+        ];
+
+        /* Corsi mostrati nelle schede. L'hash dell'URL seleziona la scheda: /triennale/#magistrale */
+        const CORSI = {
+            triennale:  { eyebrow: "Laurea triennale",                 anni: [1, 2, 3], materie: TRIENNALE },
+            magistrale: { eyebrow: "Laurea magistrale · Strutture",    anni: [1, 2],    materie: MAGISTRALE },
+        };
 
         // Tema di ogni anno (stesso mix terracotta / oceano / salvia di ripetizioni)
         const ANNI = {
@@ -402,8 +442,8 @@
                     <div class="cfu" title="Crediti formativi"><b>${m.cfu}</b><span>CFU</span></div>
                 </div>
                 <p class="meta">${I.user}<span>${esc(docenti)}</span></p>
-                <div class="flex flex-wrap gap-1.5">
-                    <span class="pill pill-sem">${semLabel(m.sem)}</span>${prove}
+                <div class="flex flex-wrap gap-1.5 empty:hidden">
+                    ${m.sem ? `<span class="pill pill-sem">${semLabel(m.sem)}</span>` : ""}${prove}
                 </div>
                 ${moduli ? `<div class="flex flex-wrap gap-1.5">${moduli}</div>` : ""}
                 <div class="subject-actions">
@@ -414,18 +454,19 @@
         }
 
         /* ---------- Rendering con filtri ---------- */
-        const state = { year: "all", sem: "all", q: "" };
+        const state = { corso: "triennale", year: "all", sem: "all", q: "" };
         const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
         function render() {
             const q = norm(state.q.trim());
+            const { materie: MATERIE, anni } = CORSI[state.corso];
             const list = MATERIE.filter(m =>
                 (state.year === "all" || String(m.anno) === state.year) &&
                 (state.sem === "all" || m.sem === state.sem) &&
                 (!q || norm([m.nome, ...m.docenti, ...(m.moduli || []).map(x => x.nome)].join(" ")).includes(q))
             );
 
-            const html = [1, 2, 3].map(anno => {
+            const html = anni.map(anno => {
                 const items = list.filter(m => m.anno === anno);
                 if (!items.length) return "";
                 const all = MATERIE.filter(m => m.anno === anno);
@@ -453,15 +494,40 @@
             document.getElementById("empty").classList.toggle("hidden", list.length > 0);
         }
 
-        // Totali in alto
-        (function () {
+        // Totali in alto + filtro anni + intestazione del corso attivo
+        function renderCourse() {
+            const { eyebrow, anni, materie: MATERIE } = CORSI[state.corso];
+            document.getElementById("courseEyebrow").textContent = eyebrow;
+            document.querySelectorAll("#courseTabs [data-corso]").forEach(b => {
+                b.classList.toggle("active-view-tab", b.dataset.corso === state.corso);
+                b.setAttribute("aria-selected", b.dataset.corso === state.corso);
+                b.querySelector(".tab-count").textContent = CORSI[b.dataset.corso].materie.length;
+            });
+            document.getElementById("yearFilter").innerHTML =
+                `<button type="button" data-year="all" aria-pressed="${state.year === "all"}">Tutti</button>` +
+                anni.map(a => `<button type="button" data-year="${a}" aria-pressed="${state.year === String(a)}">${a}° anno</button>`).join("");
             const cfu = MATERIE.reduce((s, m) => s + m.cfu, 0);
             const conMateriale = MATERIE.filter(m => m.url).length;
             document.getElementById("totals").innerHTML = `
                 <span class="chip">${I.book}${MATERIE.length} insegnamenti</span>
                 <span class="chip">${I.star}${cfu} CFU</span>
                 ${conMateriale ? `<span class="chip">${I.doc}${conMateriale} con materiale</span>` : ""}`;
-        })();
+        }
+
+        function setCorso(corso, push) {
+            if (!CORSI[corso]) corso = "triennale";
+            if (corso !== state.corso) state.year = "all";
+            state.corso = corso;
+            if (push) history.replaceState(null, "", corso === "triennale" ? location.pathname : "#" + corso);
+            renderCourse();
+            render();
+        }
+
+        document.getElementById("courseTabs").addEventListener("click", e => {
+            const b = e.target.closest("[data-corso]");
+            if (b) setCorso(b.dataset.corso, true);
+        });
+        window.addEventListener("hashchange", () => setCorso(location.hash.slice(1)));
 
         document.getElementById("yearFilter").addEventListener("click", e => {
             const b = e.target.closest("button[data-year]");
@@ -493,7 +559,7 @@
             box.classList.remove("flash"); void box.offsetWidth; box.classList.add("flash");
         });
 
-        render();
+        setCorso(location.hash.slice(1) || "triennale");
     </script>
     <script src="https://tally.so/widgets/embed.js" async onload="Tally.loadEmbeds()" onerror="document.getElementById('tallyFrame').src=TALLY_BASE"></script>
 </body>
