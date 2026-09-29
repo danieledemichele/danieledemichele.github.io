@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
 
+# Due avvii ravvicinati non girano mai insieme: il secondo aspetta il primo.
 concurrency:
   group: sync-materie
   cancel-in-progress: false
@@ -17,9 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}   # ultima versione del branch, non quella del momento dell'avvio
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -36,6 +39,23 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898341+github-actions[bot]@users.noreply.github.com"
-          git add triennale/materie.json
-          git commit -m "Materie: aggiornamento automatico da Notion"
-          git push
+          cp triennale/materie.json "$RUNNER_TEMP/materie.json"
+          # Se nel frattempo qualcuno ha modificato il repo, riparte dall'ultima versione e riprova.
+          for tentativo in 1 2 3; do
+            git fetch --quiet origin "$GITHUB_REF_NAME"
+            git reset --quiet --hard "origin/$GITHUB_REF_NAME"
+            cp "$RUNNER_TEMP/materie.json" triennale/materie.json
+            if git diff --quiet -- triennale/materie.json; then
+              echo "Il repo è già aggiornato."
+              exit 0
+            fi
+            git add triennale/materie.json
+            git commit --quiet -m "Materie: aggiornamento automatico da Notion"
+            if git push --quiet origin "HEAD:$GITHUB_REF_NAME"; then
+              echo "materie.json aggiornato."
+              exit 0
+            fi
+            echo "Push rifiutato (repo cambiato nel frattempo), tentativo $tentativo di 3…"
+            sleep $((tentativo * 5))
+          done
+          exit 1

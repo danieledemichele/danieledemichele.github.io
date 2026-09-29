@@ -34,6 +34,7 @@ LIBRERIA = ROOT / "libreria" / "data.json"
 API = os.environ.get("NOTION_API_BASE", "https://api.notion.com/v1").rstrip("/")
 TOKEN = os.environ.get("NOTION_TOKEN", "").strip()
 VERSION = "2022-06-28"
+VERSION_DS = "2025-09-03"   # API con le "origini dati" (data sources), usata se serve
 
 CORSI = {
     "triennale": {
@@ -54,12 +55,16 @@ ORDINE_PROVE = ["Scritto", "Orale", "Pratico"]
 
 # --------------------------------------------------------------------------- API
 
-def api(method, path, body=None, tentativi=5):
+class NonTrovato(RuntimeError):
+    pass
+
+
+def api(method, path, body=None, tentativi=5, version=VERSION):
     url = f"{API}/{path.lstrip('/')}"
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(url, data=data, method=method, headers={
         "Authorization": f"Bearer {TOKEN}",
-        "Notion-Version": VERSION,
+        "Notion-Version": version,
         "Content-Type": "application/json",
     })
     for i in range(tentativi):
@@ -74,6 +79,8 @@ def api(method, path, body=None, tentativi=5):
                 continue
             if e.code == 401:
                 raise RuntimeError("token Notion non valido o scaduto: controlla il segreto NOTION_TOKEN su GitHub") from None
+            if e.code == 404:
+                raise NonTrovato(f"{path}: l'integrazione non vede questa risorsa (non collegata o ID errato)") from None
             dettaglio = e.read().decode(errors="replace")[:400]
             raise RuntimeError(f"Notion {e.code} su {method} {path}: {dettaglio}") from None
         except urllib.error.URLError as e:
@@ -83,17 +90,17 @@ def api(method, path, body=None, tentativi=5):
             raise RuntimeError(f"Rete non raggiungibile ({path}): {e}") from None
 
 
-def paginate(method, path, body=None):
+def paginate(method, path, body=None, version=VERSION):
     cursor = None
     while True:
         if method == "POST":
             b = dict(body or {})
             if cursor:
                 b["start_cursor"] = cursor
-            res = api("POST", path, b)
+            res = api("POST", path, b, version=version)
         else:
             sep = "&" if "?" in path else "?"
-            res = api("GET", f"{path}{sep}page_size=100" + (f"&start_cursor={cursor}" if cursor else ""))
+            res = api("GET", f"{path}{sep}page_size=100" + (f"&start_cursor={cursor}" if cursor else ""), version=version)
         yield from res.get("results", [])
         if not res.get("has_more"):
             break
@@ -107,16 +114,38 @@ def trova_db(corso):
         api("GET", f"databases/{cfg['db']}")
         return cfg["db"]
     except RuntimeError as e:
-        print(f"  ! database {corso} non trovato con l'ID configurato ({e}); cerco «{cfg['titolo_db']}»")
-    res = api("POST", "search", {"query": cfg["titolo_db"], "filter": {"property": "object", "value": "database"}})
-    for db in res.get("results", []):
-        titolo = "".join(t.get("plain_text", "") for t in db.get("title", []))
-        if titolo.strip().lower() == cfg["titolo_db"].lower():
-            return db["id"]
+        print(f"  ! database {corso}: {e}. Cerco «{cfg['titolo_db']}» tra quelli condivisi…")
+    trovati = []
+    for version, tipo in ((VERSION, "database"), (VERSION_DS, "data_source")):
+        try:
+            res = api("POST", "search", {"query": cfg["titolo_db"], "filter": {"property": "object", "value": tipo}}, version=version)
+        except RuntimeError:
+            continue
+        for db in res.get("results", []):
+            titolo = "".join(t.get("plain_text", "") for t in db.get("title", []))
+            trovati.append(titolo)
+            if titolo.strip().lower() == cfg["titolo_db"].lower():
+                # per una data source serve l'ID del database che la contiene
+                parent = db.get("parent") or {}
+                return parent.get("database_id") or db["id"]
+    visti = ", ".join(sorted(set(t for t in trovati if t))) or "nessuno"
     raise RuntimeError(
-        f"Database «{cfg['titolo_db']}» non accessibile: collega l'integrazione alla pagina "
-        f"del corso ({corso}) da ••• → Connessioni."
+        f"database «{cfg['titolo_db']}» ({corso}) non accessibile. Database visti dall'integrazione: {visti}. "
+        f"Apri la pagina del corso su Notion → ••• → Connessioni e aggiungi l'integrazione."
     )
+
+
+def righe_db(db):
+    """Pagine del database. Se il database usa le "origini dati", passa all'API nuova."""
+    try:
+        return list(paginate("POST", f"databases/{db}/query", {"page_size": 100}))
+    except RuntimeError as e:
+        print(f"  … query classica non riuscita ({e}); provo con le origini dati")
+    info = api("GET", f"databases/{db}", version=VERSION_DS)
+    righe = []
+    for ds in info.get("data_sources", []):
+        righe += paginate("POST", f"data_sources/{ds['id']}/query", {"page_size": 100}, version=VERSION_DS)
+    return righe
 
 
 # ------------------------------------------------------------------ proprietà
@@ -262,7 +291,7 @@ def main():
     risultato, usati = {}, set()
     for corso, cfg in CORSI.items():
         db = trova_db(corso)
-        pagine = [p for p in paginate("POST", f"databases/{db}/query", {"page_size": 100}) if not p.get("archived")]
+        pagine = [p for p in righe_db(db) if not p.get("archived") and not p.get("in_trash")]
         print(f"[{corso}] {len(pagine)} pagine nel database")
 
         voci = {}
