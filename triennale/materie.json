@@ -1,12 +1,13 @@
 {
+ "aggiornato": "2026-09-29T20:24:37Z",
  "corsi": {
   "triennale": [
    {
     "anno": 1,
     "nome": "Analisi 2",
     "docenti": [
-     "Ragnedda",
-     "Vernier"
+     "Vernier",
+     "Ragnedda"
     ],
     "cfu": 9,
     "sem": "2",
@@ -71,8 +72,8 @@
     "nome": "Matematica 1",
     "integrato": true,
     "docenti": [
-     "Grimaldi",
-     "Ratto"
+     "Ratto",
+     "Grimaldi"
     ],
     "cfu": 12,
     "sem": "1",
@@ -236,8 +237,8 @@
     "nome": "Architettura Tecnica e Laboratorio di Disegno",
     "integrato": true,
     "docenti": [
-     "Bagnolo",
-     "Loddo"
+     "Loddo",
+     "Bagnolo"
     ],
     "cfu": 10,
     "sem": "1",
@@ -285,8 +286,8 @@
     "nome": "Statistica e Idrologia",
     "integrato": true,
     "docenti": [
-     "Banni",
-     "Sechi"
+     "Sechi",
+     "Banni"
     ],
     "cfu": 10,
     "sem": "1-2",
@@ -595,8 +596,8 @@
     "nome": "Geotecnica e Strade",
     "integrato": true,
     "docenti": [
-     "Maltinti",
-     "Soccodato"
+     "Soccodato",
+     "Maltinti"
     ],
     "cfu": 12,
     "sem": "2",
@@ -668,8 +669,8 @@
     "anno": 3,
     "nome": "Fondamenti di Trasporti",
     "docenti": [
-     "Fadda",
      "Meloni",
+     "Fadda",
      "Olivo"
     ],
     "cfu": 6,
@@ -737,8 +738,8 @@
     "anno": 3,
     "nome": "Matematica Applicata",
     "docenti": [
-     "Fermo",
-     "Rodriguez"
+     "Rodriguez",
+     "Fermo"
     ],
     "cfu": 6,
     "sem": "2",
@@ -784,9 +785,9 @@
     "anno": 3,
     "nome": "Tecnica delle Costruzioni",
     "docenti": [
+     "Pani",
      "Meloni",
-     "Mistretta",
-     "Pani"
+     "Mistretta"
     ],
     "cfu": 10,
     "sem": "1-2",
