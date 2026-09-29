@@ -137,6 +137,7 @@
         .pill-scritto { background: #e9eef7; color: #1e3a8a; border-color: #d3dcea; }
         .pill-orale   { background: #fbf0dc; color: #92400e; border-color: #f0dfbd; }
         .pill-pratico { background: #fbe9e5; color: #9f1239; border-color: #f3d3cd; }
+        .pill-tipo    { background: #f3effa; color: #5b3f8c; border-color: #e0d8ef; }
 
         .modulo { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; color: var(--muted); background: #faf8f5; border: 1px dashed var(--border); padding: .15rem .5rem; border-radius: .45rem; }
         .modulo svg { width: .75rem; height: .75rem; }
@@ -330,6 +331,7 @@
            prove:   "Scritto" | "Orale" | "Pratico"
            url:     link al materiale (es. sottopagina Notion). Vuoto = "In arrivo".
            moduli:  per i corsi integrati; ogni modulo può avere il suo url.
+           tipo:    "G" = altre attività formative (laboratori da 3 CFU), mostrate con etichetta dedicata.
            ===================================================================== */
         const TRIENNALE = [
             // ---------- 1° ANNO ----------
@@ -377,6 +379,7 @@
             { anno: 1, nome: "Sovrastrutture di Strade, Ferrovie e Aeroporti", docenti: ["Coni"], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
             { anno: 1, nome: "Sperimentazione e Collaudo delle Strutture", docenti: ["Meloni D."], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
             { anno: 1, nome: "Strade 2", docenti: ["Coni"], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
+            { anno: 1, nome: "Laboratorio di Strutture", tipo: "G", docenti: ["De Nicolo"], cfu: 3, sem: "", prove: [], url: "" },
             { anno: 1, nome: "Tecnica Urbanistica", docenti: ["Campagna"], cfu: 6, sem: "1", prove: ["Pratico", "Orale"], url: "" },
 
             // ---------- 2° ANNO ----------
@@ -384,8 +387,7 @@
             { anno: 2, nome: "Complementi di Scienza delle Costruzioni 2", docenti: ["Brun"], cfu: 6, sem: "2", prove: ["Scritto", "Orale", "Pratico"], url: "" },
             { anno: 2, nome: "Dinamica delle Strutture", docenti: ["Porcu"], cfu: 6, sem: "1", prove: ["Pratico", "Orale"], url: "" },
             { anno: 2, nome: "Fondazioni", docenti: ["Soccodato"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], url: "" },
-            { anno: 2, nome: "Laboratorio di Strutture", docenti: ["De Nicolo"], cfu: 6, sem: "", prove: [], url: "" },
-            { anno: 2, nome: "Laboratorio di Riqualificazione Strutturale", docenti: ["Concu", "Meloni D.", "Mistretta"], cfu: 6, sem: "", prove: [], url: "" },
+            { anno: 2, nome: "Laboratorio di Riqualificazione Strutturale", tipo: "G", docenti: ["Concu", "Meloni D.", "Mistretta"], cfu: 3, sem: "", prove: [], url: "" },
             { anno: 2, nome: "Tecnica delle Costruzioni 2", docenti: ["Concu"], cfu: 6, sem: "2", prove: ["Orale"], url: "" },
             { anno: 2, nome: "Bacini", docenti: ["Montaldo"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], url: "" },
             { anno: 2, nome: "Sismica delle Strutture", docenti: ["Porcu"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], url: "" },
@@ -438,12 +440,12 @@
             return `
             <article class="subject fade-in" style="animation-delay:${i * 25}ms">
                 <div class="flex items-start gap-3">
-                    <h3 class="flex-grow">${m.integrato ? '<span class="ci">Corso integrato</span>' : ""}${esc(m.nome)}</h3>
+                    <h3 class="flex-grow">${m.integrato ? '<span class="ci">Corso integrato</span>' : ""}${m.tipo ? '<span class="ci">Altre attività formative</span>' : ""}${esc(m.nome)}</h3>
                     <div class="cfu" title="Crediti formativi"><b>${m.cfu}</b><span>CFU</span></div>
                 </div>
                 <p class="meta">${I.user}<span>${esc(docenti)}</span></p>
                 <div class="flex flex-wrap gap-1.5 empty:hidden">
-                    ${m.sem ? `<span class="pill pill-sem">${semLabel(m.sem)}</span>` : ""}${prove}
+                    ${m.tipo ? `<span class="pill pill-tipo" title="Altre attività formative">Tipologia ${esc(m.tipo)}</span>` : ""}${m.sem ? `<span class="pill pill-sem">${semLabel(m.sem)}</span>` : ""}${prove}
                 </div>
                 ${moduli ? `<div class="flex flex-wrap gap-1.5">${moduli}</div>` : ""}
                 <div class="subject-actions">
