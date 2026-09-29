@@ -92,9 +92,12 @@
         .back-link { color: var(--muted); }
         .back-link:hover { color: var(--accent); background: rgba(255,255,255,.7); }
 
-        ::-webkit-scrollbar { width: 7px; height: 7px; }
-        ::-webkit-scrollbar-track { background: #f4efe6; }
-        ::-webkit-scrollbar-thumb { background: #d8cfc0; border-radius: 4px; }
+        /* Scrollbar pagina: sottile, color sabbia, si scurisce al passaggio */
+        html { scrollbar-width: thin; scrollbar-color: #d8cfc0 transparent; }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d8cfc0; border-radius: 9999px; border: 3px solid var(--bg); }
+        ::-webkit-scrollbar-thumb:hover { background: #b8ab97; }
 
         /* ===== Schede corso (stesse della libreria: Articoli/Libri/Università) ===== */
         .view-tab-btn { color: #78716c; border-color: transparent; }
@@ -163,9 +166,34 @@
         /* ===== Popup materia ===== */
         dialog#materiaDialog {
             width: min(640px, calc(100vw - 2rem)); max-height: min(86vh, 820px); padding: 0; border: 1px solid var(--border);
+            overflow: hidden; outline: none;
             border-radius: 1.75rem; background: var(--bg); color: var(--text);
             box-shadow: 0 30px 80px -30px rgba(28,25,23,.55);
         }
+        dialog#materiaDialog[open] { display: flex; flex-direction: column; }
+        #dlgBody { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; max-height: inherit; }
+        .dlg-scroll {
+            flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+            scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--accent) 35%, #e7e1d7) transparent;
+            scrollbar-gutter: stable;
+        }
+        .dlg-scroll::-webkit-scrollbar { width: 12px; }
+        .dlg-scroll::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
+        .dlg-scroll::-webkit-scrollbar-thumb {
+            background: color-mix(in srgb, var(--accent) 30%, #e7e1d7); border-radius: 9999px;
+            border: 4px solid transparent; background-clip: padding-box;
+        }
+        .dlg-scroll::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--accent) 60%, #e7e1d7); }
+        /* Sfumature sopra/sotto quando c'è altro contenuto da scorrere */
+        .dlg-scroll-wrap { position: relative; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+        .dlg-scroll-wrap::before, .dlg-scroll-wrap::after {
+            content: ""; position: absolute; left: 0; right: 12px; height: 18px; pointer-events: none; z-index: 1;
+            opacity: 0; transition: opacity .2s ease;
+        }
+        .dlg-scroll-wrap::before { top: 0; background: linear-gradient(var(--bg), transparent); }
+        .dlg-scroll-wrap::after { bottom: 0; background: linear-gradient(transparent, var(--bg)); }
+        .dlg-scroll-wrap.more-up::before, .dlg-scroll-wrap.more-down::after { opacity: 1; }
+        .dlg-head, .dlg-foot { flex-shrink: 0; }
         dialog#materiaDialog::backdrop { background: rgba(41, 37, 36, .45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
         dialog#materiaDialog[open] { animation: dlgIn .28s cubic-bezier(.16,1,.3,1); }
         @keyframes dlgIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
@@ -175,6 +203,7 @@
         .dlg-head { background: var(--soft); border-bottom: 1px solid var(--border); }
         .dlg-close { color: var(--muted); background: rgba(255,255,255,.8); border: 1px solid var(--border); }
         .dlg-close:hover { color: var(--accent); border-color: var(--accent); }
+        .dlg-close:focus { outline: none; }
         .dlg-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         .info-tile { background: #fff; border: 1px solid var(--border); border-radius: 1rem; padding: .7rem .85rem; }
         .info-tile dt { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -352,8 +381,8 @@
     </main>
 
     <!-- POPUP DETTAGLIO MATERIA (riempito da JS) -->
-    <dialog id="materiaDialog" aria-labelledby="dlgTitle">
-        <div id="dlgBody" class="flex flex-col max-h-[inherit]"></div>
+    <dialog id="materiaDialog" aria-labelledby="dlgTitle" tabindex="-1">
+        <div id="dlgBody"></div>
     </dialog>
 
     <footer class="border-t border-stone-200/70 py-6 mt-10">
@@ -380,7 +409,7 @@
             // ---------- 1° ANNO ----------
             { anno: 1, nome: "Analisi 2", docenti: ["Ragnedda", "Vernier"], cfu: 9, sem: "2", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/WtZ2yAwa#K2GuJqoQcU44p760aEB7Uw", "nota": "364.03 MB · 51 file e 12 sottocartelle"}], libri: ["Analisi Matematica (Vol. 2)", "Analisi Matematica (Vol. 1)", "Esercizi di Analisi Matematica 2 - Parte Prima"] },
             { anno: 1, nome: "Chimica", docenti: ["Delogu"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/K8ZQHCKD#ou28kfxnS-V-7J-JJ-NZ9g", "nota": "94.63 MB · 96 file e 9 sottocartelle"}], libri: ["Fondamenti di Chimica", "Problemi di chimica generale"] },
-            { anno: 1, nome: "Matematica 1", integrato: true, docenti: ["Grimaldi", "Ratto"], cfu: 12, sem: "1", prove: [], link: [], libri: ["Analisi Matematica (Vol. 1)"], moduli: [{"nome": "Analisi 1", "docenti": ["Grimaldi"], "cfu": 5, "sem": "1", "prove": ["Scritto", "Orale"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/L5Z0QRaQ#UoRVjrcyG2T_BtzChvl2ww", "nota": "2.89 MB · 11 file"}]}, {"nome": "Geometria", "docenti": ["Ratto"], "cfu": 7, "sem": "1", "prove": ["Scritto"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/z5Yn3SBL#rP5ihJzuBPZCeeZiiHOFvQ", "nota": "3.26 MB · 4 file"}]}] },
+            { anno: 1, nome: "Matematica 1", integrato: true, docenti: ["Grimaldi", "Ratto"], cfu: 12, sem: "1", prove: ["Scritto", "Orale"], link: [], libri: ["Analisi Matematica (Vol. 1)"], moduli: [{"nome": "Analisi 1", "docenti": ["Grimaldi"], "cfu": 5, "sem": "1", "prove": ["Scritto", "Orale"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/L5Z0QRaQ#UoRVjrcyG2T_BtzChvl2ww", "nota": "2.89 MB · 11 file"}]}, {"nome": "Geometria", "docenti": ["Ratto"], "cfu": 7, "sem": "1", "prove": ["Scritto"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/z5Yn3SBL#rP5ihJzuBPZCeeZiiHOFvQ", "nota": "3.26 MB · 4 file"}]}] },
             { anno: 1, nome: "Economia", docenti: ["Zuddas"], cfu: 5, sem: "1", prove: ["Scritto", "Orale"], link: [], libri: [] },
             { anno: 1, nome: "Fisica 1", docenti: ["Concas"], cfu: 8, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/29JX2T5R#F_9tL17SjHJSk0mkgQX_dg", "nota": "61.37 MB · 2 file"}], libri: ["Fondamenti di Fisica (Meccanica e Termlogia)"] },
             { anno: 1, nome: "Fisica 2", docenti: ["Concas"], cfu: 7, sem: "2", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/29JX2T5R#F_9tL17SjHJSk0mkgQX_dg", "nota": "61.37 MB · 2 file"}], libri: ["Fondamenti di Fisica (Meccanica e Termlogia)"] },
@@ -661,7 +690,7 @@
                     </button>
                 </div>
 
-                <div class="px-6 py-5 space-y-6 overflow-y-auto">
+                <div class="dlg-scroll-wrap"><div class="dlg-scroll pl-6 pr-3 py-5 space-y-6">
                     <dl class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         <div class="info-tile"><dt>CFU</dt><dd>${m.cfu}</dd></div>
                         <div class="info-tile"><dt>Semestre</dt><dd>${m.sem ? semLabel(m.sem).replace(" semestre", "") : "—"}</dd></div>
@@ -693,7 +722,8 @@
                     </section>` : ""}
                 </div>
 
-                <div class="px-6 py-4 border-t border-[var(--border)] bg-white/60 flex flex-wrap items-center gap-2">
+                </div>
+                <div class="dlg-foot px-6 py-4 border-t border-[var(--border)] bg-white/60 flex flex-wrap items-center gap-2">
                     <p class="text-[11px] text-muted flex-grow">Un link non si apre o manca qualcosa?</p>
                     <button type="button" class="btn-accent inline-flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2" data-dlg-ask>
                         ${I.ask.replace("<svg", '<svg class="w-4 h-4"')}Chiedi o segnala
@@ -703,6 +733,15 @@
             dlg.querySelector("[data-close]").onclick = () => dlg.close();
             dlg.querySelector("[data-dlg-ask]").onclick = () => { dlg.close(); askAbout(fullName(m)); };
             if (!dlg.open) dlg.showModal();
+            // Il focus va al dialog (non alla X): niente anello evidenziato all'apertura, Esc e Tab funzionano comunque
+            dlg.focus({ preventScroll: true });
+            const scroller = dlg.querySelector(".dlg-scroll"), wrap = dlg.querySelector(".dlg-scroll-wrap");
+            const shade = () => {
+                wrap.classList.toggle("more-up", scroller.scrollTop > 4);
+                wrap.classList.toggle("more-down", scroller.scrollTop + scroller.clientHeight < scroller.scrollHeight - 4);
+            };
+            scroller.addEventListener("scroll", shade, { passive: true });
+            requestAnimationFrame(shade);
             if (pushHash) history.replaceState(null, "", `#${state.corso}/${slug(m.nome)}`);
         }
 
