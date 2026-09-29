@@ -2460,6 +2460,21 @@
             }
         }
 
+        // Link diretto a un libro: /libreria/#libro=<id Notion> apre la scheda del libro
+        // (usato dalla pagina /triennale/ nei "Testi di riferimento"). #universita apre la scheda Università.
+        function openFromHash() {
+            const h = decodeURIComponent(location.hash.slice(1));
+            if (h === 'universita') { switchViewTab('universita'); return; }
+            if (!h.startsWith('libro=')) return;
+            const id = h.slice(6);
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+            if (item.type === 'universitario') switchViewTab('universita');
+            else if (item.type === 'libro') switchViewTab('libri');
+            openReaderModal(id);
+        }
+        window.addEventListener('hashchange', openFromHash);
+
         async function init() {
             try {
                 // cache-bust per evitare che il browser mostri dati stantii
@@ -2468,6 +2483,7 @@
                 const data = await res.json();
                 setItemsAndDerive(data);
                 startApp();
+                openFromHash();
             } catch (err) {
                 console.warn('data.json non disponibile, uso i dati di fallback locali:', err);
                 // In fase di test locale (es. apertura diretta del file, niente data.json ancora

@@ -216,6 +216,17 @@
         .file-icon { flex-shrink: 0; width: 2.1rem; height: 2.1rem; border-radius: .7rem; display: grid; place-items: center; font-weight: 800; font-size: .8rem; color: #fff; background: #d9272e; }
         .file-icon.other { background: var(--accent); }
         .file-row .ext { width: 1rem; height: 1rem; color: var(--muted); flex-shrink: 0; }
+        .book-row {
+            display: flex; align-items: center; gap: .85rem; padding: .6rem .75rem .6rem .6rem; background: #fff;
+            border: 1px solid var(--border); border-radius: 1rem; transition: border-color .2s ease, transform .2s ease;
+        }
+        a.book-row:hover { border-color: var(--accent); transform: translateX(2px); }
+        .book-cover {
+            flex-shrink: 0; width: 2.6rem; height: 3.6rem; border-radius: .45rem; object-fit: cover;
+            background: linear-gradient(135deg, #f4efe6, #e7dccb); border: 1px solid var(--border);
+            box-shadow: 0 4px 10px -6px rgba(28,25,23,.45);
+        }
+        .book-cover-ph { display: grid; place-items: center; color: #b45309; }
         .group-title { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 
         .skeleton { animation: pulse 1.6s ease-in-out infinite; background: #f4efe6; }
@@ -401,36 +412,37 @@
                     link: [{ titolo: "Appunti del corso", url: "https://mega.nz/folder/..." },
                            { titolo: "Esercitazioni",     url: "https://mega.nz/file/..." }]
                     Vuoto = "In arrivo". Si aprono nel popup cliccando la card. "nota" è facoltativa.
-           libri:   testi di riferimento (da "Books University" su Notion).
+           libri:   testi di riferimento: { id, titolo }. "id" è l'ID Notion del libro in /libreria/data.json
+                    (copertina, autore, anno ed editore arrivano da lì; il link apre il libro nella libreria).
            moduli:  per i corsi integrati: { nome, docenti, cfu, sem, prove, link: [...] }
            tipo:    "G" = altre attività formative (laboratori da 3 CFU), mostrate con etichetta dedicata.
            ===================================================================== */
         const TRIENNALE = [
             // ---------- 1° ANNO ----------
-            { anno: 1, nome: "Analisi 2", docenti: ["Ragnedda", "Vernier"], cfu: 9, sem: "2", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/WtZ2yAwa#K2GuJqoQcU44p760aEB7Uw", "nota": "364.03 MB · 51 file e 12 sottocartelle"}], libri: ["Analisi Matematica (Vol. 2)", "Analisi Matematica (Vol. 1)", "Esercizi di Analisi Matematica 2 - Parte Prima"] },
-            { anno: 1, nome: "Chimica", docenti: ["Delogu"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/K8ZQHCKD#ou28kfxnS-V-7J-JJ-NZ9g", "nota": "94.63 MB · 96 file e 9 sottocartelle"}], libri: ["Fondamenti di Chimica", "Problemi di chimica generale"] },
-            { anno: 1, nome: "Matematica 1", integrato: true, docenti: ["Grimaldi", "Ratto"], cfu: 12, sem: "1", prove: ["Scritto", "Orale"], link: [], libri: ["Analisi Matematica (Vol. 1)"], moduli: [{"nome": "Analisi 1", "docenti": ["Grimaldi"], "cfu": 5, "sem": "1", "prove": ["Scritto", "Orale"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/L5Z0QRaQ#UoRVjrcyG2T_BtzChvl2ww", "nota": "2.89 MB · 11 file"}]}, {"nome": "Geometria", "docenti": ["Ratto"], "cfu": 7, "sem": "1", "prove": ["Scritto"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/z5Yn3SBL#rP5ihJzuBPZCeeZiiHOFvQ", "nota": "3.26 MB · 4 file"}]}] },
+            { anno: 1, nome: "Analisi 2", docenti: ["Ragnedda", "Vernier"], cfu: 9, sem: "2", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/WtZ2yAwa#K2GuJqoQcU44p760aEB7Uw", "nota": "364.03 MB · 51 file e 12 sottocartelle"}], libri: [{"id": "2712578e-0629-81db-8d44-d2a9389fd278", "titolo": "Analisi Matematica (Vol. 2)"}, {"id": "2712578e-0629-8121-91a2-fd9e833823ba", "titolo": "Analisi Matematica (Vol. 1)"}, {"id": "2712578e-0629-818b-98f5-e02612047c78", "titolo": "Esercizi di Analisi Matematica 2 - Parte Prima"}] },
+            { anno: 1, nome: "Chimica", docenti: ["Delogu"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/K8ZQHCKD#ou28kfxnS-V-7J-JJ-NZ9g", "nota": "94.63 MB · 96 file e 9 sottocartelle"}], libri: [{"id": "2712578e-0629-815d-b9f4-e9fb46e6d727", "titolo": "Fondamenti di Chimica"}, {"id": "2712578e-0629-81c5-bbe8-f61560b30c97", "titolo": "Problemi di chimica generale"}] },
+            { anno: 1, nome: "Matematica 1", integrato: true, docenti: ["Grimaldi", "Ratto"], cfu: 12, sem: "1", prove: ["Scritto", "Orale"], link: [], libri: [{"id": "2712578e-0629-8121-91a2-fd9e833823ba", "titolo": "Analisi Matematica (Vol. 1)"}], moduli: [{"nome": "Analisi 1", "docenti": ["Grimaldi"], "cfu": 5, "sem": "1", "prove": ["Scritto", "Orale"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/L5Z0QRaQ#UoRVjrcyG2T_BtzChvl2ww", "nota": "2.89 MB · 11 file"}]}, {"nome": "Geometria", "docenti": ["Ratto"], "cfu": 7, "sem": "1", "prove": ["Scritto"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/z5Yn3SBL#rP5ihJzuBPZCeeZiiHOFvQ", "nota": "3.26 MB · 4 file"}]}] },
             { anno: 1, nome: "Economia", docenti: ["Zuddas"], cfu: 5, sem: "1", prove: ["Scritto", "Orale"], link: [], libri: [] },
-            { anno: 1, nome: "Fisica 1", docenti: ["Concas"], cfu: 8, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/29JX2T5R#F_9tL17SjHJSk0mkgQX_dg", "nota": "61.37 MB · 2 file"}], libri: ["Fondamenti di Fisica (Meccanica e Termlogia)"] },
-            { anno: 1, nome: "Fisica 2", docenti: ["Concas"], cfu: 7, sem: "2", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/29JX2T5R#F_9tL17SjHJSk0mkgQX_dg", "nota": "61.37 MB · 2 file"}], libri: ["Fondamenti di Fisica (Meccanica e Termlogia)"] },
-            { anno: 1, nome: "Informatica", docenti: ["Fumera"], cfu: 6, sem: "2", prove: ["Scritto"], link: [], libri: ["La guida completa C"] },
+            { anno: 1, nome: "Fisica 1", docenti: ["Concas"], cfu: 8, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/29JX2T5R#F_9tL17SjHJSk0mkgQX_dg", "nota": "61.37 MB · 2 file"}], libri: [{"id": "2712578e-0629-8188-960d-fffc56b7d476", "titolo": "Fondamenti di Fisica (Meccanica e Termlogia)"}] },
+            { anno: 1, nome: "Fisica 2", docenti: ["Concas"], cfu: 7, sem: "2", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/29JX2T5R#F_9tL17SjHJSk0mkgQX_dg", "nota": "61.37 MB · 2 file"}], libri: [{"id": "2712578e-0629-8188-960d-fffc56b7d476", "titolo": "Fondamenti di Fisica (Meccanica e Termlogia)"}] },
+            { anno: 1, nome: "Informatica", docenti: ["Fumera"], cfu: 6, sem: "2", prove: ["Scritto"], link: [], libri: [{"id": "2712578e-0629-81d3-b5fe-db1478dd34f4", "titolo": "La guida completa C"}] },
             { anno: 1, nome: "Inglese", docenti: ["Idoneità"], cfu: 3, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/L14gHbLC#n-KvodUXT1WDnx8lzpSx2g", "nota": "33.93 MB · 38 file e 6 sottocartelle"}], libri: [] },
             // ---------- 2° ANNO ----------
-            { anno: 2, nome: "Architettura Tecnica e Laboratorio di Disegno", integrato: true, docenti: ["Bagnolo", "Loddo"], cfu: 10, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/L9gwkb5D#AexUNoN9OWgBvXZdfNocUQ", "nota": "27.94 MB · 39 file e 5 sottocartelle"}], libri: ["Architettura Tecnica"], moduli: [{"nome": "Architettura Tecnica", "docenti": ["Loddo"], "cfu": 6, "sem": "", "prove": [], "link": []}, {"nome": "Laboratorio di Disegno", "docenti": ["Bagnolo"], "cfu": 4, "sem": "", "prove": [], "link": []}] },
-            { anno: 2, nome: "Statistica e Idrologia", integrato: true, docenti: ["Banni", "Sechi"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale", "Pratico"], link: [], libri: ["Appunti di Idrologia (Vol. 1)", "Probabilità e Statistica"], moduli: [{"nome": "Statistica", "docenti": ["Banni"], "cfu": 4, "sem": "1", "prove": ["Scritto"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/Lxo0gD6R#xhlucpLglrWaS1ZT2ttyTg", "nota": "114.58 MB"}]}, {"nome": "Idrologia", "docenti": ["Sechi"], "cfu": 6, "sem": "2", "prove": ["Orale", "Pratico"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/eg4DAb6T#HJ7ptEJM2qxWSJcVirXLJg", "nota": "95.94 MB · 32 file e 5 sottocartelle"}]}] },
-            { anno: 2, nome: "Topografia e Laboratorio di Topografia", integrato: true, docenti: ["Sanna"], cfu: 10, sem: "2", prove: ["Orale", "Pratico"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/2hBkQC6Z#c57SJ_uWZyvkdEyt1JlOeA", "nota": "91.19 MB · 114 file e 16 sottocartelle"}], libri: ["Topografia", "Dal GPS al GNSS", "GPS", "Topografia generale"], moduli: [{"nome": "Topografia", "docenti": ["Sanna"], "cfu": 6, "sem": "", "prove": ["Orale"], "link": []}, {"nome": "Laboratorio di Topografia", "docenti": ["Sanna"], "cfu": 4, "sem": "", "prove": ["Pratico"], "link": []}] },
-            { anno: 2, nome: "Meccanica Razionale", docenti: ["Mignemi"], cfu: 6, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/HphSCD7J#IA-LwLAE-WiPZ9x3ao8ACA", "nota": "30.61 MB · 38 file e 8 sottocartelle"}], libri: ["Meccanica Razionale", "Lezioni di Meccanica Razionale"] },
-            { anno: 2, nome: "Scienza delle Costruzioni", docenti: ["Paglietti"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/b9In3bgJ#BPRI_K4_A5E8DPzTrAx06A", "nota": "208.23 MB · 209 file e 21 sottocartelle"}], libri: ["Scienza delle Costruzioni - Volume Primo", "Scienza delle Costruzioni - Volume Secondo"] },
-            { anno: 2, nome: "Tecnologia dei Materiali", docenti: ["Elsener"], cfu: 5, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/7x4wwTQJ#SM-fU5ZXTrJNkRDS8aHAlw", "nota": "41.46 MB · 31 file e 8 sottocartelle"}], libri: ["Scienza e tecnologia dei materiali"] },
+            { anno: 2, nome: "Architettura Tecnica e Laboratorio di Disegno", integrato: true, docenti: ["Bagnolo", "Loddo"], cfu: 10, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/L9gwkb5D#AexUNoN9OWgBvXZdfNocUQ", "nota": "27.94 MB · 39 file e 5 sottocartelle"}], libri: [{"id": "27d2578e-0629-8028-bd51-ca4557ca69c8", "titolo": "Architettura Tecnica"}], moduli: [{"nome": "Architettura Tecnica", "docenti": ["Loddo"], "cfu": 6, "sem": "", "prove": [], "link": []}, {"nome": "Laboratorio di Disegno", "docenti": ["Bagnolo"], "cfu": 4, "sem": "", "prove": [], "link": []}] },
+            { anno: 2, nome: "Statistica e Idrologia", integrato: true, docenti: ["Banni", "Sechi"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale", "Pratico"], link: [], libri: [{"id": "2712578e-0629-810d-a3b2-eb67f4841164", "titolo": "Appunti di Idrologia (Vol. 1)"}, {"id": "2712578e-0629-81f6-82e6-d00d3382c4fc", "titolo": "Probabilità e Statistica"}], moduli: [{"nome": "Statistica", "docenti": ["Banni"], "cfu": 4, "sem": "1", "prove": ["Scritto"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/Lxo0gD6R#xhlucpLglrWaS1ZT2ttyTg", "nota": "114.58 MB"}]}, {"nome": "Idrologia", "docenti": ["Sechi"], "cfu": 6, "sem": "2", "prove": ["Orale", "Pratico"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/eg4DAb6T#HJ7ptEJM2qxWSJcVirXLJg", "nota": "95.94 MB · 32 file e 5 sottocartelle"}]}] },
+            { anno: 2, nome: "Topografia e Laboratorio di Topografia", integrato: true, docenti: ["Sanna"], cfu: 10, sem: "2", prove: ["Orale", "Pratico"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/2hBkQC6Z#c57SJ_uWZyvkdEyt1JlOeA", "nota": "91.19 MB · 114 file e 16 sottocartelle"}], libri: [{"id": "2712578e-0629-81c9-8c64-f542f49c160c", "titolo": "Topografia"}, {"id": "27d2578e-0629-80a0-96e7-ff11df822523", "titolo": "Dal GPS al GNSS"}, {"id": "27d2578e-0629-809e-b50d-d446dacec12e", "titolo": "GPS"}, {"id": "27d2578e-0629-8045-9921-ff2c6948250c", "titolo": "Topografia generale"}], moduli: [{"nome": "Topografia", "docenti": ["Sanna"], "cfu": 6, "sem": "", "prove": ["Orale"], "link": []}, {"nome": "Laboratorio di Topografia", "docenti": ["Sanna"], "cfu": 4, "sem": "", "prove": ["Pratico"], "link": []}] },
+            { anno: 2, nome: "Meccanica Razionale", docenti: ["Mignemi"], cfu: 6, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/HphSCD7J#IA-LwLAE-WiPZ9x3ao8ACA", "nota": "30.61 MB · 38 file e 8 sottocartelle"}], libri: [{"id": "2712578e-0629-8172-b8d3-ffe7520a5a0b", "titolo": "Meccanica Razionale"}, {"id": "27e2578e-0629-80c7-9b2a-c1a5b97eaa6e", "titolo": "Lezioni di Meccanica Razionale"}] },
+            { anno: 2, nome: "Scienza delle Costruzioni", docenti: ["Paglietti"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/b9In3bgJ#BPRI_K4_A5E8DPzTrAx06A", "nota": "208.23 MB · 209 file e 21 sottocartelle"}], libri: [{"id": "2712578e-0629-8135-8114-e3aa77dd7180", "titolo": "Scienza delle Costruzioni - Volume Primo"}, {"id": "2712578e-0629-8185-9971-e3dcc9fb2007", "titolo": "Scienza delle Costruzioni - Volume Secondo"}] },
+            { anno: 2, nome: "Tecnologia dei Materiali", docenti: ["Elsener"], cfu: 5, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/7x4wwTQJ#SM-fU5ZXTrJNkRDS8aHAlw", "nota": "41.46 MB · 31 file e 8 sottocartelle"}], libri: [{"id": "2712578e-0629-8142-9466-f10702efdac0", "titolo": "Scienza e tecnologia dei materiali"}] },
             // ---------- 3° ANNO ----------
             { anno: 3, nome: "Acquedotti e Fognature e Laboratorio di Acquedotti e Fognature", integrato: true, docenti: ["Saba"], cfu: 10, sem: "1", prove: ["Scritto", "Pratico"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/jkpESKZZ#os53NibzedWEq91UFEonrA", "nota": "452.19 MB · 109 file e 10 sottocartelle"}], libri: [] },
-            { anno: 3, nome: "Fisica Tecnica ed Elettrotecnica", integrato: true, docenti: ["Baccoli", "Sias"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], link: [], libri: ["Principi di trasmissione del calore", "Trasmissione del calore", "Circuiti elettrici", "Circuiti Elettrici"], moduli: [{"nome": "Fisica Tecnica", "docenti": ["Baccoli"], "cfu": 5, "sem": "1", "prove": ["Scritto"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/jlx1GTgJ#CPCLUHx7m0k6QpSQDbaS-g", "nota": "35.83 MB · 41 file e 5 sottocartelle"}]}, {"nome": "Elettrotecnica", "docenti": ["Sias"], "cfu": 5, "sem": "2", "prove": ["Scritto", "Orale"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/f8JikR4R#3buh-9DXZC0cuzNk4c-AIg", "nota": "173.76 MB · 40 file e 22 sottocartelle"}]}] },
-            { anno: 3, nome: "Geotecnica e Strade", integrato: true, docenti: ["Maltinti", "Soccodato"], cfu: 12, sem: "2", prove: ["Scritto", "Orale"], link: [], libri: ["Geotecnica", "Moti di filtrazione", "Ingegneria stradale - Geometria e progetto di strade (vol. I)", "Strade ferrovie aeroporti"], moduli: [{"nome": "Geotecnica", "docenti": ["Soccodato"], "cfu": 6, "sem": "2", "prove": ["Scritto", "Orale"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/L0IAmZLB#6OaMDhMFK1aNP7i818Fwkg", "nota": "420.23 MB · 264 file e 37 sottocartelle"}]}, {"nome": "Strade 1", "docenti": ["Maltinti"], "cfu": 6, "sem": "2", "prove": ["Orale", "Pratico"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/eppSSYIL#00by6EiLx05c1XspqDWekQ", "nota": "120.8 MB · 115 file e 18 sottocartelle"}]}] },
-            { anno: 3, nome: "Fondamenti di Trasporti", docenti: ["Fadda", "Meloni", "Olivo"], cfu: 6, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/SwBAVapQ#uVxsN_bX6MVLH8pPkXs54A", "nota": "117.18 MB · 32 file e 6 sottocartelle"}], libri: ["Fondamenti di Trasporti"] },
-            { anno: 3, nome: "Idraulica", docenti: ["Querzoli"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/C0YFDL4a#CHVsv1C6bA2abBqOExyqmQ", "nota": "813.36 MB · 415 file e 42 sottocartelle"}], libri: ["Idraulica - Basi scientifiche e applicazioni tecniche, Volume I, parte I", "Idraulica - Basi scientifiche e applicazioni tecniche, Volume I, parte II", "Idraulica", "Problemi di idraulica e meccanica dei fluidi", "Meccanica dei fluidi"] },
-            { anno: 3, nome: "Matematica Applicata", docenti: ["Fermo", "Rodriguez"], cfu: 6, sem: "2", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/e5YAhaLQ#Mwr6tGLZyupRu_QxwVoD2Q", "nota": "131.84 MB · 235 file e 32 sottocartelle"}], libri: ["Introduzione alla matematica applicata"] },
+            { anno: 3, nome: "Fisica Tecnica ed Elettrotecnica", integrato: true, docenti: ["Baccoli", "Sias"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], link: [], libri: [{"id": "2712578e-0629-814c-90c8-f40533fe4a31", "titolo": "Principi di trasmissione del calore"}, {"id": "2712578e-0629-81a4-a9ec-eaa0826edff2", "titolo": "Trasmissione del calore"}, {"id": "27d2578e-0629-8017-a418-cc0e0dc5a9dc", "titolo": "Circuiti elettrici"}, {"id": "27d2578e-0629-8087-9ef9-f57af95a9102", "titolo": "Circuiti Elettrici"}], moduli: [{"nome": "Fisica Tecnica", "docenti": ["Baccoli"], "cfu": 5, "sem": "1", "prove": ["Scritto"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/jlx1GTgJ#CPCLUHx7m0k6QpSQDbaS-g", "nota": "35.83 MB · 41 file e 5 sottocartelle"}]}, {"nome": "Elettrotecnica", "docenti": ["Sias"], "cfu": 5, "sem": "2", "prove": ["Scritto", "Orale"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/f8JikR4R#3buh-9DXZC0cuzNk4c-AIg", "nota": "173.76 MB · 40 file e 22 sottocartelle"}]}] },
+            { anno: 3, nome: "Geotecnica e Strade", integrato: true, docenti: ["Maltinti", "Soccodato"], cfu: 12, sem: "2", prove: ["Scritto", "Orale"], link: [], libri: [{"id": "27d2578e-0629-80c1-af27-f68eddd0f525", "titolo": "Geotecnica"}, {"id": "27d2578e-0629-807c-8911-de7a6864a0a2", "titolo": "Moti di filtrazione"}, {"id": "2712578e-0629-81df-9e98-fcccb3682574", "titolo": "Ingegneria stradale - Geometria e progetto di strade (vol. I)"}, {"id": "27d2578e-0629-801e-a538-c3e71cee7e31", "titolo": "Strade ferrovie aeroporti"}], moduli: [{"nome": "Geotecnica", "docenti": ["Soccodato"], "cfu": 6, "sem": "2", "prove": ["Scritto", "Orale"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/L0IAmZLB#6OaMDhMFK1aNP7i818Fwkg", "nota": "420.23 MB · 264 file e 37 sottocartelle"}]}, {"nome": "Strade 1", "docenti": ["Maltinti"], "cfu": 6, "sem": "2", "prove": ["Orale", "Pratico"], "link": [{"titolo": "Materiale del modulo", "url": "https://mega.nz/folder/eppSSYIL#00by6EiLx05c1XspqDWekQ", "nota": "120.8 MB · 115 file e 18 sottocartelle"}]}] },
+            { anno: 3, nome: "Fondamenti di Trasporti", docenti: ["Fadda", "Meloni", "Olivo"], cfu: 6, sem: "1", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/SwBAVapQ#uVxsN_bX6MVLH8pPkXs54A", "nota": "117.18 MB · 32 file e 6 sottocartelle"}], libri: [{"id": "27d2578e-0629-80c0-b391-e729e2f9e1f2", "titolo": "Fondamenti di Trasporti"}] },
+            { anno: 3, nome: "Idraulica", docenti: ["Querzoli"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/C0YFDL4a#CHVsv1C6bA2abBqOExyqmQ", "nota": "813.36 MB · 415 file e 42 sottocartelle"}], libri: [{"id": "2712578e-0629-814e-9432-cd7634c0ca3d", "titolo": "Idraulica - Basi scientifiche e applicazioni tecniche, Volume I, parte I"}, {"id": "2712578e-0629-81ae-aff3-f3e0acef8fc3", "titolo": "Idraulica - Basi scientifiche e applicazioni tecniche, Volume I, parte II"}, {"id": "27d2578e-0629-8053-90f3-f12029c6f943", "titolo": "Idraulica"}, {"id": "27d2578e-0629-80c1-8611-c65d5f280cef", "titolo": "Problemi di idraulica e meccanica dei fluidi"}, {"id": "27d2578e-0629-800c-b59e-c300ee5171ea", "titolo": "Meccanica dei fluidi"}] },
+            { anno: 3, nome: "Matematica Applicata", docenti: ["Fermo", "Rodriguez"], cfu: 6, sem: "2", prove: ["Scritto"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/e5YAhaLQ#Mwr6tGLZyupRu_QxwVoD2Q", "nota": "131.84 MB · 235 file e 32 sottocartelle"}], libri: [{"id": "27d2578e-0629-80f0-891f-fe6aa44b3d4e", "titolo": "Introduzione alla matematica applicata"}] },
             { anno: 3, nome: "Sicurezza 1", docenti: ["Massacci"], cfu: 6, sem: "2", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/bxgySYJJ#w0tqfCDtdDPWWaffXqctAQ", "nota": "61.26 MB · 55 file e 10 sottocartelle"}], libri: [] },
-            { anno: 3, nome: "Tecnica delle Costruzioni", docenti: ["Meloni", "Mistretta", "Pani"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/3hIBDSAb#ybeVOqeZP2AWV-GReW189Q", "nota": "222.64 MB · 69 file e 15 sottocartelle"}], libri: ["Il cemento armato - La tecnica e la Statica (vol. I)", "Teoria e Tecnica delle Costruzioni"] },
+            { anno: 3, nome: "Tecnica delle Costruzioni", docenti: ["Meloni", "Mistretta", "Pani"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/3hIBDSAb#ybeVOqeZP2AWV-GReW189Q", "nota": "222.64 MB · 69 file e 15 sottocartelle"}], libri: [{"id": "2712578e-0629-81e5-bd9c-fce10e3428e8", "titolo": "Il cemento armato - La tecnica e la Statica (vol. I)"}, {"id": "2712578e-0629-818d-a898-ffa4c1fdb42f", "titolo": "Teoria e Tecnica delle Costruzioni"}] },
             { anno: 3, nome: "Tirocinio", docenti: ["Valdes"], cfu: 3, sem: "2", prove: ["Pratico"], link: [{"titolo": "Materiale del corso", "url": "https://mega.nz/folder/60oQBY6D#Y1PcxQxZouYKmM1HHijd3w", "nota": "34.5 MB · 30 file e 3 sottocartelle"}], libri: [] },
         ];
 
@@ -530,7 +542,7 @@
             const list = MATERIE.filter(m =>
                 (state.year === "all" || String(m.anno) === state.year) &&
                 (state.sem === "all" || m.sem === state.sem) &&
-                (!q || norm([m.nome, ...m.docenti, ...(m.moduli || []).map(x => x.nome), ...(m.libri || [])].join(" ")).includes(q))
+                (!q || norm([m.nome, ...m.docenti, ...(m.moduli || []).map(x => x.nome), ...(m.libri || []).map(b => b.titolo)].join(" ")).includes(q))
             );
 
             const html = anni.map(anno => {
@@ -643,6 +655,62 @@
             }).join("");
         }
 
+        /* ---------- Collegamento con la libreria (/libreria/data.json) ---------- */
+        let LIBRERIA = null;          // Map id -> libro, quando caricata
+        let libreriaPromise = null;
+        function loadLibreria() {
+            if (!libreriaPromise) {
+                libreriaPromise = fetch("/libreria/data.json")
+                    .then(r => r.ok ? r.json() : Promise.reject(r.status))
+                    .then(d => { LIBRERIA = new Map((d.items || []).map(x => [x.id, x])); return LIBRERIA; })
+                    .catch(() => { LIBRERIA = new Map(); return LIBRERIA; });
+            }
+            return libreriaPromise;
+        }
+
+        function coverError(img) {
+            // 1° tentativo: copertina salvata nel repo (covers/…); 2°: URL Notion; poi segnaposto.
+            const next = img.dataset.alt;
+            if (next) { img.dataset.alt = ""; img.src = next; return; }
+            const ph = document.createElement("span");
+            ph.className = "book-cover book-cover-ph";
+            ph.innerHTML = I.book.replace("<svg", '<svg class="w-4 h-4"');
+            img.replaceWith(ph);
+        }
+
+        function bookRow(b) {
+            const x = LIBRERIA && LIBRERIA.get(b.id);
+            if (LIBRERIA === null) {
+                return `
+                <div class="book-row">
+                    <span class="book-cover skeleton"></span>
+                    <span class="flex-grow min-w-0"><span class="block text-sm font-semibold">${esc(b.titolo)}</span>
+                    <span class="block mt-1 h-2.5 w-24 rounded skeleton"></span></span>
+                </div>`;
+            }
+            if (!x) {
+                return `
+                <div class="book-row">
+                    <span class="book-cover book-cover-ph">${I.book.replace("<svg", '<svg class="w-4 h-4"')}</span>
+                    <span class="flex-grow min-w-0 text-sm font-semibold">${esc(b.titolo)}</span>
+                </div>`;
+            }
+            const local = x.imageFallback ? "/libreria/" + x.imageFallback : "";
+            const src = local || x.image || "";
+            const alt = local && x.image ? x.image : "";
+            const meta = [x.author, x.source, x.year].filter(Boolean).join(" · ");
+            return `
+                <a href="/libreria/#libro=${encodeURIComponent(x.id)}" target="_blank" rel="noopener" class="book-row" title="Apri nella libreria">
+                    ${src ? `<img class="book-cover" src="${esc(src)}" data-alt="${esc(alt)}" alt="" loading="lazy" onerror="coverError(this)">`
+                          : `<span class="book-cover book-cover-ph">${I.book.replace("<svg", '<svg class="w-4 h-4"')}</span>`}
+                    <span class="flex-grow min-w-0">
+                        <span class="block text-sm font-semibold leading-snug">${esc(x.title || b.titolo)}</span>
+                        ${meta ? `<span class="block text-[11px] text-muted mt-0.5 truncate">${esc(meta)}</span>` : ""}
+                    </span>
+                    <svg class="ext w-4 h-4 text-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>`;
+        }
+
         function openMateria(m, pushHash = true) {
             const corso = CORSI[state.corso];
             const tema = ANNI[m.anno].tema;
@@ -665,11 +733,7 @@
                     ${(mod.prove || []).length ? `<div class="flex flex-wrap gap-1">${mod.prove.map(p => `<span class="pill pill-${p.toLowerCase()}">${p}</span>`).join("")}</div>` : ""}
                 </div>`).join("");
 
-            const libri = (m.libri || []).map(t => `
-                <li class="flex items-start gap-2.5 text-sm">
-                    <span class="mt-0.5 text-accent flex-shrink-0">${I.book.replace("<svg", '<svg class="w-4 h-4"')}</span>
-                    <span>${esc(t)}</span>
-                </li>`).join("");
+            const libri = (m.libri || []).map(bookRow).join("");
             if (!n) materiale = `
                 <div class="info-tile flex items-center gap-3 !p-4">
                     <span class="note-icon w-9 h-9 rounded-xl grid place-items-center bg-[var(--soft)] text-accent flex-shrink-0">${I.clock.replace("<svg", '<svg class="w-4 h-4"')}</span>
@@ -716,9 +780,9 @@
                     <section class="space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="eyebrow">Testi di riferimento</span>
-                            <a href="/libreria/" class="text-[11px] link-accent">Vai alla libreria</a>
+                            <a href="/libreria/#universita" target="_blank" rel="noopener" class="text-[11px] link-accent">Tutti i testi universitari</a>
                         </div>
-                        <ul class="info-tile space-y-2 !p-4">${libri}</ul>
+                        <div class="space-y-2" id="dlgBooks">${libri}</div>
                     </section>` : ""}
                 </div>
 
@@ -733,6 +797,13 @@
             dlg.querySelector("[data-close]").onclick = () => dlg.close();
             dlg.querySelector("[data-dlg-ask]").onclick = () => { dlg.close(); askAbout(fullName(m)); };
             if (!dlg.open) dlg.showModal();
+            // Se la libreria non è ancora caricata, i libri compaiono con uno scheletro e si completano appena arriva
+            if (LIBRERIA === null && (m.libri || []).length) {
+                loadLibreria().then(() => {
+                    const box = document.getElementById("dlgBooks");
+                    if (box && dlg.open) box.innerHTML = m.libri.map(bookRow).join("");
+                });
+            }
             // Il focus va al dialog (non alla X): niente anello evidenziato all'apertura, Esc e Tab funzionano comunque
             dlg.focus({ preventScroll: true });
             const scroller = dlg.querySelector(".dlg-scroll"), wrap = dlg.querySelector(".dlg-scroll-wrap");
@@ -769,6 +840,7 @@
             }
         }
         fromHash();
+        (window.requestIdleCallback || setTimeout)(() => loadLibreria());
     </script>
     <script src="https://tally.so/widgets/embed.js" async onload="Tally.loadEmbeds()" onerror="document.getElementById('tallyFrame').src=TALLY_BASE"></script>
 </body>
