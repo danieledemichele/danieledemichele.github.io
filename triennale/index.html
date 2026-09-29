@@ -155,6 +155,39 @@
         .map-frame { position: relative; border-radius: 1.25rem; overflow: hidden; border: 1px solid var(--border); background: #fff; aspect-ratio: 16 / 11; }
         .map-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: saturate(.85) sepia(.08); }
 
+        /* ===== Card cliccabile ===== */
+        .subject { cursor: pointer; }
+        .subject:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 2px; }
+        .act-files { color: var(--accent-hover); background: var(--soft); border: 1px solid var(--border); }
+
+        /* ===== Popup materia ===== */
+        dialog#materiaDialog {
+            width: min(640px, calc(100vw - 2rem)); max-height: min(86vh, 820px); padding: 0; border: 1px solid var(--border);
+            border-radius: 1.75rem; background: var(--bg); color: var(--text);
+            box-shadow: 0 30px 80px -30px rgba(28,25,23,.55);
+        }
+        dialog#materiaDialog::backdrop { background: rgba(41, 37, 36, .45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+        dialog#materiaDialog[open] { animation: dlgIn .28s cubic-bezier(.16,1,.3,1); }
+        @keyframes dlgIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+        @media (max-width: 639px) {
+            dialog#materiaDialog { width: 100vw; max-width: 100vw; margin: auto 0 0; border-radius: 1.5rem 1.5rem 0 0; max-height: 88vh; }
+        }
+        .dlg-head { background: var(--soft); border-bottom: 1px solid var(--border); }
+        .dlg-close { color: var(--muted); background: rgba(255,255,255,.8); border: 1px solid var(--border); }
+        .dlg-close:hover { color: var(--accent); border-color: var(--accent); }
+        .info-tile { background: #fff; border: 1px solid var(--border); border-radius: 1rem; padding: .7rem .85rem; }
+        .info-tile dt { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+        .info-tile dd { margin-top: .2rem; font-size: .9rem; font-weight: 600; color: var(--accent-hover); }
+        .file-row {
+            display: flex; align-items: center; gap: .8rem; padding: .7rem .85rem; background: #fff;
+            border: 1px solid var(--border); border-radius: 1rem; transition: border-color .2s ease, transform .2s ease;
+        }
+        .file-row:hover { border-color: var(--accent); transform: translateX(2px); }
+        .file-icon { flex-shrink: 0; width: 2.1rem; height: 2.1rem; border-radius: .7rem; display: grid; place-items: center; font-weight: 800; font-size: .8rem; color: #fff; background: #d9272e; }
+        .file-icon.other { background: var(--accent); }
+        .file-row .ext { width: 1rem; height: 1rem; color: var(--muted); flex-shrink: 0; }
+        .group-title { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
         .skeleton { animation: pulse 1.6s ease-in-out infinite; background: #f4efe6; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
 
@@ -317,6 +350,11 @@
         </div>
     </main>
 
+    <!-- POPUP DETTAGLIO MATERIA (riempito da JS) -->
+    <dialog id="materiaDialog" aria-labelledby="dlgTitle">
+        <div id="dlgBody" class="flex flex-col max-h-[inherit]"></div>
+    </dialog>
+
     <footer class="border-t border-stone-200/70 py-6 mt-10">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-1 text-xs text-muted">
             <p>&copy; 2026 Daniele De Michele · Materiale condiviso a scopo didattico</p>
@@ -329,70 +367,73 @@
            DATI MATERIE — modifica solo qui.
            sem:     "1" | "2" | "1-2" (annuale)
            prove:   "Scritto" | "Orale" | "Pratico"
-           url:     link al materiale (es. sottopagina Notion). Vuoto = "In arrivo".
-           moduli:  per i corsi integrati; ogni modulo può avere il suo url.
+           link:    materiale della materia, es.
+                    link: [{ titolo: "Appunti del corso", url: "https://mega.nz/folder/..." },
+                           { titolo: "Esercitazioni",     url: "https://mega.nz/file/..." }]
+                    Vuoto = "In arrivo". Si aprono nel popup cliccando la card.
+           moduli:  per i corsi integrati; ogni modulo ha i suoi link: { nome: "Analisi 1", link: [...] }
            tipo:    "G" = altre attività formative (laboratori da 3 CFU), mostrate con etichetta dedicata.
            ===================================================================== */
         const TRIENNALE = [
             // ---------- 1° ANNO ----------
-            { anno: 1, nome: "Analisi 2", docenti: ["Vernier", "Ragnedda"], cfu: 9, sem: "2", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 1, nome: "Chimica", docenti: ["Delogu"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 1, nome: "Matematica 1", integrato: true, docenti: ["Ratto", "Grimaldi"], cfu: 12, sem: "1", prove: [], url: "",
-              moduli: [{ nome: "Analisi 1", url: "" }, { nome: "Geometria", url: "" }] },
-            { anno: 1, nome: "Economia", docenti: ["Zuddas"], cfu: 5, sem: "1", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 1, nome: "Fisica 1", docenti: ["Concas"], cfu: 8, sem: "1", prove: ["Scritto"], url: "" },
-            { anno: 1, nome: "Fisica 2", docenti: ["Concas"], cfu: 7, sem: "2", prove: ["Scritto"], url: "" },
-            { anno: 1, nome: "Informatica", docenti: ["Fumera"], cfu: 6, sem: "2", prove: ["Scritto"], url: "" },
-            { anno: 1, nome: "Inglese", docenti: ["Idoneità"], cfu: 3, sem: "1", prove: ["Scritto"], url: "" },
+            { anno: 1, nome: "Analisi 2", docenti: ["Vernier", "Ragnedda"], cfu: 9, sem: "2", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 1, nome: "Chimica", docenti: ["Delogu"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 1, nome: "Matematica 1", integrato: true, docenti: ["Ratto", "Grimaldi"], cfu: 12, sem: "1", prove: [], link: [],
+              moduli: [{ nome: "Analisi 1", link: [] }, { nome: "Geometria", link: [] }] },
+            { anno: 1, nome: "Economia", docenti: ["Zuddas"], cfu: 5, sem: "1", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 1, nome: "Fisica 1", docenti: ["Concas"], cfu: 8, sem: "1", prove: ["Scritto"], link: [] },
+            { anno: 1, nome: "Fisica 2", docenti: ["Concas"], cfu: 7, sem: "2", prove: ["Scritto"], link: [] },
+            { anno: 1, nome: "Informatica", docenti: ["Fumera"], cfu: 6, sem: "2", prove: ["Scritto"], link: [] },
+            { anno: 1, nome: "Inglese", docenti: ["Idoneità"], cfu: 3, sem: "1", prove: ["Scritto"], link: [] },
 
             // ---------- 2° ANNO ----------
-            { anno: 2, nome: "Architettura Tecnica e Laboratorio di Disegno", integrato: true, docenti: ["Loddo", "Bagnolo"], cfu: 10, sem: "1", prove: ["Scritto"], url: "",
-              moduli: [{ nome: "Architettura Tecnica", url: "" }, { nome: "Laboratorio di Disegno", url: "" }] },
-            { anno: 2, nome: "Statistica e Idrologia", integrato: true, docenti: ["Sechi", "Banni"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale", "Pratico"], url: "",
-              moduli: [{ nome: "Statistica", url: "" }, { nome: "Idrologia", url: "" }] },
-            { anno: 2, nome: "Topografia e Laboratorio di Topografia", integrato: true, docenti: ["Sanna"], cfu: 10, sem: "2", prove: ["Orale", "Pratico"], url: "",
-              moduli: [{ nome: "Topografia", url: "" }, { nome: "Laboratorio di Topografia", url: "" }] },
-            { anno: 2, nome: "Meccanica Razionale", docenti: ["Mignemi"], cfu: 6, sem: "1", prove: ["Scritto"], url: "" },
-            { anno: 2, nome: "Scienza delle Costruzioni", docenti: ["Paglietti"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 2, nome: "Tecnologia dei Materiali", docenti: ["Elsener"], cfu: 5, sem: "1", prove: ["Scritto"], url: "" },
+            { anno: 2, nome: "Architettura Tecnica e Laboratorio di Disegno", integrato: true, docenti: ["Loddo", "Bagnolo"], cfu: 10, sem: "1", prove: ["Scritto"], link: [],
+              moduli: [{ nome: "Architettura Tecnica", link: [] }, { nome: "Laboratorio di Disegno", link: [] }] },
+            { anno: 2, nome: "Statistica e Idrologia", integrato: true, docenti: ["Sechi", "Banni"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale", "Pratico"], link: [],
+              moduli: [{ nome: "Statistica", link: [] }, { nome: "Idrologia", link: [] }] },
+            { anno: 2, nome: "Topografia e Laboratorio di Topografia", integrato: true, docenti: ["Sanna"], cfu: 10, sem: "2", prove: ["Orale", "Pratico"], link: [],
+              moduli: [{ nome: "Topografia", link: [] }, { nome: "Laboratorio di Topografia", link: [] }] },
+            { anno: 2, nome: "Meccanica Razionale", docenti: ["Mignemi"], cfu: 6, sem: "1", prove: ["Scritto"], link: [] },
+            { anno: 2, nome: "Scienza delle Costruzioni", docenti: ["Paglietti"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 2, nome: "Tecnologia dei Materiali", docenti: ["Elsener"], cfu: 5, sem: "1", prove: ["Scritto"], link: [] },
 
             // ---------- 3° ANNO ----------
-            { anno: 3, nome: "Acquedotti e Fognature e Laboratorio di Acquedotti e Fognature", integrato: true, docenti: ["Saba"], cfu: 10, sem: "1", prove: ["Scritto", "Pratico"], url: "" },
-            { anno: 3, nome: "Fisica Tecnica ed Elettrotecnica", integrato: true, docenti: ["Baccoli", "Sias"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], url: "",
-              moduli: [{ nome: "Fisica Tecnica", url: "" }, { nome: "Elettrotecnica", url: "" }] },
-            { anno: 3, nome: "Geotecnica e Strade", integrato: true, docenti: ["Soccodato", "Maltinti"], cfu: 12, sem: "2", prove: ["Scritto", "Orale"], url: "",
-              moduli: [{ nome: "Geotecnica", url: "" }, { nome: "Strade 1", url: "" }] },
-            { anno: 3, nome: "Fondamenti di Trasporti", docenti: ["Meloni", "Fadda", "Olivo"], cfu: 6, sem: "1", prove: ["Scritto"], url: "" },
-            { anno: 3, nome: "Idraulica", docenti: ["Querzoli"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 3, nome: "Matematica Applicata", docenti: ["Rodriguez", "Fermo"], cfu: 6, sem: "2", prove: ["Scritto"], url: "" },
-            { anno: 3, nome: "Sicurezza 1", docenti: ["Massacci"], cfu: 6, sem: "2", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 3, nome: "Tecnica delle Costruzioni", docenti: ["Pani", "Meloni", "Mistretta"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 3, nome: "Tirocinio", docenti: ["Valdes"], cfu: 3, sem: "2", prove: ["Pratico"], url: "" },
+            { anno: 3, nome: "Acquedotti e Fognature e Laboratorio di Acquedotti e Fognature", integrato: true, docenti: ["Saba"], cfu: 10, sem: "1", prove: ["Scritto", "Pratico"], link: [] },
+            { anno: 3, nome: "Fisica Tecnica ed Elettrotecnica", integrato: true, docenti: ["Baccoli", "Sias"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], link: [],
+              moduli: [{ nome: "Fisica Tecnica", link: [] }, { nome: "Elettrotecnica", link: [] }] },
+            { anno: 3, nome: "Geotecnica e Strade", integrato: true, docenti: ["Soccodato", "Maltinti"], cfu: 12, sem: "2", prove: ["Scritto", "Orale"], link: [],
+              moduli: [{ nome: "Geotecnica", link: [] }, { nome: "Strade 1", link: [] }] },
+            { anno: 3, nome: "Fondamenti di Trasporti", docenti: ["Meloni", "Fadda", "Olivo"], cfu: 6, sem: "1", prove: ["Scritto"], link: [] },
+            { anno: 3, nome: "Idraulica", docenti: ["Querzoli"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 3, nome: "Matematica Applicata", docenti: ["Rodriguez", "Fermo"], cfu: 6, sem: "2", prove: ["Scritto"], link: [] },
+            { anno: 3, nome: "Sicurezza 1", docenti: ["Massacci"], cfu: 6, sem: "2", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 3, nome: "Tecnica delle Costruzioni", docenti: ["Pani", "Meloni", "Mistretta"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 3, nome: "Tirocinio", docenti: ["Valdes"], cfu: 3, sem: "2", prove: ["Pratico"], link: [] },
         ];
 
         const MAGISTRALE = [
             // ---------- 1° ANNO ----------
-            { anno: 1, nome: "Costruzioni in Acciaio", docenti: ["Fenu"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], url: "" },
-            { anno: 1, nome: "Modelli e Metodi Matematici", docenti: ["Zuddas"], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
-            { anno: 1, nome: "Pianificazione dei Trasporti", docenti: ["Meloni"], cfu: 6, sem: "2", prove: ["Orale", "Pratico"], url: "" },
-            { anno: 1, nome: "Scienza delle Costruzioni 2", docenti: ["Cazzani"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 1, nome: "Sovrastrutture di Strade, Ferrovie e Aeroporti", docenti: ["Coni"], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
-            { anno: 1, nome: "Sperimentazione e Collaudo delle Strutture", docenti: ["Meloni D."], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
-            { anno: 1, nome: "Strade 2", docenti: ["Coni"], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
-            { anno: 1, nome: "Laboratorio di Strutture", tipo: "G", docenti: ["De Nicolo"], cfu: 3, sem: "", prove: [], url: "" },
-            { anno: 1, nome: "Tecnica Urbanistica", docenti: ["Campagna"], cfu: 6, sem: "1", prove: ["Pratico", "Orale"], url: "" },
+            { anno: 1, nome: "Costruzioni in Acciaio", docenti: ["Fenu"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], link: [] },
+            { anno: 1, nome: "Modelli e Metodi Matematici", docenti: ["Zuddas"], cfu: 6, sem: "1", prove: ["Orale"], link: [] },
+            { anno: 1, nome: "Pianificazione dei Trasporti", docenti: ["Meloni"], cfu: 6, sem: "2", prove: ["Orale", "Pratico"], link: [] },
+            { anno: 1, nome: "Scienza delle Costruzioni 2", docenti: ["Cazzani"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 1, nome: "Sovrastrutture di Strade, Ferrovie e Aeroporti", docenti: ["Coni"], cfu: 6, sem: "1", prove: ["Orale"], link: [] },
+            { anno: 1, nome: "Sperimentazione e Collaudo delle Strutture", docenti: ["Meloni D."], cfu: 6, sem: "1", prove: ["Orale"], link: [] },
+            { anno: 1, nome: "Strade 2", docenti: ["Coni"], cfu: 6, sem: "1", prove: ["Orale"], link: [] },
+            { anno: 1, nome: "Laboratorio di Strutture", tipo: "G", docenti: ["De Nicolo"], cfu: 3, sem: "", prove: [], link: [] },
+            { anno: 1, nome: "Tecnica Urbanistica", docenti: ["Campagna"], cfu: 6, sem: "1", prove: ["Pratico", "Orale"], link: [] },
 
             // ---------- 2° ANNO ----------
-            { anno: 2, nome: "Calcolo Automatico delle Strutture", docenti: ["Meloni D."], cfu: 6, sem: "1", prove: ["Orale"], url: "" },
-            { anno: 2, nome: "Complementi di Scienza delle Costruzioni 2", docenti: ["Brun"], cfu: 6, sem: "2", prove: ["Scritto", "Orale", "Pratico"], url: "" },
-            { anno: 2, nome: "Dinamica delle Strutture", docenti: ["Porcu"], cfu: 6, sem: "1", prove: ["Pratico", "Orale"], url: "" },
-            { anno: 2, nome: "Fondazioni", docenti: ["Soccodato"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], url: "" },
-            { anno: 2, nome: "Laboratorio di Riqualificazione Strutturale", tipo: "G", docenti: ["Concu", "Meloni D.", "Mistretta"], cfu: 3, sem: "", prove: [], url: "" },
-            { anno: 2, nome: "Tecnica delle Costruzioni 2", docenti: ["Concu"], cfu: 6, sem: "2", prove: ["Orale"], url: "" },
-            { anno: 2, nome: "Bacini", docenti: ["Montaldo"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], url: "" },
-            { anno: 2, nome: "Sismica delle Strutture", docenti: ["Porcu"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], url: "" },
-            { anno: 2, nome: "Ponti", docenti: ["Mistretta"], cfu: 6, sem: "2", prove: ["Orale", "Pratico"], url: "" },
-            { anno: 2, nome: "Sicurezza 2", docenti: ["Dentoni"], cfu: 6, sem: "2", prove: [], url: "" },
+            { anno: 2, nome: "Calcolo Automatico delle Strutture", docenti: ["Meloni D."], cfu: 6, sem: "1", prove: ["Orale"], link: [] },
+            { anno: 2, nome: "Complementi di Scienza delle Costruzioni 2", docenti: ["Brun"], cfu: 6, sem: "2", prove: ["Scritto", "Orale", "Pratico"], link: [] },
+            { anno: 2, nome: "Dinamica delle Strutture", docenti: ["Porcu"], cfu: 6, sem: "1", prove: ["Pratico", "Orale"], link: [] },
+            { anno: 2, nome: "Fondazioni", docenti: ["Soccodato"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], link: [] },
+            { anno: 2, nome: "Laboratorio di Riqualificazione Strutturale", tipo: "G", docenti: ["Concu", "Meloni D.", "Mistretta"], cfu: 3, sem: "", prove: [], link: [] },
+            { anno: 2, nome: "Tecnica delle Costruzioni 2", docenti: ["Concu"], cfu: 6, sem: "2", prove: ["Orale"], link: [] },
+            { anno: 2, nome: "Bacini", docenti: ["Montaldo"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], link: [] },
+            { anno: 2, nome: "Sismica delle Strutture", docenti: ["Porcu"], cfu: 6, sem: "2", prove: ["Pratico", "Orale"], link: [] },
+            { anno: 2, nome: "Ponti", docenti: ["Mistretta"], cfu: 6, sem: "2", prove: ["Orale", "Pratico"], link: [] },
+            { anno: 2, nome: "Sicurezza 2", docenti: ["Dentoni"], cfu: 6, sem: "2", prove: [], link: [] },
         ];
 
         /* Corsi mostrati nelle schede. L'hash dell'URL seleziona la scheda: /triennale/#magistrale */
@@ -426,19 +467,21 @@
         const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
         const semLabel = s => s === "1-2" ? "1° e 2° semestre" : `${s}° semestre`;
         const fullName = m => (m.integrato ? "Corso Integrato: " : "") + m.nome;
+        const countLinks = m => (m.link || []).length + (m.moduli || []).reduce((s, x) => s + (x.link || []).length, 0);
+        const slug = s => norm(s).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
         function subjectCard(m, i) {
             const docenti = m.docenti.join(", ");
             const prove = m.prove.map(p => `<span class="pill pill-${p.toLowerCase()}">${p}</span>`).join("");
-            const moduli = (m.moduli || []).map(mod => mod.url
-                ? `<a href="${esc(mod.url)}" target="_blank" rel="noopener" class="modulo hover:!border-solid hover:text-[var(--accent)]">${I.doc}${esc(mod.nome)}</a>`
-                : `<span class="modulo">${I.doc}${esc(mod.nome)}</span>`).join("");
-            const materiale = m.url
-                ? `<a href="${esc(m.url)}" target="_blank" rel="noopener" class="act act-primary">${I.open}Materiale</a>`
+            const moduli = (m.moduli || []).map(mod => `<span class="modulo">${I.doc}${esc(mod.nome)}</span>`).join("");
+            const n = countLinks(m);
+            const materiale = n
+                ? `<span class="act act-files">${I.doc}${n} link</span>`
                 : `<span class="act act-disabled" title="Materiale non ancora disponibile">${I.clock}In arrivo</span>`;
 
             return `
-            <article class="subject fade-in" style="animation-delay:${i * 25}ms">
+            <article class="subject fade-in" style="animation-delay:${i * 25}ms" tabindex="0" role="button"
+                     data-idx="${CORSI[state.corso].materie.indexOf(m)}" aria-label="Dettagli di ${esc(m.nome)}">
                 <div class="flex items-start gap-3">
                     <h3 class="flex-grow">${m.integrato ? '<span class="ci">Corso integrato</span>' : ""}${m.tipo ? '<span class="ci">Altre attività formative</span>' : ""}${esc(m.nome)}</h3>
                     <div class="cfu" title="Crediti formativi"><b>${m.cfu}</b><span>CFU</span></div>
@@ -509,7 +552,7 @@
                 `<button type="button" data-year="all" aria-pressed="${state.year === "all"}">Tutti</button>` +
                 anni.map(a => `<button type="button" data-year="${a}" aria-pressed="${state.year === String(a)}">${a}° anno</button>`).join("");
             const cfu = MATERIE.reduce((s, m) => s + m.cfu, 0);
-            const conMateriale = MATERIE.filter(m => m.url).length;
+            const conMateriale = MATERIE.filter(m => countLinks(m)).length;
             document.getElementById("totals").innerHTML = `
                 <span class="chip">${I.book}${MATERIE.length} insegnamenti</span>
                 <span class="chip">${I.star}${cfu} CFU</span>
@@ -529,7 +572,7 @@
             const b = e.target.closest("[data-corso]");
             if (b) setCorso(b.dataset.corso, true);
         });
-        window.addEventListener("hashchange", () => setCorso(location.hash.slice(1)));
+        window.addEventListener("hashchange", () => fromHash());
 
         document.getElementById("yearFilter").addEventListener("click", e => {
             const b = e.target.closest("button[data-year]");
@@ -547,10 +590,7 @@
         frame.addEventListener("load", () => { if (frame.getAttribute("src")) tallySkeleton.remove(); });
         setTimeout(() => { if (tallySkeleton.isConnected) tallySkeleton.remove(); }, 8000);
 
-        document.getElementById("years").addEventListener("click", e => {
-            const b = e.target.closest("[data-ask]");
-            if (!b) return;
-            const materia = b.dataset.ask;
+        function askAbout(materia) {
             const src = `${TALLY_BASE}&${TALLY_PREFILL_PARAM}=${encodeURIComponent(materia)}`;
             frame.setAttribute("data-tally-src", src);
             frame.src = src; // Tally.loadEmbeds() salta gli iframe già caricati: impostiamo src a mano
@@ -559,9 +599,114 @@
             const box = document.getElementById("richiesta");
             box.scrollIntoView({ behavior: "smooth", block: "start" });
             box.classList.remove("flash"); void box.offsetWidth; box.classList.add("flash");
+        }
+
+        /* ---------- Popup materia ---------- */
+        const dlg = document.getElementById("materiaDialog");
+        const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
+
+        function fileRows(links) {
+            return links.map(l => {
+                const host = hostOf(l.url);
+                const mega = /mega\.(nz|io|co\.nz)$/.test(host);
+                return `
+                <a href="${esc(l.url)}" target="_blank" rel="noopener" class="file-row">
+                    <span class="file-icon ${mega ? "" : "other"}">${mega ? "M" : I.doc.replace("<svg", '<svg class="w-4 h-4"')}</span>
+                    <span class="flex-grow min-w-0">
+                        <span class="block text-sm font-semibold truncate">${esc(l.titolo || "Materiale")}</span>
+                        <span class="block text-[11px] text-muted truncate">${mega ? (/\/file\//.test(l.url) ? "File su MEGA" : "Cartella MEGA") : esc(host)}${l.nota ? " · " + esc(l.nota) : ""}</span>
+                    </span>
+                    <svg class="ext" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>`;
+            }).join("");
+        }
+
+        function openMateria(m, pushHash = true) {
+            const corso = CORSI[state.corso];
+            const tema = ANNI[m.anno].tema;
+            const n = countLinks(m);
+            const prove = m.prove.map(p => `<span class="pill pill-${p.toLowerCase()}">${p}</span>`).join("") || '<span class="text-muted text-sm font-normal">—</span>';
+
+            let materiale = "";
+            if ((m.link || []).length) materiale += `<div class="space-y-2">${m.moduli ? '<p class="group-title">Materiale del corso</p>' : ""}${fileRows(m.link)}</div>`;
+            (m.moduli || []).forEach(mod => {
+                materiale += `<div class="space-y-2"><p class="group-title">${esc(mod.nome)}</p>${
+                    (mod.link || []).length ? fileRows(mod.link) : '<p class="text-xs text-muted pl-1">Materiale in arrivo.</p>'}</div>`;
+            });
+            if (!n) materiale = `
+                <div class="info-tile flex items-center gap-3 !p-4">
+                    <span class="note-icon w-9 h-9 rounded-xl grid place-items-center bg-[var(--soft)] text-accent flex-shrink-0">${I.clock.replace("<svg", '<svg class="w-4 h-4"')}</span>
+                    <p class="text-sm text-muted">Il materiale di questa materia non è ancora stato caricato. Se ti serve, chiedilo dal modulo.</p>
+                </div>`;
+
+            dlg.className = tema;
+            document.getElementById("dlgBody").innerHTML = `
+                <div class="dlg-head px-6 pt-5 pb-5 flex items-start gap-4">
+                    <div class="flex-grow min-w-0">
+                        <span class="eyebrow">${m.anno}° anno · ${esc(corso.eyebrow)}</span>
+                        <h2 id="dlgTitle" class="mt-2 text-2xl font-serif font-bold tracking-tight leading-tight">
+                            ${m.integrato ? '<span class="block text-[11px] font-sans font-bold tracking-[.08em] uppercase text-accent mb-1">Corso integrato</span>' : ""}${m.tipo ? '<span class="block text-[11px] font-sans font-bold tracking-[.08em] uppercase text-accent mb-1">Altre attività formative · Tipologia ' + esc(m.tipo) + '</span>' : ""}${esc(m.nome)}
+                        </h2>
+                    </div>
+                    <button type="button" class="dlg-close w-9 h-9 rounded-full grid place-items-center flex-shrink-0" data-close aria-label="Chiudi">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="px-6 py-5 space-y-6 overflow-y-auto">
+                    <dl class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div class="info-tile"><dt>CFU</dt><dd>${m.cfu}</dd></div>
+                        <div class="info-tile"><dt>Semestre</dt><dd>${m.sem ? semLabel(m.sem).replace(" semestre", "") : "—"}</dd></div>
+                        <div class="info-tile col-span-2"><dt>Modalità d'esame</dt><dd class="flex flex-wrap gap-1.5">${prove}</dd></div>
+                        <div class="info-tile col-span-2 sm:col-span-4"><dt>${m.docenti.length > 1 ? "Docenti" : "Docente"}</dt><dd>${esc(m.docenti.join(" · "))}</dd></div>
+                    </dl>
+
+                    <section class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="eyebrow">Materiale di studio</span>
+                            ${n ? `<span class="chip !py-1">${n} link</span>` : ""}
+                        </div>
+                        ${materiale}
+                    </section>
+                </div>
+
+                <div class="px-6 py-4 border-t border-[var(--border)] bg-white/60 flex flex-wrap items-center gap-2">
+                    <p class="text-[11px] text-muted flex-grow">Un link non si apre o manca qualcosa?</p>
+                    <button type="button" class="btn-accent inline-flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2" data-dlg-ask>
+                        ${I.ask.replace("<svg", '<svg class="w-4 h-4"')}Chiedi o segnala
+                    </button>
+                </div>`;
+
+            dlg.querySelector("[data-close]").onclick = () => dlg.close();
+            dlg.querySelector("[data-dlg-ask]").onclick = () => { dlg.close(); askAbout(fullName(m)); };
+            if (!dlg.open) dlg.showModal();
+            if (pushHash) history.replaceState(null, "", `#${state.corso}/${slug(m.nome)}`);
+        }
+
+        dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); }); // clic sullo sfondo
+        dlg.addEventListener("close", () => history.replaceState(null, "", state.corso === "triennale" ? location.pathname : "#" + state.corso));
+
+        const years = document.getElementById("years");
+        years.addEventListener("click", e => {
+            const ask = e.target.closest("[data-ask]");
+            if (ask) { askAbout(ask.dataset.ask); return; }
+            const card = e.target.closest(".subject");
+            if (card) openMateria(CORSI[state.corso].materie[+card.dataset.idx]);
+        });
+        years.addEventListener("keydown", e => {
+            const card = e.target.closest(".subject");
+            if (card && e.target === card && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); card.click(); }
         });
 
-        setCorso(location.hash.slice(1) || "triennale");
+        function fromHash() {
+            const [corso, materia] = location.hash.slice(1).split("/");
+            setCorso(corso || "triennale");
+            if (materia) {
+                const m = CORSI[state.corso].materie.find(x => slug(x.nome) === materia);
+                if (m) openMateria(m, false);
+            }
+        }
+        fromHash();
     </script>
     <script src="https://tally.so/widgets/embed.js" async onload="Tally.loadEmbeds()" onerror="document.getElementById('tallyFrame').src=TALLY_BASE"></script>
 </body>
