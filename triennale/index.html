@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingegneria Civile · Laurea Triennale · Daniele De Michele</title>
+    <meta name="description" content="Le materie del corso di laurea triennale in Ingegneria Civile, anno per anno: docenti, CFU, semestre, modalità d'esame e materiale di studio.">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Ingegneria Civile · Laurea Triennale">
+    <meta property="og:description" content="Materie, docenti, CFU e materiale di studio del percorso triennale, con modulo di richiesta supporto.">
+    <meta property="og:url" content="https://danieledemichele.it/triennale/">
+    <meta property="og:image" content="https://danieledemichele.it/assets/cover.jpg">
+    <meta property="og:locale" content="it_IT">
+
+    <!-- Favicon -->
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../assets/favicon.ico" sizes="any">
+    <link rel="icon" href="../assets/favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="../assets/favicon-16.png" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+
+    <!-- Tailwind CSS e font: identici a libreria/ e ripetizioni/ -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===== Palette base (terracotta/crema, come libreria e ripetizioni) ===== */
+        :root {
+            --bg: #fbf8f3;
+            --text: #2c2825;
+            --muted: #57534e;
+            --soft: #f4efe6;
+            --border: #e2dcd2;
+            --accent: #9a3412;
+            --accent-hover: #7c2d12;
+        }
+
+        /* ===== Toni delle card (mix come in ripetizioni) ===== */
+        .theme-oceano { --soft: #e9eef7; --border: #d3dcea; --accent: #1e3a8a; --accent-hover: #172554; --muted: #4b5567; }
+        .theme-salvia { --soft: #e4eae7; --border: #cfdad4; --accent: #2f5d50; --accent-hover: #1f3d36; --muted: #526159; }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--text); }
+        ::selection { background: #fde68a; color: #451a03; }
+        .font-serif { font-family: 'Playfair Display', Georgia, serif; }
+        .text-muted { color: var(--muted); }
+        .text-accent { color: var(--accent); }
+        .text-accent-strong { color: var(--accent-hover); }
+
+        .glass-panel {
+            background: rgba(251, 248, 243, 0.82);
+            backdrop-filter: saturate(1.4) blur(14px);
+            -webkit-backdrop-filter: saturate(1.4) blur(14px);
+        }
+
+        /* ===== Card ===== */
+        .card {
+            border-radius: 1.75rem;
+            border: 1px solid var(--border);
+            background: var(--soft);
+            box-shadow: 0 1px 2px rgba(28, 25, 23, .04), 0 18px 40px -28px rgba(28, 25, 23, .28);
+            transition: border-color .25s ease, box-shadow .25s ease;
+        }
+        .card:hover { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
+        .card-white { background: #fff; }
+
+        .eyebrow {
+            display: inline-flex; align-items: center; gap: .5rem;
+            font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+            color: var(--accent);
+        }
+        .eyebrow::before { content: ""; width: .5rem; height: .5rem; border-radius: 9999px; background: currentColor; }
+
+        .chip {
+            display: inline-flex; align-items: center; gap: .4rem;
+            font-size: .75rem; font-weight: 600; color: var(--accent-hover);
+            background: rgba(255,255,255,.7); border: 1px solid var(--border);
+            padding: .35rem .75rem; border-radius: 9999px;
+        }
+        .chip svg { width: .9rem; height: .9rem; color: var(--accent); }
+
+        .logo-badge { background: var(--accent); box-shadow: 0 8px 18px -8px rgba(154, 52, 18, .6); }
+        .btn-accent { background: var(--accent); color: #fff; transition: background .2s ease, transform .2s ease; }
+        .btn-accent:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-ghost { color: var(--accent-hover); background: rgba(255,255,255,.75); border: 1px solid var(--border); transition: border-color .2s ease, background .2s ease; }
+        .btn-ghost:hover { border-color: var(--accent); background: #fff; }
+        .link-accent { color: var(--accent); font-weight: 600; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent); text-underline-offset: 3px; }
+        .link-accent:hover { text-decoration-color: var(--accent); }
+        .back-link { color: var(--muted); }
+        .back-link:hover { color: var(--accent); background: rgba(255,255,255,.7); }
+
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #f4efe6; }
+        ::-webkit-scrollbar-thumb { background: #d8cfc0; border-radius: 4px; }
+
+        /* ===== Barra filtri ===== */
+        .seg { display: inline-flex; padding: .25rem; gap: .25rem; border-radius: 9999px; background: rgba(255,255,255,.75); border: 1px solid var(--border); }
+        .seg button { font-size: .8rem; font-weight: 600; color: var(--muted); padding: .4rem .9rem; border-radius: 9999px; transition: background .2s ease, color .2s ease; white-space: nowrap; }
+        .seg button:hover { color: var(--accent); }
+        .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+        .field {
+            font-size: .85rem; background: #fff; border: 1px solid var(--border); border-radius: 9999px;
+            padding: .5rem .9rem; color: var(--text); outline: none; transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent); }
+
+        /* ===== Card materia ===== */
+        .subject {
+            position: relative; display: flex; flex-direction: column; gap: .7rem;
+            background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1.1rem 1.15rem 1rem;
+            transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+        }
+        .subject:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); transform: translateY(-2px); box-shadow: 0 14px 30px -22px rgba(28,25,23,.45); }
+        .subject h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1.05rem; line-height: 1.3; color: var(--text); }
+        .subject .ci { display: block; font-family: 'Inter', sans-serif; font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: .2rem; }
+        .meta { display: flex; align-items: center; gap: .45rem; font-size: .78rem; color: var(--muted); }
+        .meta svg { width: .85rem; height: .85rem; flex-shrink: 0; color: var(--accent); }
+        .cfu {
+            flex-shrink: 0; min-width: 2.6rem; text-align: center; border-radius: .75rem; padding: .3rem .45rem;
+            background: var(--soft); border: 1px solid var(--border); line-height: 1;
+        }
+        .cfu b { display: block; font-size: 1rem; color: var(--accent-hover); }
+        .cfu span { font-size: .55rem; font-weight: 700; letter-spacing: .08em; color: var(--muted); }
+
+        .pill { font-size: .68rem; font-weight: 600; padding: .18rem .55rem; border-radius: .45rem; border: 1px solid transparent; }
+        .pill-sem     { background: var(--soft); color: var(--accent-hover); border-color: var(--border); }
+        .pill-scritto { background: #e9eef7; color: #1e3a8a; border-color: #d3dcea; }
+        .pill-orale   { background: #fbf0dc; color: #92400e; border-color: #f0dfbd; }
+        .pill-pratico { background: #fbe9e5; color: #9f1239; border-color: #f3d3cd; }
+
+        .modulo { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; color: var(--muted); background: #faf8f5; border: 1px dashed var(--border); padding: .15rem .5rem; border-radius: .45rem; }
+        .modulo svg { width: .75rem; height: .75rem; }
+
+        .subject-actions { display: flex; gap: .4rem; margin-top: auto; padding-top: .65rem; border-top: 1px solid #f1ede6; }
+        .act { display: inline-flex; align-items: center; gap: .35rem; font-size: .75rem; font-weight: 600; border-radius: 9999px; padding: .35rem .75rem; }
+        .act svg { width: .85rem; height: .85rem; }
+        .act-primary { background: var(--accent); color: #fff; }
+        .act-primary:hover { background: var(--accent-hover); }
+        .act-disabled { color: #a8a29e; background: #f5f5f4; cursor: default; }
+        .act-ask { color: var(--accent-hover); margin-left: auto; }
+        .act-ask:hover { background: var(--soft); }
+
+        /* ===== Mappa ===== */
+        .map-frame { position: relative; border-radius: 1.25rem; overflow: hidden; border: 1px solid var(--border); background: #fff; aspect-ratio: 16 / 11; }
+        .map-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: saturate(.85) sepia(.08); }
+
+        .skeleton { animation: pulse 1.6s ease-in-out infinite; background: #f4efe6; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+
+        .fade-in { animation: fadeIn .35s cubic-bezier(.16,1,.3,1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .flash { animation: flash 1.4s ease; }
+        @keyframes flash { 0%,100% { box-shadow: 0 1px 2px rgba(28,25,23,.04), 0 18px 40px -28px rgba(28,25,23,.28); } 30% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-stone-200/70">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="logo-badge w-10 h-10 rounded-xl flex items-center justify-center text-white">
+                        <!-- tocco -->
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6m-6.2-9.6v5.1c0 1.4 2.8 3.5 6.2 3.5s6.2-2.1 6.2-3.5v-5.1"></path></svg>
+                    </div>
+                    <div class="leading-tight">
+                        <h1 class="text-lg sm:text-xl font-serif font-bold tracking-tight">Ingegneria Civile</h1>
+                        <p class="text-[11px] text-muted font-medium hidden sm:block">Laurea triennale · materie e materiale di studio</p>
+                    </div>
+                </div>
+                <a href="/" class="back-link text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 rounded-full px-3 py-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span class="hidden sm:inline">Torna al sito</span><span class="sm:hidden">Home</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-grow max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
+
+            <!-- ===================== SINISTRA: MATERIE ===================== -->
+            <div class="lg:col-span-8 space-y-5 lg:space-y-6 min-w-0">
+
+                <!-- Intro + filtri -->
+                <section class="card p-6 sm:p-7 flex flex-col gap-5">
+                    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                        <div>
+                            <span class="eyebrow">Percorso di laurea triennale</span>
+                            <h2 class="mt-2 text-2xl sm:text-[1.75rem] leading-tight font-serif font-bold tracking-tight">Le materie, anno per anno</h2>
+                            <p class="mt-2 text-sm text-muted leading-relaxed max-w-xl">
+                                Per ogni insegnamento trovi docenti, CFU, semestre e modalità d'esame. Apri il <strong class="text-accent-strong">materiale</strong> oppure, se ti serve una mano, usa <em>Chiedi</em> per compilare il modulo già sulla materia giusta.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap sm:flex-nowrap gap-2 flex-shrink-0" id="totals"></div>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row md:items-center gap-3">
+                        <div class="seg overflow-x-auto max-w-full" role="group" aria-label="Filtra per anno" id="yearFilter">
+                            <button type="button" data-year="all" aria-pressed="true">Tutti</button>
+                            <button type="button" data-year="1" aria-pressed="false">1° anno</button>
+                            <button type="button" data-year="2" aria-pressed="false">2° anno</button>
+                            <button type="button" data-year="3" aria-pressed="false">3° anno</button>
+                        </div>
+                        <div class="flex gap-2 md:ml-auto">
+                            <select id="semFilter" class="field pr-8" aria-label="Filtra per semestre">
+                                <option value="all">Ogni semestre</option>
+                                <option value="1">1° semestre</option>
+                                <option value="2">2° semestre</option>
+                                <option value="1-2">Annuale</option>
+                            </select>
+                            <label class="relative flex-grow md:w-56">
+                                <span class="sr-only">Cerca</span>
+                                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"></path></svg>
+                                <input id="search" type="search" class="field w-full" style="padding-left:2.25rem" placeholder="Materia o docente…">
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Anni (generati da JS) -->
+                <div id="years" class="space-y-5 lg:space-y-6"></div>
+
+                <p id="empty" class="hidden card p-8 text-center text-sm text-muted">Nessuna materia corrisponde ai filtri selezionati.</p>
+            </div>
+
+            <!-- ===================== DESTRA: SEDE + MODULO ===================== -->
+            <aside class="lg:col-span-4 space-y-5 lg:space-y-6 lg:sticky lg:top-24">
+
+                <!-- DOVE SI TROVA -->
+                <section class="card theme-oceano p-6 flex flex-col gap-4">
+                    <span class="eyebrow">Dove si trova</span>
+                    <div>
+                        <h2 class="text-xl font-serif font-bold tracking-tight leading-snug">Facoltà di Ingegneria e Architettura</h2>
+                        <p class="mt-2 text-sm text-muted leading-relaxed">
+                            Nata nel 2012 dall'unione della Facoltà di Ingegneria (1939) e di Architettura (2006), coordina la didattica dei dipartimenti <abbr title="Ingegneria Civile, Ambientale e Architettura" class="no-underline font-semibold text-accent-strong">DICAAR</abbr>, <abbr title="Ingegneria Elettrica ed Elettronica" class="no-underline font-semibold text-accent-strong">DIEE</abbr> e <abbr title="Ingegneria Meccanica, Chimica e dei Materiali" class="no-underline font-semibold text-accent-strong">DIMCM</abbr>.
+                        </p>
+                    </div>
+
+                    <div class="map-frame">
+                        <div id="mapSkeleton" class="absolute inset-0 skeleton"></div>
+                        <iframe title="Mappa: Via Marengo 2, Cagliari" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                                src="https://www.google.com/maps?q=Via+Marengo+2,+09123+Cagliari+CA&z=16&output=embed"
+                                onload="document.getElementById('mapSkeleton')?.remove()"></iframe>
+                    </div>
+
+                    <div class="flex items-start gap-3">
+                        <span class="w-8 h-8 rounded-lg bg-white border border-[var(--border)] grid place-items-center flex-shrink-0 text-accent">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.7 16.7L13.4 21a2 2 0 01-2.8 0l-4.3-4.3a8 8 0 1111.4 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </span>
+                        <div class="text-sm leading-snug">
+                            <p class="font-semibold text-accent-strong">Via Marengo 2</p>
+                            <p class="text-muted">09123 Cagliari</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <a class="btn-accent inline-flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2" target="_blank" rel="noopener"
+                           href="https://www.google.com/maps/dir/?api=1&destination=Via+Marengo+2,+09123+Cagliari">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.4-2.7A1 1 0 013 16.4V5.6a1 1 0 011.4-.9L9 7m0 13l6-3m-6 3V7m6 10l4.6 2.3a1 1 0 001.4-.9V7.6a1 1 0 00-.6-.9L15 4m0 13V4m0 0L9 7"></path></svg>
+                            Indicazioni
+                        </a>
+                        <a class="btn-ghost inline-flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2" target="_blank" rel="noopener"
+                           href="https://www.google.com/maps/search/?api=1&query=Via+Marengo+2,+09123+Cagliari">
+                            Apri in Google Maps
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- RICHIESTA DI SUPPORTO (Tally) -->
+                <section id="richiesta" class="scroll-mt-20 card card-white theme-salvia overflow-hidden flex flex-col">
+                    <div class="px-6 pt-5 pb-4 border-b border-stone-100 space-y-2">
+                        <span class="eyebrow">Richiesta di supporto</span>
+                        <p class="text-sm text-muted leading-relaxed">
+                            Chiarimenti su una materia, <strong class="text-accent-strong">ripetizioni</strong>, fonti e materiali di studio o un <strong class="text-accent-strong">link non accessibile</strong>: scrivimi qui e ti rispondo al contatto che indichi.
+                        </p>
+                        <div id="prefillNote" class="hidden fade-in"><span class="chip !text-[11px]">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Materia: <b id="prefillName"></b></span>
+                        </span></div>
+                    </div>
+                    <div class="relative px-3 sm:px-4 pb-2 min-h-[420px]">
+                        <div id="tallySkeleton" class="absolute inset-0 p-6 space-y-4 pointer-events-none z-10 bg-white">
+                            <div class="skeleton h-5 w-40 rounded-lg"></div>
+                            <div class="skeleton h-11 w-full rounded-xl"></div>
+                            <div class="skeleton h-5 w-36 rounded-lg"></div>
+                            <div class="skeleton h-11 w-full rounded-xl"></div>
+                            <div class="skeleton h-5 w-28 rounded-lg"></div>
+                            <div class="skeleton h-11 w-full rounded-xl"></div>
+                            <p class="text-xs text-muted text-center pt-2">Caricamento del modulo…</p>
+                        </div>
+                        <iframe id="tallyFrame" title="Richiesta di supporto" width="100%" height="420" frameborder="0" marginheight="0" marginwidth="0"
+                                data-tally-src="https://tally.so/embed/KYldMD?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
+                                loading="lazy"></iframe>
+                    </div>
+                    <div class="px-6 py-3 border-t border-stone-100 text-[11px] text-muted">
+                        Non si carica? <a href="https://tally.so/r/KYldMD" target="_blank" rel="noopener" class="link-accent">Apri il modulo in una nuova scheda</a>.
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="border-t border-stone-200/70 py-6 mt-10">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-1 text-xs text-muted">
+            <p>&copy; 2026 Daniele De Michele · Materiale condiviso a scopo didattico</p>
+            <p class="text-[10px] opacity-70">Le informazioni possono variare: fa sempre fede il sito ufficiale del corso di studi.</p>
+        </div>
+    </footer>
+
+    <script>
+        /* =====================================================================
+           DATI MATERIE — modifica solo qui.
+           sem:     "1" | "2" | "1-2" (annuale)
+           prove:   "Scritto" | "Orale" | "Pratico"
+           url:     link al materiale (es. sottopagina Notion). Vuoto = "In arrivo".
+           moduli:  per i corsi integrati; ogni modulo può avere il suo url.
+           ===================================================================== */
+        const MATERIE = [
+            // ---------- 1° ANNO ----------
+            { anno: 1, nome: "Analisi 2", docenti: ["Vernier", "Ragnedda"], cfu: 9, sem: "2", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 1, nome: "Chimica", docenti: ["Delogu"], cfu: 6, sem: "1", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 1, nome: "Matematica 1", integrato: true, docenti: ["Ratto", "Grimaldi"], cfu: 12, sem: "1", prove: [], url: "",
+              moduli: [{ nome: "Analisi 1", url: "" }, { nome: "Geometria", url: "" }] },
+            { anno: 1, nome: "Economia", docenti: ["Zuddas"], cfu: 5, sem: "1", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 1, nome: "Fisica 1", docenti: ["Concas"], cfu: 8, sem: "1", prove: ["Scritto"], url: "" },
+            { anno: 1, nome: "Fisica 2", docenti: ["Concas"], cfu: 7, sem: "2", prove: ["Scritto"], url: "" },
+            { anno: 1, nome: "Informatica", docenti: ["Fumera"], cfu: 6, sem: "2", prove: ["Scritto"], url: "" },
+            { anno: 1, nome: "Inglese", docenti: ["Idoneità"], cfu: 3, sem: "1", prove: ["Scritto"], url: "" },
+
+            // ---------- 2° ANNO ----------
+            { anno: 2, nome: "Architettura Tecnica e Laboratorio di Disegno", integrato: true, docenti: ["Loddo", "Bagnolo"], cfu: 10, sem: "1", prove: ["Scritto"], url: "",
+              moduli: [{ nome: "Architettura Tecnica", url: "" }, { nome: "Laboratorio di Disegno", url: "" }] },
+            { anno: 2, nome: "Statistica e Idrologia", integrato: true, docenti: ["Sechi", "Banni"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale", "Pratico"], url: "",
+              moduli: [{ nome: "Statistica", url: "" }, { nome: "Idrologia", url: "" }] },
+            { anno: 2, nome: "Topografia e Laboratorio di Topografia", integrato: true, docenti: ["Sanna"], cfu: 10, sem: "2", prove: ["Orale", "Pratico"], url: "",
+              moduli: [{ nome: "Topografia", url: "" }, { nome: "Laboratorio di Topografia", url: "" }] },
+            { anno: 2, nome: "Meccanica Razionale", docenti: ["Mignemi"], cfu: 6, sem: "1", prove: ["Scritto"], url: "" },
+            { anno: 2, nome: "Scienza delle Costruzioni", docenti: ["Paglietti"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 2, nome: "Tecnologia dei Materiali", docenti: ["Elsener"], cfu: 5, sem: "1", prove: ["Scritto"], url: "" },
+
+            // ---------- 3° ANNO ----------
+            { anno: 3, nome: "Acquedotti e Fognature e Laboratorio di Acquedotti e Fognature", integrato: true, docenti: ["Saba"], cfu: 10, sem: "1", prove: ["Scritto", "Pratico"], url: "" },
+            { anno: 3, nome: "Fisica Tecnica ed Elettrotecnica", integrato: true, docenti: ["Baccoli", "Sias"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], url: "",
+              moduli: [{ nome: "Fisica Tecnica", url: "" }, { nome: "Elettrotecnica", url: "" }] },
+            { anno: 3, nome: "Geotecnica e Strade", integrato: true, docenti: ["Soccodato", "Maltinti"], cfu: 12, sem: "2", prove: ["Scritto", "Orale"], url: "",
+              moduli: [{ nome: "Geotecnica", url: "" }, { nome: "Strade 1", url: "" }] },
+            { anno: 3, nome: "Fondamenti di Trasporti", docenti: ["Meloni", "Fadda", "Olivo"], cfu: 6, sem: "1", prove: ["Scritto"], url: "" },
+            { anno: 3, nome: "Idraulica", docenti: ["Querzoli"], cfu: 10, sem: "1", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 3, nome: "Matematica Applicata", docenti: ["Rodriguez", "Fermo"], cfu: 6, sem: "2", prove: ["Scritto"], url: "" },
+            { anno: 3, nome: "Sicurezza 1", docenti: ["Massacci"], cfu: 6, sem: "2", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 3, nome: "Tecnica delle Costruzioni", docenti: ["Pani", "Meloni", "Mistretta"], cfu: 10, sem: "1-2", prove: ["Scritto", "Orale"], url: "" },
+            { anno: 3, nome: "Tirocinio", docenti: ["Valdes"], cfu: 3, sem: "2", prove: ["Pratico"], url: "" },
+        ];
+
+        // Tema di ogni anno (stesso mix terracotta / oceano / salvia di ripetizioni)
+        const ANNI = {
+            1: { titolo: "Primo anno",   tema: "" },
+            2: { titolo: "Secondo anno", tema: "theme-oceano" },
+            3: { titolo: "Terzo anno",   tema: "theme-salvia" },
+        };
+
+        // Nome del campo Tally da precompilare con ?<param>=<materia>
+        const TALLY_BASE = "https://tally.so/embed/KYldMD?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1";
+        const TALLY_PREFILL_PARAM = "materia";
+
+        /* ---------- Icone ---------- */
+        const I = {
+            user: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>',
+            doc:  '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.6a1 1 0 01.7.3l5.4 5.4a1 1 0 01.3.7V19a2 2 0 01-2 2z"/></svg>',
+            open: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>',
+            clock:'<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+            ask:  '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.4-4 8-9 8a9.9 9.9 0 01-4.3-.9L3 20l1.4-3.7A7.6 7.6 0 013 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg>',
+            book: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.3C10.8 5.5 9.2 5 7.5 5S4.2 5.5 3 6.3v13C4.2 18.5 5.8 18 7.5 18s3.3.5 4.5 1.3m0-13C13.2 5.5 14.8 5 16.5 5s3.3.5 4.5 1.3v13c-1.2-.8-2.8-1.3-4.5-1.3s-3.3.5-4.5 1.3m0-13v13"/></svg>',
+            star: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.8 4.7a3.4 3.4 0 001.9-.8 3.4 3.4 0 014.6 0 3.4 3.4 0 001.9.8 3.4 3.4 0 013.1 3.1c.1.7.3 1.4.8 1.9a3.4 3.4 0 010 4.6 3.4 3.4 0 00-.8 1.9 3.4 3.4 0 01-3.1 3.1 3.4 3.4 0 00-1.9.8 3.4 3.4 0 01-4.6 0 3.4 3.4 0 00-1.9-.8 3.4 3.4 0 01-3.1-3.1 3.4 3.4 0 00-.8-1.9 3.4 3.4 0 010-4.6c.5-.5.7-1.2.8-1.9a3.4 3.4 0 013.1-3.1z"/></svg>',
+        };
+
+        const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const semLabel = s => s === "1-2" ? "1° e 2° semestre" : `${s}° semestre`;
+        const fullName = m => (m.integrato ? "Corso Integrato: " : "") + m.nome;
+
+        function subjectCard(m, i) {
+            const docenti = m.docenti.join(", ");
+            const prove = m.prove.map(p => `<span class="pill pill-${p.toLowerCase()}">${p}</span>`).join("");
+            const moduli = (m.moduli || []).map(mod => mod.url
+                ? `<a href="${esc(mod.url)}" target="_blank" rel="noopener" class="modulo hover:!border-solid hover:text-[var(--accent)]">${I.doc}${esc(mod.nome)}</a>`
+                : `<span class="modulo">${I.doc}${esc(mod.nome)}</span>`).join("");
+            const materiale = m.url
+                ? `<a href="${esc(m.url)}" target="_blank" rel="noopener" class="act act-primary">${I.open}Materiale</a>`
+                : `<span class="act act-disabled" title="Materiale non ancora disponibile">${I.clock}In arrivo</span>`;
+
+            return `
+            <article class="subject fade-in" style="animation-delay:${i * 25}ms">
+                <div class="flex items-start gap-3">
+                    <h3 class="flex-grow">${m.integrato ? '<span class="ci">Corso integrato</span>' : ""}${esc(m.nome)}</h3>
+                    <div class="cfu" title="Crediti formativi"><b>${m.cfu}</b><span>CFU</span></div>
+                </div>
+                <p class="meta">${I.user}<span>${esc(docenti)}</span></p>
+                <div class="flex flex-wrap gap-1.5">
+                    <span class="pill pill-sem">${semLabel(m.sem)}</span>${prove}
+                </div>
+                ${moduli ? `<div class="flex flex-wrap gap-1.5">${moduli}</div>` : ""}
+                <div class="subject-actions">
+                    ${materiale}
+                    <button type="button" class="act act-ask" data-ask="${esc(fullName(m))}">${I.ask}Chiedi</button>
+                </div>
+            </article>`;
+        }
+
+        /* ---------- Rendering con filtri ---------- */
+        const state = { year: "all", sem: "all", q: "" };
+        const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+        function render() {
+            const q = norm(state.q.trim());
+            const list = MATERIE.filter(m =>
+                (state.year === "all" || String(m.anno) === state.year) &&
+                (state.sem === "all" || m.sem === state.sem) &&
+                (!q || norm([m.nome, ...m.docenti, ...(m.moduli || []).map(x => x.nome)].join(" ")).includes(q))
+            );
+
+            const html = [1, 2, 3].map(anno => {
+                const items = list.filter(m => m.anno === anno);
+                if (!items.length) return "";
+                const all = MATERIE.filter(m => m.anno === anno);
+                const cfu = all.reduce((s, m) => s + m.cfu, 0);
+                const { titolo, tema } = ANNI[anno];
+                return `
+                <section class="card ${tema} p-5 sm:p-6" id="anno-${anno}">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div>
+                            <span class="eyebrow">${anno}° anno</span>
+                            <h2 class="mt-1 text-xl font-serif font-bold tracking-tight">${titolo}</h2>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="chip">${I.book}${all.length} insegnamenti</span>
+                            <span class="chip">${I.star}${cfu} CFU</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                        ${items.map(subjectCard).join("")}
+                    </div>
+                </section>`;
+            }).join("");
+
+            document.getElementById("years").innerHTML = html;
+            document.getElementById("empty").classList.toggle("hidden", list.length > 0);
+        }
+
+        // Totali in alto
+        (function () {
+            const cfu = MATERIE.reduce((s, m) => s + m.cfu, 0);
+            const conMateriale = MATERIE.filter(m => m.url).length;
+            document.getElementById("totals").innerHTML = `
+                <span class="chip">${I.book}${MATERIE.length} insegnamenti</span>
+                <span class="chip">${I.star}${cfu} CFU</span>
+                ${conMateriale ? `<span class="chip">${I.doc}${conMateriale} con materiale</span>` : ""}`;
+        })();
+
+        document.getElementById("yearFilter").addEventListener("click", e => {
+            const b = e.target.closest("button[data-year]");
+            if (!b) return;
+            state.year = b.dataset.year;
+            e.currentTarget.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+            render();
+        });
+        document.getElementById("semFilter").addEventListener("change", e => { state.sem = e.target.value; render(); });
+        document.getElementById("search").addEventListener("input", e => { state.q = e.target.value; render(); });
+
+        /* ---------- Tally: caricamento + precompilazione materia ---------- */
+        const frame = document.getElementById("tallyFrame");
+        const tallySkeleton = document.getElementById("tallySkeleton");
+        frame.addEventListener("load", () => { if (frame.getAttribute("src")) tallySkeleton.remove(); });
+        setTimeout(() => { if (tallySkeleton.isConnected) tallySkeleton.remove(); }, 8000);
+
+        document.getElementById("years").addEventListener("click", e => {
+            const b = e.target.closest("[data-ask]");
+            if (!b) return;
+            const materia = b.dataset.ask;
+            const src = `${TALLY_BASE}&${TALLY_PREFILL_PARAM}=${encodeURIComponent(materia)}`;
+            frame.setAttribute("data-tally-src", src);
+            frame.src = src; // Tally.loadEmbeds() salta gli iframe già caricati: impostiamo src a mano
+            document.getElementById("prefillName").textContent = materia;
+            document.getElementById("prefillNote").classList.remove("hidden");
+            const box = document.getElementById("richiesta");
+            box.scrollIntoView({ behavior: "smooth", block: "start" });
+            box.classList.remove("flash"); void box.offsetWidth; box.classList.add("flash");
+        });
+
+        render();
+    </script>
+    <script src="https://tally.so/widgets/embed.js" async onload="Tally.loadEmbeds()" onerror="document.getElementById('tallyFrame').src=TALLY_BASE"></script>
+</body>
+</html>
