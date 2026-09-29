@@ -308,7 +308,14 @@
                 </section>
 
                 <!-- Anni (generati da JS) -->
-                <div id="years" class="space-y-5 lg:space-y-6"></div>
+                <div id="years" class="space-y-5 lg:space-y-6">
+                    <div class="card p-5 sm:p-6 space-y-4" aria-hidden="true">
+                        <div class="skeleton h-5 w-40 rounded-lg"></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                            <div class="skeleton h-40 rounded-[1.25rem]"></div><div class="skeleton h-40 rounded-[1.25rem]"></div><div class="skeleton h-40 rounded-[1.25rem]"></div>
+                        </div>
+                    </div>
+                </div>
 
                 <p id="empty" class="hidden card p-8 text-center text-sm text-muted">Nessuna materia corrisponde ai filtri selezionati.</p>
             </div>
@@ -398,14 +405,18 @@
 
     <footer class="border-t border-stone-200/70 py-6 mt-10">
         <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-1 text-xs text-muted">
-            <p>&copy; 2026 Daniele De Michele · Materiale condiviso a scopo didattico</p>
+            <p>&copy; 2026 Daniele De Michele · Materiale condiviso a scopo didattico<span id="updatedAt"></span></p>
             <p class="text-[10px] opacity-70">Le informazioni possono variare: fa sempre fede il sito ufficiale del corso di studi.</p>
         </div>
     </footer>
 
     <script>
         /* =====================================================================
-           DATI MATERIE — modifica solo qui.
+           DATI MATERIE
+           La fonte è Notion: il GitHub Action "Aggiorna materie da Notion" (scripts/sync_materie.py)
+           genera triennale/materie.json ogni notte o con "Run workflow", e la pagina lo carica all'avvio.
+           Le eccezioni (es. laboratori di tipologia G) stanno in triennale/materie-overrides.json.
+           Gli elenchi qui sotto sono solo dati di riserva, usati se materie.json non si carica.
            sem:     "1" | "2" | "1-2" (annuale)
            prove:   "Scritto" | "Orale" | "Pratico"
            link:    materiale della materia, es.
@@ -839,7 +850,26 @@
                 if (m) openMateria(m, false);
             }
         }
-        fromHash();
+        // Carica i dati aggiornati da Notion (materie.json); se non disponibili usa quelli di riserva
+        async function caricaMaterie() {
+            try {
+                const r = await fetch("materie.json?t=" + Date.now(), { cache: "no-store" });
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                const d = await r.json();
+                for (const k of Object.keys(CORSI)) {
+                    const lista = d.corsi && d.corsi[k];
+                    if (Array.isArray(lista) && lista.length) CORSI[k].materie = lista;
+                }
+                if (d.aggiornato) {
+                    const t = new Date(d.aggiornato);
+                    if (!isNaN(t)) document.getElementById("updatedAt").textContent =
+                        " · Aggiornato il " + t.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+                }
+            } catch (e) {
+                console.warn("materie.json non disponibile, uso i dati di riserva:", e);
+            }
+        }
+        caricaMaterie().then(fromHash);
         (window.requestIdleCallback || setTimeout)(() => loadLibreria());
     </script>
     <script src="https://tally.so/widgets/embed.js" async onload="Tally.loadEmbeds()" onerror="document.getElementById('tallyFrame').src=TALLY_BASE"></script>

@@ -1,0 +1,6 @@
+{
+  "_come_funziona": "Eccezioni applicate dopo aver letto Notion. Chiave = titolo della pagina su Notion (maiuscole indifferenti); valore = campi da sostituire (anno, nome, cfu, sem, prove, docenti, tipo, link...). Se correggi il dato direttamente su Notion puoi cancellare la riga.",
+  "Laboratorio di Strutture": { "anno": 1, "cfu": 3, "tipo": "G" },
+  "Laboratorio di Riqualificazione Strutturale": { "anno": 2, "cfu": 3, "tipo": "G" },
+  "Sovrastrutture di Strade, Ferrovie e Aereoporti": { "nome": "Sovrastrutture di Strade, Ferrovie e Aeroporti" }
+}

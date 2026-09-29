@@ -1,0 +1,41 @@
+name: Aggiorna materie da Notion
+
+on:
+  schedule:
+    - cron: "17 2 * * *"      # ogni notte alle 02:17 UTC (04:17 in Italia con l'ora legale)
+  workflow_dispatch:           # pulsante "Run workflow" nella scheda Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-materie
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Leggi Notion e genera triennale/materie.json
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: python scripts/sync_materie.py
+
+      - name: Salva le modifiche (solo se qualcosa è cambiato)
+        run: |
+          if git diff --quiet -- triennale/materie.json; then
+            echo "Nessuna modifica da Notion."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898341+github-actions[bot]@users.noreply.github.com"
+          git add triennale/materie.json
+          git commit -m "Materie: aggiornamento automatico da Notion"
+          git push

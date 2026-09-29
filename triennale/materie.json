@@ -1,0 +1,1117 @@
+{
+ "corsi": {
+  "triennale": [
+   {
+    "anno": 1,
+    "nome": "Analisi 2",
+    "docenti": [
+     "Ragnedda",
+     "Vernier"
+    ],
+    "cfu": 9,
+    "sem": "2",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/WtZ2yAwa#K2GuJqoQcU44p760aEB7Uw",
+      "nota": "364.03 MB · 51 file e 12 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-81db-8d44-d2a9389fd278",
+      "titolo": "Analisi Matematica (Vol. 2)"
+     },
+     {
+      "id": "2712578e-0629-8121-91a2-fd9e833823ba",
+      "titolo": "Analisi Matematica (Vol. 1)"
+     },
+     {
+      "id": "2712578e-0629-818b-98f5-e02612047c78",
+      "titolo": "Esercizi di Analisi Matematica 2 - Parte Prima"
+     }
+    ]
+   },
+   {
+    "anno": 1,
+    "nome": "Chimica",
+    "docenti": [
+     "Delogu"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/K8ZQHCKD#ou28kfxnS-V-7J-JJ-NZ9g",
+      "nota": "94.63 MB · 96 file e 9 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-815d-b9f4-e9fb46e6d727",
+      "titolo": "Fondamenti di Chimica"
+     },
+     {
+      "id": "2712578e-0629-81c5-bbe8-f61560b30c97",
+      "titolo": "Problemi di chimica generale"
+     }
+    ]
+   },
+   {
+    "anno": 1,
+    "nome": "Matematica 1",
+    "integrato": true,
+    "docenti": [
+     "Grimaldi",
+     "Ratto"
+    ],
+    "cfu": 12,
+    "sem": "1",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [],
+    "libri": [
+     {
+      "id": "2712578e-0629-8121-91a2-fd9e833823ba",
+      "titolo": "Analisi Matematica (Vol. 1)"
+     }
+    ],
+    "moduli": [
+     {
+      "nome": "Analisi 1",
+      "docenti": [
+       "Grimaldi"
+      ],
+      "cfu": 5,
+      "sem": "1",
+      "prove": [
+       "Scritto",
+       "Orale"
+      ],
+      "link": [
+       {
+        "titolo": "Materiale del modulo",
+        "url": "https://mega.nz/folder/L5Z0QRaQ#UoRVjrcyG2T_BtzChvl2ww",
+        "nota": "2.89 MB · 11 file"
+       }
+      ]
+     },
+     {
+      "nome": "Geometria",
+      "docenti": [
+       "Ratto"
+      ],
+      "cfu": 7,
+      "sem": "1",
+      "prove": [
+       "Scritto"
+      ],
+      "link": [
+       {
+        "titolo": "Materiale del modulo",
+        "url": "https://mega.nz/folder/z5Yn3SBL#rP5ihJzuBPZCeeZiiHOFvQ",
+        "nota": "3.26 MB · 4 file"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "anno": 1,
+    "nome": "Economia",
+    "docenti": [
+     "Zuddas"
+    ],
+    "cfu": 5,
+    "sem": "1",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 1,
+    "nome": "Fisica 1",
+    "docenti": [
+     "Concas"
+    ],
+    "cfu": 8,
+    "sem": "1",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/29JX2T5R#F_9tL17SjHJSk0mkgQX_dg",
+      "nota": "61.37 MB · 2 file"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-8188-960d-fffc56b7d476",
+      "titolo": "Fondamenti di Fisica (Meccanica e Termlogia)"
+     }
+    ]
+   },
+   {
+    "anno": 1,
+    "nome": "Fisica 2",
+    "docenti": [
+     "Concas"
+    ],
+    "cfu": 7,
+    "sem": "2",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/29JX2T5R#F_9tL17SjHJSk0mkgQX_dg",
+      "nota": "61.37 MB · 2 file"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-8188-960d-fffc56b7d476",
+      "titolo": "Fondamenti di Fisica (Meccanica e Termlogia)"
+     }
+    ]
+   },
+   {
+    "anno": 1,
+    "nome": "Informatica",
+    "docenti": [
+     "Fumera"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [],
+    "libri": [
+     {
+      "id": "2712578e-0629-81d3-b5fe-db1478dd34f4",
+      "titolo": "La guida completa C"
+     }
+    ]
+   },
+   {
+    "anno": 1,
+    "nome": "Inglese",
+    "docenti": [
+     "Idoneità"
+    ],
+    "cfu": 3,
+    "sem": "1",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/L14gHbLC#n-KvodUXT1WDnx8lzpSx2g",
+      "nota": "33.93 MB · 38 file e 6 sottocartelle"
+     }
+    ],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Architettura Tecnica e Laboratorio di Disegno",
+    "integrato": true,
+    "docenti": [
+     "Bagnolo",
+     "Loddo"
+    ],
+    "cfu": 10,
+    "sem": "1",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/L9gwkb5D#AexUNoN9OWgBvXZdfNocUQ",
+      "nota": "27.94 MB · 39 file e 5 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "27d2578e-0629-8028-bd51-ca4557ca69c8",
+      "titolo": "Architettura Tecnica"
+     }
+    ],
+    "moduli": [
+     {
+      "nome": "Architettura Tecnica",
+      "docenti": [
+       "Loddo"
+      ],
+      "cfu": 6,
+      "sem": "",
+      "prove": [],
+      "link": []
+     },
+     {
+      "nome": "Laboratorio di Disegno",
+      "docenti": [
+       "Bagnolo"
+      ],
+      "cfu": 4,
+      "sem": "",
+      "prove": [],
+      "link": []
+     }
+    ]
+   },
+   {
+    "anno": 2,
+    "nome": "Statistica e Idrologia",
+    "integrato": true,
+    "docenti": [
+     "Banni",
+     "Sechi"
+    ],
+    "cfu": 10,
+    "sem": "1-2",
+    "prove": [
+     "Scritto",
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": [
+     {
+      "id": "2712578e-0629-810d-a3b2-eb67f4841164",
+      "titolo": "Appunti di Idrologia (Vol. 1)"
+     },
+     {
+      "id": "2712578e-0629-81f6-82e6-d00d3382c4fc",
+      "titolo": "Probabilità e Statistica"
+     }
+    ],
+    "moduli": [
+     {
+      "nome": "Statistica",
+      "docenti": [
+       "Banni"
+      ],
+      "cfu": 4,
+      "sem": "1",
+      "prove": [
+       "Scritto"
+      ],
+      "link": [
+       {
+        "titolo": "Materiale del modulo",
+        "url": "https://mega.nz/folder/Lxo0gD6R#xhlucpLglrWaS1ZT2ttyTg",
+        "nota": "114.58 MB"
+       }
+      ]
+     },
+     {
+      "nome": "Idrologia",
+      "docenti": [
+       "Sechi"
+      ],
+      "cfu": 6,
+      "sem": "2",
+      "prove": [
+       "Orale",
+       "Pratico"
+      ],
+      "link": [
+       {
+        "titolo": "Materiale del modulo",
+        "url": "https://mega.nz/folder/eg4DAb6T#HJ7ptEJM2qxWSJcVirXLJg",
+        "nota": "95.94 MB · 32 file e 5 sottocartelle"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "anno": 2,
+    "nome": "Topografia e Laboratorio di Topografia",
+    "integrato": true,
+    "docenti": [
+     "Sanna"
+    ],
+    "cfu": 10,
+    "sem": "2",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/2hBkQC6Z#c57SJ_uWZyvkdEyt1JlOeA",
+      "nota": "91.19 MB · 114 file e 16 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-81c9-8c64-f542f49c160c",
+      "titolo": "Topografia"
+     },
+     {
+      "id": "27d2578e-0629-80a0-96e7-ff11df822523",
+      "titolo": "Dal GPS al GNSS"
+     },
+     {
+      "id": "27d2578e-0629-809e-b50d-d446dacec12e",
+      "titolo": "GPS"
+     },
+     {
+      "id": "27d2578e-0629-8045-9921-ff2c6948250c",
+      "titolo": "Topografia generale"
+     }
+    ],
+    "moduli": [
+     {
+      "nome": "Topografia",
+      "docenti": [
+       "Sanna"
+      ],
+      "cfu": 6,
+      "sem": "",
+      "prove": [
+       "Orale"
+      ],
+      "link": []
+     },
+     {
+      "nome": "Laboratorio di Topografia",
+      "docenti": [
+       "Sanna"
+      ],
+      "cfu": 4,
+      "sem": "",
+      "prove": [
+       "Pratico"
+      ],
+      "link": []
+     }
+    ]
+   },
+   {
+    "anno": 2,
+    "nome": "Meccanica Razionale",
+    "docenti": [
+     "Mignemi"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/HphSCD7J#IA-LwLAE-WiPZ9x3ao8ACA",
+      "nota": "30.61 MB · 38 file e 8 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-8172-b8d3-ffe7520a5a0b",
+      "titolo": "Meccanica Razionale"
+     },
+     {
+      "id": "27e2578e-0629-80c7-9b2a-c1a5b97eaa6e",
+      "titolo": "Lezioni di Meccanica Razionale"
+     }
+    ]
+   },
+   {
+    "anno": 2,
+    "nome": "Scienza delle Costruzioni",
+    "docenti": [
+     "Paglietti"
+    ],
+    "cfu": 10,
+    "sem": "1-2",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/b9In3bgJ#BPRI_K4_A5E8DPzTrAx06A",
+      "nota": "208.23 MB · 209 file e 21 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-8135-8114-e3aa77dd7180",
+      "titolo": "Scienza delle Costruzioni - Volume Primo"
+     },
+     {
+      "id": "2712578e-0629-8185-9971-e3dcc9fb2007",
+      "titolo": "Scienza delle Costruzioni - Volume Secondo"
+     }
+    ]
+   },
+   {
+    "anno": 2,
+    "nome": "Tecnologia dei Materiali",
+    "docenti": [
+     "Elsener"
+    ],
+    "cfu": 5,
+    "sem": "1",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/7x4wwTQJ#SM-fU5ZXTrJNkRDS8aHAlw",
+      "nota": "41.46 MB · 31 file e 8 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-8142-9466-f10702efdac0",
+      "titolo": "Scienza e tecnologia dei materiali"
+     }
+    ]
+   },
+   {
+    "anno": 3,
+    "nome": "Acquedotti e Fognature e Laboratorio di Acquedotti e Fognature",
+    "integrato": true,
+    "docenti": [
+     "Saba"
+    ],
+    "cfu": 10,
+    "sem": "1",
+    "prove": [
+     "Scritto",
+     "Pratico"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/jkpESKZZ#os53NibzedWEq91UFEonrA",
+      "nota": "452.19 MB · 109 file e 10 sottocartelle"
+     }
+    ],
+    "libri": []
+   },
+   {
+    "anno": 3,
+    "nome": "Fisica Tecnica ed Elettrotecnica",
+    "integrato": true,
+    "docenti": [
+     "Baccoli",
+     "Sias"
+    ],
+    "cfu": 10,
+    "sem": "1",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [],
+    "libri": [
+     {
+      "id": "2712578e-0629-814c-90c8-f40533fe4a31",
+      "titolo": "Principi di trasmissione del calore"
+     },
+     {
+      "id": "2712578e-0629-81a4-a9ec-eaa0826edff2",
+      "titolo": "Trasmissione del calore"
+     },
+     {
+      "id": "27d2578e-0629-8017-a418-cc0e0dc5a9dc",
+      "titolo": "Circuiti elettrici"
+     },
+     {
+      "id": "27d2578e-0629-8087-9ef9-f57af95a9102",
+      "titolo": "Circuiti Elettrici"
+     }
+    ],
+    "moduli": [
+     {
+      "nome": "Fisica Tecnica",
+      "docenti": [
+       "Baccoli"
+      ],
+      "cfu": 5,
+      "sem": "1",
+      "prove": [
+       "Scritto"
+      ],
+      "link": [
+       {
+        "titolo": "Materiale del modulo",
+        "url": "https://mega.nz/folder/jlx1GTgJ#CPCLUHx7m0k6QpSQDbaS-g",
+        "nota": "35.83 MB · 41 file e 5 sottocartelle"
+       }
+      ]
+     },
+     {
+      "nome": "Elettrotecnica",
+      "docenti": [
+       "Sias"
+      ],
+      "cfu": 5,
+      "sem": "2",
+      "prove": [
+       "Scritto",
+       "Orale"
+      ],
+      "link": [
+       {
+        "titolo": "Materiale del modulo",
+        "url": "https://mega.nz/folder/f8JikR4R#3buh-9DXZC0cuzNk4c-AIg",
+        "nota": "173.76 MB · 40 file e 22 sottocartelle"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "anno": 3,
+    "nome": "Geotecnica e Strade",
+    "integrato": true,
+    "docenti": [
+     "Maltinti",
+     "Soccodato"
+    ],
+    "cfu": 12,
+    "sem": "2",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [],
+    "libri": [
+     {
+      "id": "27d2578e-0629-80c1-af27-f68eddd0f525",
+      "titolo": "Geotecnica"
+     },
+     {
+      "id": "27d2578e-0629-807c-8911-de7a6864a0a2",
+      "titolo": "Moti di filtrazione"
+     },
+     {
+      "id": "2712578e-0629-81df-9e98-fcccb3682574",
+      "titolo": "Ingegneria stradale - Geometria e progetto di strade (vol. I)"
+     },
+     {
+      "id": "27d2578e-0629-801e-a538-c3e71cee7e31",
+      "titolo": "Strade ferrovie aeroporti"
+     }
+    ],
+    "moduli": [
+     {
+      "nome": "Geotecnica",
+      "docenti": [
+       "Soccodato"
+      ],
+      "cfu": 6,
+      "sem": "2",
+      "prove": [
+       "Scritto",
+       "Orale"
+      ],
+      "link": [
+       {
+        "titolo": "Materiale del modulo",
+        "url": "https://mega.nz/folder/L0IAmZLB#6OaMDhMFK1aNP7i818Fwkg",
+        "nota": "420.23 MB · 264 file e 37 sottocartelle"
+       }
+      ]
+     },
+     {
+      "nome": "Strade 1",
+      "docenti": [
+       "Maltinti"
+      ],
+      "cfu": 6,
+      "sem": "2",
+      "prove": [
+       "Orale",
+       "Pratico"
+      ],
+      "link": [
+       {
+        "titolo": "Materiale del modulo",
+        "url": "https://mega.nz/folder/eppSSYIL#00by6EiLx05c1XspqDWekQ",
+        "nota": "120.8 MB · 115 file e 18 sottocartelle"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "anno": 3,
+    "nome": "Fondamenti di Trasporti",
+    "docenti": [
+     "Fadda",
+     "Meloni",
+     "Olivo"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/SwBAVapQ#uVxsN_bX6MVLH8pPkXs54A",
+      "nota": "117.18 MB · 32 file e 6 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "27d2578e-0629-80c0-b391-e729e2f9e1f2",
+      "titolo": "Fondamenti di Trasporti"
+     }
+    ]
+   },
+   {
+    "anno": 3,
+    "nome": "Idraulica",
+    "docenti": [
+     "Querzoli"
+    ],
+    "cfu": 10,
+    "sem": "1",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/C0YFDL4a#CHVsv1C6bA2abBqOExyqmQ",
+      "nota": "813.36 MB · 415 file e 42 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-814e-9432-cd7634c0ca3d",
+      "titolo": "Idraulica - Basi scientifiche e applicazioni tecniche, Volume I, parte I"
+     },
+     {
+      "id": "2712578e-0629-81ae-aff3-f3e0acef8fc3",
+      "titolo": "Idraulica - Basi scientifiche e applicazioni tecniche, Volume I, parte II"
+     },
+     {
+      "id": "27d2578e-0629-8053-90f3-f12029c6f943",
+      "titolo": "Idraulica"
+     },
+     {
+      "id": "27d2578e-0629-80c1-8611-c65d5f280cef",
+      "titolo": "Problemi di idraulica e meccanica dei fluidi"
+     },
+     {
+      "id": "27d2578e-0629-800c-b59e-c300ee5171ea",
+      "titolo": "Meccanica dei fluidi"
+     }
+    ]
+   },
+   {
+    "anno": 3,
+    "nome": "Matematica Applicata",
+    "docenti": [
+     "Fermo",
+     "Rodriguez"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Scritto"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/e5YAhaLQ#Mwr6tGLZyupRu_QxwVoD2Q",
+      "nota": "131.84 MB · 235 file e 32 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "27d2578e-0629-80f0-891f-fe6aa44b3d4e",
+      "titolo": "Introduzione alla matematica applicata"
+     }
+    ]
+   },
+   {
+    "anno": 3,
+    "nome": "Sicurezza 1",
+    "docenti": [
+     "Massacci"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/bxgySYJJ#w0tqfCDtdDPWWaffXqctAQ",
+      "nota": "61.26 MB · 55 file e 10 sottocartelle"
+     }
+    ],
+    "libri": []
+   },
+   {
+    "anno": 3,
+    "nome": "Tecnica delle Costruzioni",
+    "docenti": [
+     "Meloni",
+     "Mistretta",
+     "Pani"
+    ],
+    "cfu": 10,
+    "sem": "1-2",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/3hIBDSAb#ybeVOqeZP2AWV-GReW189Q",
+      "nota": "222.64 MB · 69 file e 15 sottocartelle"
+     }
+    ],
+    "libri": [
+     {
+      "id": "2712578e-0629-81e5-bd9c-fce10e3428e8",
+      "titolo": "Il cemento armato - La tecnica e la Statica (vol. I)"
+     },
+     {
+      "id": "2712578e-0629-818d-a898-ffa4c1fdb42f",
+      "titolo": "Teoria e Tecnica delle Costruzioni"
+     }
+    ]
+   },
+   {
+    "anno": 3,
+    "nome": "Tirocinio",
+    "docenti": [
+     "Valdes"
+    ],
+    "cfu": 3,
+    "sem": "2",
+    "prove": [
+     "Pratico"
+    ],
+    "link": [
+     {
+      "titolo": "Materiale del corso",
+      "url": "https://mega.nz/folder/60oQBY6D#Y1PcxQxZouYKmM1HHijd3w",
+      "nota": "34.5 MB · 30 file e 3 sottocartelle"
+     }
+    ],
+    "libri": []
+   }
+  ],
+  "magistrale": [
+   {
+    "anno": 1,
+    "nome": "Costruzioni in Acciaio",
+    "docenti": [
+     "Fenu"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 1,
+    "nome": "Laboratorio di Strutture",
+    "docenti": [
+     "De Nicolo"
+    ],
+    "cfu": 3,
+    "sem": "",
+    "prove": [],
+    "link": [],
+    "libri": [],
+    "tipo": "G"
+   },
+   {
+    "anno": 1,
+    "nome": "Modelli e Metodi Matematici",
+    "docenti": [
+     "Zuddas"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 1,
+    "nome": "Pianificazione dei Trasporti",
+    "docenti": [
+     "Meloni"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 1,
+    "nome": "Scienza delle Costruzioni 2",
+    "docenti": [
+     "Cazzani"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 1,
+    "nome": "Sovrastrutture di Strade, Ferrovie e Aeroporti",
+    "docenti": [
+     "Coni"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 1,
+    "nome": "Sperimentazione e Collaudo delle Strutture",
+    "docenti": [
+     "Meloni D."
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 1,
+    "nome": "Strade 2",
+    "docenti": [
+     "Coni"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 1,
+    "nome": "Tecnica Urbanistica",
+    "docenti": [
+     "Campagna"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Bacini",
+    "docenti": [
+     "Montaldo"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Scritto",
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Calcolo Automatico delle Strutture",
+    "docenti": [
+     "Meloni D."
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Complementi di Scienza delle Costruzioni 2",
+    "docenti": [
+     "Brun"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Scritto",
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Dinamica delle Strutture",
+    "docenti": [
+     "Porcu"
+    ],
+    "cfu": 6,
+    "sem": "1",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Fondazioni",
+    "docenti": [
+     "Soccodato"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Laboratorio di Riqualificazione Strutturale",
+    "docenti": [
+     "Concu",
+     "Meloni D.",
+     "Mistretta"
+    ],
+    "cfu": 3,
+    "sem": "",
+    "prove": [],
+    "link": [],
+    "libri": [],
+    "tipo": "G"
+   },
+   {
+    "anno": 2,
+    "nome": "Ponti",
+    "docenti": [
+     "Mistretta"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Sicurezza 2",
+    "docenti": [
+     "Dentoni"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Sismica delle Strutture",
+    "docenti": [
+     "Porcu"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Orale",
+     "Pratico"
+    ],
+    "link": [],
+    "libri": []
+   },
+   {
+    "anno": 2,
+    "nome": "Tecnica delle Costruzioni 2",
+    "docenti": [
+     "Concu"
+    ],
+    "cfu": 6,
+    "sem": "2",
+    "prove": [
+     "Orale"
+    ],
+    "link": [],
+    "libri": []
+   }
+  ]
+ }
+}
