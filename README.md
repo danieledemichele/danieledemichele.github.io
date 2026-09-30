@@ -30,6 +30,16 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 │   ├── cover.jpg
 │   ├── screenshot.jpg            # opzionale
 │   └── favicon.svg / favicon.ico / favicon-16.png / favicon-32.png / apple-touch-icon.png
+├── ripetizioni/                  # vedi sezione "Prenota una ripetizione"
+│   └── index.html
+├── triennale/                    # vedi sezione "Ingegneria Civile — materie"
+│   ├── index.html
+│   ├── materie.json              # generato da Notion (non si modifica a mano)
+│   └── materie-overrides.json    # eccezioni ai dati di Notion
+├── scripts/
+│   └── sync_materie.py           # Notion → triennale/materie.json
+├── .github/workflows/
+│   └── sync-materie.yml          # GitHub Action che lancia lo script
 ├── libreria/                     # vedi sezione "La Mia Libreria" più sotto
 │   ├── index.html
 │   ├── statistiche.html
@@ -37,6 +47,8 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 │   ├── covers/
 │   ├── favicon-libreria.svg / .ico / -16.png / -32.png / apple-touch-icon-libreria.png
 │   └── favicon-statistiche.svg / .ico / -16.png / -32.png / apple-touch-icon-statistiche.png
+├── .gitignore
+├── CLAUDE.md                     # regole per l'assistente (es. aggiornare questo README)
 ├── CNAME
 ├── LICENSE
 └── README.md
@@ -53,8 +65,53 @@ Ogni pagina ha la propria favicon, per distinguerla subito tra le schede del bro
 | `index.html` (portfolio) | monogramma "D" su cerchio scuro | `assets/favicon.*` |
 | `libreria/index.html` | libro chiuso con segnalibro | `libreria/favicon-libreria.*` |
 | `libreria/statistiche.html` | istogramma a barre | `libreria/favicon-statistiche.*` |
+| `ripetizioni/index.html`, `triennale/index.html` | stesso monogramma del portfolio | `assets/favicon.*` |
 
 Ogni set include un `.svg` (usato dai browser moderni), un `.ico` multi-risoluzione (fallback), due `.png` (16×16 e 32×32) e un `apple-touch-icon.png` (180×180, per l'aggiunta alla home screen su iOS). Per cambiare un'icona basta rigenerare il set e sovrascrivere i file: gli `<link rel="icon">` nell'`<head>` di ciascuna pagina restano invariati.
+
+---
+
+## 📅 Prenota una ripetizione (`/ripetizioni`)
+
+Pagina per prenotare le ripetizioni private, collegata dalla voce "Prenota un appuntamento!" della home.
+
+- **Live**: <https://www.danieledemichele.it/ripetizioni/>
+- Istruzioni passo passo + **calendario Calendly incorporato** (lezioni da 1 ora, conferma via email, link per spostare o cancellare).
+- Stile coerente con la libreria (Tailwind CDN, palette terracotta / oceano / salvia). Dopo la prenotazione compare un riquadro di conferma (evento `calendly.event_scheduled`).
+- L'altezza visibile del calendario si regola con le variabili CSS `--cal-crop` e `--cal-visible` in cima al file.
+
+---
+
+## 🎓 Ingegneria Civile — materie (`/triennale`)
+
+Pagina per gli studenti con tutte le materie di **Ingegneria Civile**, collegata dalla voce "Percorso di laurea triennale/magistrale" della home. Sostituisce le vecchie pagine Notion pubbliche.
+
+- **Live**: <https://www.danieledemichele.it/triennale/> · magistrale: <https://www.danieledemichele.it/triennale/#magistrale>
+- **Schede** "Laurea Triennale" e "Magistrale · Strutture"; materie divise per anno con CFU, docenti, semestre e modalità d'esame. Filtri per anno e semestre e ricerca per materia, docente o libro.
+- **Popup della materia** (clic sulla card): dati, moduli dei corsi integrati, link al materiale (cartelle MEGA) e **testi di riferimento** collegati alla libreria (copertina, autori, editore; il clic apre il libro in `/libreria/#libro=<id>`).
+- **Colonna destra**: sede della facoltà con mappa e modulo **Tally** "Richiesta di supporto". Il pulsante "Chiedi" apre il modulo con la materia già indicata (parametro `?materia=`).
+- **Link diretti**: `#triennale/<materia>` o `#magistrale/<materia>` aprono subito il popup (es. `#magistrale/ponti`).
+
+### Da dove arrivano i dati
+
+La fonte è **Notion** (database "Laurea Ingegneria" e "Laurea Magistrale", con le relazioni a "Books University"). Il flusso è automatico:
+
+1. Il GitHub Action **"Aggiorna materie da Notion"** (`.github/workflows/sync-materie.yml`) gira ogni notte alle 02:17 UTC, oppure a mano da **Actions → Run workflow**.
+2. Lancia `scripts/sync_materie.py` (solo libreria standard Python), che legge i database, i link presenti nel corpo di ogni pagina (anche nei moduli) e gli ID dei libri, e scrive `triennale/materie.json`.
+3. Se qualcosa è cambiato fa commit su `main` e GitHub Pages ripubblica; altrimenti non fa nulla. La pagina mostra in fondo "Aggiornato il …".
+
+Serve il segreto **`NOTION_TOKEN`** (Settings → Secrets and variables → Actions) e l'integrazione Notion collegata alle due pagine dei corsi (••• → Connessioni).
+
+Regole applicate dallo script:
+- nei **corsi integrati** con più cartelle e moduli senza link propri, la 1ª cartella va al 1° modulo, la 2ª al 2°, …;
+- un corso integrato senza modalità d'esame prende l'**unione** di quelle dei moduli;
+- le **note** dei link (es. "364 MB · 51 file") già presenti in `materie.json` vengono conservate, perché l'API di Notion non le fornisce.
+
+**Eccezioni** — `triennale/materie-overrides.json` corregge i dati letti da Notion (chiave = titolo della pagina su Notion). Oggi contiene i due laboratori di **tipologia G** da 3 CFU (Strutture al 1° anno, Riqualificazione Strutturale al 2°) e la correzione del nome "Aeroporti". Se correggi il dato su Notion puoi eliminare la riga.
+
+**Aggiungere materiale** (es. una materia della magistrale): inserisci il link MEGA nel corpo della pagina della materia su Notion; compare sul sito dopo la sincronizzazione notturna o subito con "Run workflow".
+
+Gli elenchi `TRIENNALE` / `MAGISTRALE` dentro `triennale/index.html` sono solo **dati di riserva**, usati se `materie.json` non si carica.
 
 ---
 
@@ -64,6 +121,7 @@ Sezione self-hosted, separata dal resto del portfolio, che sostituisce la vecchi
 
 - **Live**: <https://www.danieledemichele.it/libreria/> · statistiche: <https://www.danieledemichele.it/libreria/statistiche.html>
 - **`libreria/index.html`** — vetrina + archivio, filtri (categoria, anno, autore, tipologia, ricerca, scorciatoie rapide) e viste per Articoli / Libri / Università / Archivio Completo. Pagina singola, self-contained (Tailwind CDN + JS vanilla), nessuna build.
+- **Link diretti**: `/libreria/#libro=<id Notion>` apre la scheda di un singolo libro (usato dai "Testi di riferimento" di `/triennale/`), `/libreria/#universita` apre la vista Università.
 - **`libreria/statistiche.html`** — report con grafici Chart.js (andamento nel tempo, distribuzione per tipo, categorie e autori più letti, riviste in abbonamento, stato dei libri).
 - **`libreria/data.json`** — i dati mostrati dalle due pagine sopra. **Non si modifica a mano**: viene rigenerato dallo script `export_libreria.py` (vedi sotto) e va semplicemente committato quando cambia.
 - **`libreria/covers/`** — copertine dei singoli elementi, scaricate in locale durante l'export: è la via di fuga se il link "fresco" (vedi sotto) non risponde.
@@ -202,12 +260,13 @@ Modifica qui per cambiare velocemente look & feel.
   content="default-src 'self';
            img-src 'self' data:;
            style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
-           script-src 'self' https://cdn.jsdelivr.net;
+           script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
            font-src https://cdn.jsdelivr.net 'self';
            connect-src 'self';
            frame-ancestors 'self';">
 ```
-Se sposti CSS/JS in file esterni nel repo, puoi rimuovere `'unsafe-inline'` e rendere la policy più rigida.
+Se sposti CSS/JS in file esterni nel repo, puoi rimuovere `'unsafe-inline'` (da `style-src` e `script-src`) e rendere la policy più rigida.
+La CSP vale solo per la home: `libreria/`, `ripetizioni/` e `triennale/` caricano anche Tailwind, Google Fonts, Calendly, Tally e Google Maps.
 
 ---
 
@@ -233,7 +292,9 @@ Se sposti CSS/JS in file esterni nel repo, puoi rimuovere `'unsafe-inline'` e re
 - [ ] Progetti da `projects.json` + template dinamici.
 - [ ] Sezione **Blog/Note** (Jekyll su Pages).
 - [ ] **Analytics** privacy-first (Plausible/Umami) senza cookie banner.
+- [x] GitHub **Actions**: sincronizzazione notturna delle materie da Notion.
 - [ ] GitHub **Actions**: link-checker + report Lighthouse ad ogni push.
+- [ ] Automatizzare anche l'export di `libreria/data.json` con un Action (oggi lo script è esterno e il file si carica a mano).
 
 ---
 
@@ -268,8 +329,8 @@ furnished to do so, subject to the following conditions:
 
 ## 📬 Contatti
 
-- LinkedIn: https://www.linkedin.com/in/username  
-- GitHub: https://github.com/username  
+- LinkedIn: https://www.linkedin.com/in/danieledemichele  
+- GitHub: https://github.com/danieledemichele  
 - Email: daniele@danieledemichele.it
 
 ---
