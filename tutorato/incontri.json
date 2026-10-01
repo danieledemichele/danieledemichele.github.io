@@ -1,0 +1,141 @@
+{
+ "aggiornato": "2026-10-01T20:35:00Z",
+ "anni": {
+  "2026/27": {
+   "incontri": [],
+   "compiti": []
+  },
+  "2025/26": {
+   "incontri": [
+    {
+     "data": "2026-04-09",
+     "argomenti": [
+      "Strutture isostatiche"
+     ],
+     "corsi": [
+      "gestionale"
+     ],
+     "allegati": [],
+     "inizio": "17:30",
+     "fine": "19:30"
+    },
+    {
+     "data": "2026-04-17",
+     "argomenti": [
+      "Strutture isostatiche"
+     ],
+     "corsi": [
+      "gestionale"
+     ],
+     "allegati": [
+      {
+       "nome": "Notes_260417_173832",
+       "file": "Notes_260417_173832.pdf"
+      }
+     ],
+     "inizio": "17:30",
+     "fine": "19:30"
+    },
+    {
+     "data": "2026-04-23",
+     "argomenti": [
+      "Geometria delle aree"
+     ],
+     "corsi": [
+      "gestionale"
+     ],
+     "allegati": [
+      {
+       "nome": "Notes_260423_192930",
+       "file": "Notes_260423_192930.pdf"
+      }
+     ],
+     "inizio": "17:30",
+     "fine": "19:30"
+    },
+    {
+     "data": "2026-05-07",
+     "argomenti": [
+      "Geometria delle aree",
+      "Navier e Jourawski"
+     ],
+     "corsi": [
+      "gestionale"
+     ],
+     "allegati": [
+      {
+       "nome": "Notes_260512_162949",
+       "file": "Notes_260512_162949.pdf"
+      }
+     ],
+     "inizio": "17:30",
+     "fine": "19:30"
+    },
+    {
+     "data": "2026-05-14",
+     "argomenti": [
+      "Navier e Jourawski"
+     ],
+     "corsi": [
+      "gestionale"
+     ],
+     "allegati": [
+      {
+       "nome": "Notes_260514_192549",
+       "file": "Notes_260514_192549.pdf"
+      }
+     ],
+     "inizio": "17:30",
+     "fine": "19:30"
+    },
+    {
+     "data": "2026-05-21",
+     "argomenti": [
+      "Strutture iperstatiche"
+     ],
+     "corsi": [
+      "gestionale"
+     ],
+     "allegati": [],
+     "inizio": "17:30",
+     "fine": "19:30"
+    },
+    {
+     "data": "2026-05-28",
+     "argomenti": [
+      "Strutture iperstatiche"
+     ],
+     "corsi": [
+      "gestionale"
+     ],
+     "allegati": [
+      {
+       "nome": "Notes_260528_191829_",
+       "file": "Notes_260528_191829_.pdf"
+      }
+     ],
+     "inizio": "17:30",
+     "fine": "19:45"
+    },
+    {
+     "data": "2026-06-04",
+     "argomenti": [
+      "Spostamenti"
+     ],
+     "corsi": [
+      "gestionale"
+     ],
+     "allegati": [
+      {
+       "nome": "Notes_260604_170813",
+       "file": "Notes_260604_170813.pdf"
+      }
+     ],
+     "inizio": "17:00",
+     "fine": "19:30"
+    }
+   ],
+   "compiti": []
+  }
+ }
+}
