@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Tutorato Scienza delle Costruzioni</title>
+    <title>Tutoraggio · Scienza delle Costruzioni · Daniele De Michele</title>
     <meta name="description" content="Gli incontri di tutorato di Scienza delle Costruzioni per Ingegneria Civile, Architettura, Ingegneria Gestionale e Ambientale: incontri, appunti, compiti svolti e modulo per chiarimenti.">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Tutorato · Scienza delle Costruzioni">
+    <meta property="og:title" content="Tutoraggio · Scienza delle Costruzioni">
     <meta property="og:description" content="Incontri, argomenti e appunti del tutorato universitario, con modulo per chiarimenti e segnalazioni.">
     <meta property="og:url" content="https://danieledemichele.it/tutorato/">
     <meta property="og:image" content="https://danieledemichele.it/assets/cover.jpg">
@@ -198,7 +198,7 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18"/><path d="M5 9l-2.5 4h5z"/><path d="M19 9l-2.5 4h5z"/><path d="M12 3v4m-1.5-1.5L12 7l1.5-1.5"/><path d="M2 16h7m6 0h7"/></svg>
                     </div>
                     <div class="leading-tight min-w-0">
-                        <h1 class="text-lg sm:text-xl font-serif font-bold tracking-tight truncate">Tutorato</h1>
+                        <h1 class="text-lg sm:text-xl font-serif font-bold tracking-tight truncate">Tutoraggio</h1>
                         <p class="text-[11px] text-muted font-medium hidden sm:block">Scienza delle Costruzioni · incontri e appunti</p>
                     </div>
                 </div>
@@ -313,9 +313,9 @@
         /* =====================================================================
            DATI
            Fonte: database Notion "Tutorato" (proprietà Titolo, Tipo, Corso, Argomenti, Anno accademico,
-           Data, Allegato). In produzione arriveranno da tutorato/incontri.json, generato da un GitHub Action
-           (come triennale/materie.json), che scaricherà anche gli allegati in tutorato/appunti/.
-           Qui sotto: dati reali dell'A.A. 2025/26, usati come anteprima e come riserva.
+           Data, Allegato). La pagina carica tutorato/incontri.json, generato dal GitHub Action
+           "Aggiorna tutorato da Notion", che scarica anche gli allegati in tutorato/appunti/.
+           Qui sotto: dati di riserva, usati se incontri.json non si carica.
            corsi:     "civile" | "architettura" | "gestionale" | "ambientale" (anche più di uno)
            argomenti: etichette brevi, usate per il filtro
            allegati:  { nome, file } → file è relativo a tutorato/appunti/
@@ -763,11 +763,48 @@
             if (x) openIncontro(x, false);
         }
 
-        Object.values(AA).forEach(list => { list.forEach(x => { x.tipo = "incontro"; x.id = x.data; }); numera(list); });
-        Object.values(COMPITI).forEach(list => list.forEach(x => { x.tipo = "compito"; x.id = "compito-" + x.data; }));
-        renderTabs();
-        renderCorsiList();
-        fromHash();
+        // Anno accademico in corso (parte a settembre): la sua scheda c'è sempre, anche vuota
+        function aaCorrente(d = new Date()) {
+            const y = d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1;
+            return `${y}/${String(y + 1).slice(-2)}`;
+        }
+
+        // Dati aggiornati da Notion (incontri.json, generato dal GitHub Action "Aggiorna tutorato da Notion").
+        // Se il file non si carica restano i dati di riserva scritti qui sopra.
+        async function caricaTutorato() {
+            try {
+                const r = await fetch("incontri.json?t=" + Date.now(), { cache: "no-store" });
+                if (!r.ok) throw new Error("HTTP " + r.status);
+                const d = await r.json();
+                if (d.anni && Object.keys(d.anni).length) {
+                    for (const k of Object.keys(AA)) delete AA[k];
+                    for (const k of Object.keys(COMPITI)) delete COMPITI[k];
+                    for (const [aa, g] of Object.entries(d.anni)) {
+                        AA[aa] = g.incontri || [];
+                        COMPITI[aa] = g.compiti || [];
+                    }
+                }
+                const t = new Date(d.aggiornato);
+                if (!isNaN(t)) document.getElementById("updatedAt").textContent =
+                    " · Aggiornato il " + t.toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" });
+            } catch (e) {
+                console.warn("incontri.json non disponibile, uso i dati di riserva:", e);
+            }
+            const cur = aaCorrente();
+            AA[cur] ||= [];
+            COMPITI[cur] ||= [];
+            for (const k of Object.keys(AA)) COMPITI[k] ||= [];
+            for (const k of Object.keys(COMPITI)) AA[k] ||= [];
+            state.aa = Object.keys(AA).sort().at(-1);
+        }
+
+        caricaTutorato().then(() => {
+            Object.values(AA).forEach(list => { list.forEach(x => { x.tipo = "incontro"; x.id = x.data; }); numera(list); });
+            Object.values(COMPITI).forEach(list => list.forEach(x => { x.tipo = "compito"; x.id = "compito-" + x.data; }));
+            renderTabs();
+            renderCorsiList();
+            fromHash();
+        });
         frame.src = TALLY_BASE;
     </script>
 </body>

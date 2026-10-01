@@ -1,14 +1,19 @@
-name: Aggiorna materie da Notion
+name: Aggiorna tutorato da Notion
 
 on:
   schedule:
-    - cron: "17 2 * * *"      # ogni notte alle 02:17 UTC (04:17 in Italia con l'ora legale)
+    - cron: "37 2 * * *"      # ogni notte alle 02:37 UTC, dopo la sincronizzazione delle materie
   workflow_dispatch:           # pulsante "Run workflow" nella scheda Actions
+  push:                        # e subito dopo ogni modifica allo script o a questo workflow
+    branches: [main]
+    paths:
+      - scripts/sync_tutorato.py
+      - .github/workflows/sync-tutorato.yml
 
 permissions:
   contents: write
 
-# Due avvii ravvicinati non girano mai insieme: il secondo aspetta il primo.
+# Condivide il gruppo con le materie: le due sincronizzazioni non scrivono mai insieme.
 concurrency:
   group: sync-notion
   cancel-in-progress: false
@@ -20,39 +25,41 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: ${{ github.ref_name }}   # ultima versione del branch, non quella del momento dell'avvio
+          ref: ${{ github.ref_name }}
 
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
-      - name: Leggi Notion e genera triennale/materie.json
+      - name: Leggi Notion e genera tutorato/incontri.json + appunti PDF
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-        run: python scripts/sync_materie.py
+        run: python scripts/sync_tutorato.py
 
       - name: Salva le modifiche (solo se qualcosa è cambiato)
         run: |
-          if git diff --quiet -- triennale/materie.json; then
+          if [ -z "$(git status --porcelain -- tutorato/incontri.json tutorato/appunti)" ]; then
             echo "Nessuna modifica da Notion."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898341+github-actions[bot]@users.noreply.github.com"
-          cp triennale/materie.json "$RUNNER_TEMP/materie.json"
+          mkdir -p "$RUNNER_TEMP/tutorato"
+          cp -r tutorato/incontri.json tutorato/appunti "$RUNNER_TEMP/tutorato/"
           # Se nel frattempo qualcuno ha modificato il repo, riparte dall'ultima versione e riprova.
           for tentativo in 1 2 3; do
             git fetch --quiet origin "$GITHUB_REF_NAME"
             git reset --quiet --hard "origin/$GITHUB_REF_NAME"
-            cp "$RUNNER_TEMP/materie.json" triennale/materie.json
-            if git diff --quiet -- triennale/materie.json; then
+            rm -rf tutorato/appunti
+            cp -r "$RUNNER_TEMP/tutorato/incontri.json" "$RUNNER_TEMP/tutorato/appunti" tutorato/
+            if [ -z "$(git status --porcelain -- tutorato/incontri.json tutorato/appunti)" ]; then
               echo "Il repo è già aggiornato."
               exit 0
             fi
-            git add triennale/materie.json
-            git commit --quiet -m "Materie: aggiornamento automatico da Notion"
+            git add -A -- tutorato/incontri.json tutorato/appunti
+            git commit --quiet -m "Tutorato: aggiornamento automatico da Notion"
             if git push --quiet origin "HEAD:$GITHUB_REF_NAME"; then
-              echo "materie.json aggiornato."
+              echo "Tutorato aggiornato."
               exit 0
             fi
             echo "Push rifiutato (repo cambiato nel frattempo), tentativo $tentativo di 3…"
