@@ -77,8 +77,9 @@ def data_ora(page):
 
 def nome_file(nome: str) -> str:
     """Nome sicuro per il repo: niente spazi, niente suffissi "_(1)" dei duplicati."""
-    nome = re.sub(r"_?\(\d+\)(?=\.[A-Za-z0-9]+$)", "", nome.strip())
+    nome = re.sub(r"[\s_]*\(\d+\)(?=\.[A-Za-z0-9]+$)", "", nome.strip())
     nome = re.sub(r"[^A-Za-z0-9._-]+", "_", nome)
+    nome = re.sub(r"_+(?=\.[A-Za-z0-9]+$)", "", nome)
     return nome or "allegato.pdf"
 
 
