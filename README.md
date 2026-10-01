@@ -36,10 +36,16 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 │   ├── index.html
 │   ├── materie.json              # generato da Notion (non si modifica a mano)
 │   └── materie-overrides.json    # eccezioni ai dati di Notion
+├── tutorato/                     # vedi sezione "Tutoraggio — Scienza delle Costruzioni"
+│   ├── index.html
+│   ├── incontri.json             # generato da Notion (non si modifica a mano)
+│   └── appunti/                  # PDF scaricati da Notion (generati)
 ├── scripts/
-│   └── sync_materie.py           # Notion → triennale/materie.json
+│   ├── sync_materie.py           # Notion → triennale/materie.json
+│   └── sync_tutorato.py          # Notion → tutorato/incontri.json + tutorato/appunti/
 ├── .github/workflows/
-│   └── sync-materie.yml          # GitHub Action che lancia lo script
+│   ├── sync-materie.yml          # GitHub Action che lancia sync_materie.py
+│   └── sync-tutorato.yml         # GitHub Action che lancia sync_tutorato.py
 ├── libreria/                     # vedi sezione "La Mia Libreria" più sotto
 │   ├── index.html
 │   ├── statistiche.html
@@ -65,7 +71,7 @@ Ogni pagina ha la propria favicon, per distinguerla subito tra le schede del bro
 | `index.html` (portfolio) | monogramma "D" su cerchio scuro | `assets/favicon.*` |
 | `libreria/index.html` | libro chiuso con segnalibro | `libreria/favicon-libreria.*` |
 | `libreria/statistiche.html` | istogramma a barre | `libreria/favicon-statistiche.*` |
-| `ripetizioni/index.html`, `triennale/index.html` | stesso monogramma del portfolio | `assets/favicon.*` |
+| `ripetizioni/index.html`, `triennale/index.html`, `tutorato/index.html` | stesso monogramma del portfolio | `assets/favicon.*` |
 
 Ogni set include un `.svg` (usato dai browser moderni), un `.ico` multi-risoluzione (fallback), due `.png` (16×16 e 32×32) e un `apple-touch-icon.png` (180×180, per l'aggiunta alla home screen su iOS). Per cambiare un'icona basta rigenerare il set e sovrascrivere i file: gli `<link rel="icon">` nell'`<head>` di ciascuna pagina restano invariati.
 
@@ -112,6 +118,36 @@ Regole applicate dallo script:
 **Aggiungere materiale** (es. una materia della magistrale): inserisci il link MEGA nel corpo della pagina della materia su Notion; compare sul sito dopo la sincronizzazione notturna o subito con "Run workflow".
 
 Gli elenchi `TRIENNALE` / `MAGISTRALE` dentro `triennale/index.html` sono solo **dati di riserva**, usati se `materie.json` non si carica.
+
+---
+
+## 🧑‍🏫 Tutoraggio — Scienza delle Costruzioni (`/tutorato`)
+
+Pagina per gli studenti del tutorato universitario di **Scienza delle Costruzioni** (Ingegneria Civile, Architettura, Ingegneria Gestionale, Ingegneria Ambientale). Collegata dalla voce "Tutoraggio" della home, subito sotto "Percorso di laurea triennale/magistrale"; sostituisce la vecchia pagina Notion pubblica.
+
+- **Live**: <https://www.danieledemichele.it/tutorato/>
+
+- **Schede** per anno accademico (2026/27 e 2025/26). Un anno senza incontri mostra un avviso con il collegamento all'anno precedente.
+- Filtro per **corso di laurea** (un colore per corso), per argomento e ricerca. Scegliendo un corso compaiono il nome dell'insegnamento e, se presenti, gli obiettivi formativi (richiudibili).
+- **Incontri** raggruppati per mese, con numero progressivo per corso, orario e durata.
+- **Compiti svolti**: sezione dedicata alle prove d'esame risolte per Ingegneria Civile e Architettura, visibile con "Tutti i corsi", "Civile" o "Architettura".
+- Il popup apre gli **appunti PDF in un visualizzatore interno** (da `tutorato/appunti/`), con Scarica, Nuova scheda e "Segnala questo file".
+- **Chiedi o segnala**: modulo Tally `LZRvby` incorporato, precompilato con i campi nascosti `incontro` e `corso` (da creare nel modulo).
+- **Link diretti**: `#gestionale` (o `#civile`, `#architettura`, `#ambientale`) filtra per corso; `#AAAA-MM-GG` apre l'incontro di quel giorno, `#compito-AAAA-MM-GG` il compito svolto; `#compiti` porta alla sezione.
+- **Modulo Tally**: i campi nascosti `incontro` e `corso` sono già presenti nel modulo "Richiesta di tutoraggio" (`LZRvby`).
+
+### Da dove arrivano i dati
+
+1. La fonte è il database Notion **"Tutorato"**, dentro la pagina "Tutorato – Scienza delle Costruzioni": proprietà Titolo, Tipo (Incontro / Compito svolto), Corso, Argomenti, Anno accademico, Data (con orario di inizio e fine), Allegato (i PDF).
+2. Il GitHub Action **"Aggiorna tutorato da Notion"** (`.github/workflows/sync-tutorato.yml`) gira ogni notte alle 02:37 UTC, a mano da **Actions → Run workflow** e dopo ogni modifica allo script. Condivide il gruppo di concorrenza `sync-notion` con le materie.
+3. Lancia `scripts/sync_tutorato.py` (solo libreria standard, riusa le funzioni API di `sync_materie.py`): scrive `tutorato/incontri.json` e scarica gli allegati in `tutorato/appunti/`, perché i link ai file di Notion scadono dopo circa un'ora. I PDF già scaricati non si riscaricano; quelli non più collegati vengono rimossi.
+4. Fa commit e push solo se qualcosa è cambiato.
+
+**Requisito**: l'integrazione Notion del segreto `NOTION_TOKEN` deve essere collegata alla pagina "Tutorato – Scienza delle Costruzioni" (••• → Connessioni). Senza, l'Action si ferma con un messaggio che lo spiega.
+
+**Aggiungere un incontro o un compito svolto**: crea una riga nel database con Tipo, Corso, Data e PDF in Allegato. Compare sul sito dopo la sincronizzazione notturna o subito con "Run workflow". L'anno accademico, se manca, si ricava dalla data (inizia a settembre).
+
+Gli elenchi `AA` / `COMPITI` dentro `tutorato/index.html` sono solo **dati di riserva**, usati se `incontri.json` non si carica.
 
 ---
 
@@ -266,7 +302,7 @@ Modifica qui per cambiare velocemente look & feel.
            frame-ancestors 'self';">
 ```
 Se sposti CSS/JS in file esterni nel repo, puoi rimuovere `'unsafe-inline'` (da `style-src` e `script-src`) e rendere la policy più rigida.
-La CSP vale solo per la home: `libreria/`, `ripetizioni/` e `triennale/` caricano anche Tailwind, Google Fonts, Calendly, Tally e Google Maps.
+La CSP vale solo per la home: `libreria/`, `ripetizioni/`, `triennale/` e `tutorato/` caricano anche Tailwind, Google Fonts, Calendly, Tally e Google Maps.
 
 ---
 
@@ -293,6 +329,7 @@ La CSP vale solo per la home: `libreria/`, `ripetizioni/` e `triennale/` carican
 - [ ] Sezione **Blog/Note** (Jekyll su Pages).
 - [ ] **Analytics** privacy-first (Plausible/Umami) senza cookie banner.
 - [x] GitHub **Actions**: sincronizzazione notturna delle materie da Notion.
+- [x] GitHub **Actions**: sincronizzazione notturna del tutorato da Notion (`tutorato/incontri.json` + appunti PDF).
 - [ ] GitHub **Actions**: link-checker + report Lighthouse ad ogni push.
 - [ ] Automatizzare anche l'export di `libreria/data.json` con un Action (oggi lo script è esterno e il file si carica a mano).
 
