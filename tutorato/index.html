@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="it" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Tutorato Scienza delle Costruzioni</title>
+    <meta name="description" content="Gli incontri di tutorato di Scienza delle Costruzioni per Ingegneria Civile e Architettura, Gestionale e Ambientale: argomenti, appunti e modulo per chiarimenti.">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tutorato · Scienza delle Costruzioni">
+    <meta property="og:description" content="Incontri, argomenti e appunti del tutorato universitario, con modulo per chiarimenti e segnalazioni.">
+    <meta property="og:url" content="https://danieledemichele.it/tutorato/">
+    <meta property="og:image" content="https://danieledemichele.it/assets/cover.jpg">
+    <meta property="og:locale" content="it_IT">
+
+    <!-- Favicon -->
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../assets/favicon.ico" sizes="any">
+    <link rel="icon" href="../assets/favicon-32.png" type="image/png" sizes="32x32">
+    <link rel="icon" href="../assets/favicon-16.png" type="image/png" sizes="16x16">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+
+    <!-- Tailwind CSS e font: identici a triennale/, libreria/ e ripetizioni/ -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Layout: colonna incontri (timeline per mese) + colonna laterale con info e modulo, come /triennale/ */
+        /* ===== Palette base (terracotta/crema, come il resto del sito) ===== */
+        :root {
+            --bg: #fbf8f3;
+            --text: #2c2825;
+            --muted: #57534e;
+            --soft: #f4efe6;
+            --border: #e2dcd2;
+            --accent: #9a3412;
+            --accent-hover: #7c2d12;
+            --white: #ffffff;
+            --line: #f1ede6;
+            color-scheme: light;
+        }
+        /* ===== Toni (uno per corso di laurea) ===== */
+        .theme-oceano { --soft: #e9eef7; --border: #d3dcea; --accent: #1e3a8a; --accent-hover: #172554; --muted: #4b5567; }
+        .theme-salvia { --soft: #e4eae7; --border: #cfdad4; --accent: #2f5d50; --accent-hover: #1f3d36; --muted: #526159; }
+
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); color: var(--text); }
+        ::selection { background: #fde68a; color: #451a03; }
+        .font-serif { font-family: 'Playfair Display', Georgia, serif; }
+        h1, h2, h3 { text-wrap: balance; }
+        .text-muted { color: var(--muted); }
+        .text-accent { color: var(--accent); }
+        .text-accent-strong { color: var(--accent-hover); }
+        .tnum { font-variant-numeric: tabular-nums; }
+
+        .glass-panel { background: rgba(251, 248, 243, 0.82); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); }
+        header.sticky { top: env(safe-area-inset-top, 0px); }
+
+        .card {
+            border-radius: 1.75rem; border: 1px solid var(--border); background: var(--soft);
+            box-shadow: 0 1px 2px rgba(28, 25, 23, .04), 0 18px 40px -28px rgba(28, 25, 23, .28);
+        }
+        .card-white { background: var(--white); }
+        .eyebrow { display: inline-flex; align-items: center; gap: .5rem; font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+        .eyebrow::before { content: ""; width: .5rem; height: .5rem; border-radius: 9999px; background: currentColor; }
+        .chip { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; font-weight: 600; color: var(--accent-hover); background: rgba(255,255,255,.7); border: 1px solid var(--border); padding: .35rem .75rem; border-radius: 9999px; white-space: nowrap; }
+        .chip svg { width: .9rem; height: .9rem; color: var(--accent); }
+        .logo-badge { background: var(--accent); box-shadow: 0 8px 18px -8px rgba(154, 52, 18, .6); }
+        .btn-accent { background: var(--accent); color: #fff; transition: background .2s ease, transform .2s ease; }
+        .btn-accent:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        .btn-ghost { color: var(--accent-hover); background: rgba(255,255,255,.75); border: 1px solid var(--border); transition: border-color .2s ease, background .2s ease; }
+        .btn-ghost:hover { border-color: var(--accent); background: #fff; }
+        .link-accent { color: var(--accent); font-weight: 600; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent); text-underline-offset: 3px; }
+        .link-accent:hover { text-decoration-color: var(--accent); }
+        .back-link { color: var(--muted); }
+        .back-link:hover { color: var(--accent); background: rgba(255,255,255,.7); }
+        button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 2px; }
+
+        html { scrollbar-width: thin; scrollbar-color: #d8cfc0 transparent; }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-thumb { background: #d8cfc0; border-radius: 9999px; border: 3px solid var(--bg); }
+
+        /* ===== Schede anno accademico (come le schede corso di /triennale/) ===== */
+        .view-tab-btn { color: #78716c; border-color: transparent; }
+        .view-tab-btn:hover { color: #9a3412; }
+        .view-tab-btn.active-view-tab { color: #9a3412; border-color: #9a3412; }
+        .view-tab-btn .tab-count { font-size: .65rem; font-weight: 700; padding: .1rem .45rem; border-radius: 9999px; background: #f4efe6; color: #78716c; margin-left: .35rem; }
+        .view-tab-btn.active-view-tab .tab-count { background: #9a3412; color: #fff; }
+
+        /* ===== Filtri ===== */
+        .seg { display: inline-flex; padding: .25rem; gap: .25rem; border-radius: 9999px; background: rgba(255,255,255,.75); border: 1px solid var(--border); max-width: 100%; overflow-x: auto; }
+        .seg button { display: inline-flex; align-items: center; gap: .4rem; font-size: .8rem; font-weight: 600; color: var(--muted); padding: .4rem .9rem; border-radius: 9999px; transition: background .2s ease, color .2s ease; white-space: nowrap; }
+        .seg button:hover { color: var(--accent); }
+        .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+        .seg button[aria-pressed="true"] .dot { background: #fff; }
+        .field { font-size: .85rem; background: #fff; border: 1px solid var(--border); border-radius: 9999px; padding: .5rem .9rem; color: var(--text); outline: none; transition: border-color .2s ease, box-shadow .2s ease; }
+        .field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent); }
+
+        /* ===== Corsi: pallino e badge ===== */
+        .dot { width: .55rem; height: .55rem; border-radius: 9999px; flex-shrink: 0; background: var(--c); }
+        .c-civile     { --c: #9a3412; --c-soft: #f6e9df; --c-border: #ecd5c4; }
+        .c-gestionale { --c: #1e3a8a; --c-soft: #e9eef7; --c-border: #d3dcea; }
+        .c-ambientale { --c: #2f5d50; --c-soft: #e4eae7; --c-border: #cfdad4; }
+        .badge-corso { display: inline-flex; align-items: center; gap: .35rem; font-size: .68rem; font-weight: 600; padding: .18rem .55rem; border-radius: .45rem; color: var(--c); background: var(--c-soft); border: 1px solid var(--c-border); white-space: nowrap; }
+        .pill-arg { font-size: .7rem; font-weight: 600; padding: .2rem .6rem; border-radius: 9999px; background: #fff; color: var(--accent-hover); border: 1px solid var(--border); white-space: nowrap; }
+        button.pill-arg:hover { border-color: var(--accent); }
+
+        /* ===== Riga incontro ===== */
+        .incontro {
+            display: grid; grid-template-columns: auto 1fr; gap: .9rem 1rem; align-items: start;
+            background: #fff; border: 1px solid var(--border); border-radius: 1.25rem; padding: 1rem 1.1rem;
+            cursor: pointer; transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+        }
+        .incontro:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); transform: translateY(-2px); box-shadow: 0 14px 30px -22px rgba(28,25,23,.45); }
+        .incontro:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 40%, transparent); outline-offset: 2px; }
+        .datebox { width: 3.6rem; text-align: center; border-radius: .9rem; background: var(--soft); border: 1px solid var(--border); padding: .45rem .2rem .5rem; line-height: 1; }
+        .datebox .wd { font-size: .58rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+        .datebox .d { display: block; margin: .2rem 0 .15rem; font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1.55rem; color: var(--accent-hover); }
+        .datebox .m { font-size: .62rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+        .incontro h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 1.08rem; line-height: 1.3; }
+        .inc-n { display: block; font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: .2rem; }
+        .meta { display: inline-flex; align-items: center; gap: .4rem; font-size: .78rem; color: var(--muted); }
+        .meta svg { width: .85rem; height: .85rem; flex-shrink: 0; color: var(--accent); }
+        .inc-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; padding-top: .7rem; border-top: 1px solid var(--line); }
+        .act { display: inline-flex; align-items: center; gap: .35rem; font-size: .75rem; font-weight: 600; border-radius: 9999px; padding: .35rem .75rem; }
+        .act svg { width: .85rem; height: .85rem; }
+        .act-files { color: var(--accent-hover); background: var(--soft); border: 1px solid var(--border); }
+        .act-disabled { color: #a8a29e; background: #f5f5f4; cursor: default; }
+        .act-ask { color: var(--accent-hover); margin-left: auto; }
+        .act-ask:hover { background: var(--soft); }
+        @media (min-width: 640px) {
+            .incontro { grid-template-columns: auto 1fr auto; }
+            .inc-actions { grid-column: 3; flex-direction: column; align-items: stretch; padding-top: 0; border-top: 0; padding-left: 1rem; border-left: 1px solid var(--line); min-width: 8.5rem; }
+            .act-ask { margin-left: 0; }
+            .act { justify-content: center; }
+        }
+
+        /* ===== Obiettivi formativi ===== */
+        details.obiettivi summary { list-style: none; cursor: pointer; }
+        details.obiettivi summary::-webkit-details-marker { display: none; }
+        details.obiettivi .chev { transition: transform .2s ease; }
+        details.obiettivi[open] .chev { transform: rotate(180deg); }
+
+        /* ===== Popup incontro ===== */
+        dialog#incDialog {
+            width: min(660px, calc(100vw - 2rem)); max-height: min(88vh, 860px); padding: 0; border: 1px solid var(--border);
+            overflow: hidden; outline: none; border-radius: 1.75rem; background: var(--bg); color: var(--text);
+            box-shadow: 0 30px 80px -30px rgba(28,25,23,.55);
+            transition: width .25s ease;
+        }
+        dialog#incDialog.wide { width: min(1100px, calc(100vw - 2rem)); height: min(92vh, 1000px); max-height: none; }
+        dialog#incDialog[open] { display: flex; flex-direction: column; animation: dlgIn .28s cubic-bezier(.16,1,.3,1); }
+        dialog#incDialog::backdrop { background: rgba(41, 37, 36, .45); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+        @keyframes dlgIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }
+        @media (max-width: 639px) {
+            dialog#incDialog, dialog#incDialog.wide { width: 100vw; max-width: 100vw; margin: auto 0 0; border-radius: 1.5rem 1.5rem 0 0; max-height: 92vh; }
+            dialog#incDialog.wide { height: 92vh; }
+        }
+        #dlgBody { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+        .dlg-head { background: var(--soft); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .dlg-foot { flex-shrink: 0; }
+        .dlg-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+        .dlg-close { color: var(--muted); background: rgba(255,255,255,.8); border: 1px solid var(--border); }
+        .dlg-close:hover { color: var(--accent); border-color: var(--accent); }
+        .info-tile { background: #fff; border: 1px solid var(--border); border-radius: 1rem; padding: .7rem .85rem; min-width: 0; }
+        .info-tile dt { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+        .info-tile dd { margin-top: .2rem; font-size: .9rem; font-weight: 600; color: var(--accent-hover); }
+        .file-row { display: flex; align-items: center; gap: .8rem; width: 100%; text-align: left; padding: .7rem .85rem; background: #fff; border: 1px solid var(--border); border-radius: 1rem; transition: border-color .2s ease, transform .2s ease; }
+        .file-row:hover { border-color: var(--accent); transform: translateX(2px); }
+        .file-icon { flex-shrink: 0; width: 2.1rem; height: 2.1rem; border-radius: .7rem; display: grid; place-items: center; font-weight: 800; font-size: .62rem; letter-spacing: .04em; color: #fff; background: #b42318; }
+
+        /* Visualizzatore PDF */
+        .viewer { flex: 1 1 auto; min-height: 0; position: relative; background: #e9e4db; }
+        .viewer iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #e9e4db; }
+        .viewer-msg { position: absolute; inset: 0; display: grid; place-items: center; padding: 1.5rem; text-align: center; }
+
+        .skeleton { animation: pulse 1.6s ease-in-out infinite; background: #f4efe6; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+        .fade-in { animation: fadeIn .35s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes fadeIn { from { opacity: .001; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        .flash { animation: flash 1.4s ease; }
+        @keyframes flash { 30% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent); } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-40 glass-panel border-b border-stone-200/70">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="logo-badge w-10 h-10 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+                        <!-- trave su due appoggi -->
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18"/><path d="M5 9l-2.5 4h5z"/><path d="M19 9l-2.5 4h5z"/><path d="M12 3v4m-1.5-1.5L12 7l1.5-1.5"/><path d="M2 16h7m6 0h7"/></svg>
+                    </div>
+                    <div class="leading-tight min-w-0">
+                        <h1 class="text-lg sm:text-xl font-serif font-bold tracking-tight truncate">Tutorato</h1>
+                        <p class="text-[11px] text-muted font-medium hidden sm:block">Scienza delle Costruzioni · incontri e appunti</p>
+                    </div>
+                </div>
+                <a href="/" class="back-link text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5 rounded-full px-3 py-1.5 flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span class="hidden sm:inline">Torna al sito</span><span class="sm:hidden">Home</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-[1400px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
+
+            <!-- ===================== SINISTRA: INCONTRI ===================== -->
+            <div class="lg:col-span-8 space-y-5 lg:space-y-6 min-w-0">
+
+                <!-- Schede anno accademico -->
+                <nav class="flex items-center gap-1 border-b border-stone-200 overflow-x-auto" id="aaTabs" aria-label="Anno accademico"></nav>
+
+                <!-- Intro + filtri -->
+                <section class="card p-6 sm:p-7 flex flex-col gap-5">
+                    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                        <div class="min-w-0">
+                            <span class="eyebrow" id="aaEyebrow">Tutorato universitario</span>
+                            <h2 class="mt-2 text-2xl sm:text-[1.75rem] leading-tight font-serif font-bold tracking-tight">Gli incontri, uno per uno</h2>
+                            <p class="mt-2 text-sm text-muted leading-relaxed max-w-xl">
+                                Scegli il tuo corso di laurea per vedere solo gli incontri che ti riguardano. Apri un incontro per leggere gli <strong class="text-accent-strong">appunti</strong> direttamente qui, oppure usa <em>Chiedi</em> per un chiarimento o per segnalare un file che non si apre.
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap sm:flex-nowrap gap-2 flex-shrink-0" id="totals"></div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <div class="seg" role="group" aria-label="Filtra per corso di laurea" id="corsoFilter"></div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <select id="argFilter" class="field pr-8 sm:w-60" aria-label="Filtra per argomento"></select>
+                            <label class="relative flex-grow">
+                                <span class="sr-only">Cerca</span>
+                                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"></path></svg>
+                                <input id="search" type="search" class="field w-full" style="padding-left:2.25rem" placeholder="Argomento, data o nome del file…">
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Insegnamento del corso scelto -->
+                <div id="corsoInfo"></div>
+
+                <!-- Incontri raggruppati per mese (generati da JS) -->
+                <div id="mesi" class="space-y-5 lg:space-y-6"></div>
+                <p id="empty" class="hidden card p-8 text-center text-sm text-muted"></p>
+            </div>
+
+            <!-- ===================== DESTRA: COME FUNZIONA + MODULO ===================== -->
+            <aside class="lg:col-span-4 space-y-5 lg:space-y-6 lg:sticky lg:top-24">
+
+                <section class="card theme-oceano p-6 flex flex-col gap-4">
+                    <span class="eyebrow">Come funziona</span>
+                    <h2 class="text-xl font-serif font-bold tracking-tight leading-snug">Un tutorato, tre corsi di laurea</h2>
+                    <p class="text-sm text-muted leading-relaxed">
+                        Gli incontri affiancano il corso con esercizi svolti alla lavagna. Dopo ogni incontro carico gli appunti in PDF: li trovi nella scheda dell'incontro.
+                    </p>
+                    <ul class="space-y-2" id="corsiList"></ul>
+                    <div class="rounded-2xl bg-white/70 border border-[var(--border)] p-4 text-sm leading-relaxed">
+                        <p class="font-semibold text-accent-strong">Ti serve un aiuto individuale?</p>
+                        <p class="text-muted mt-1">Oltre al tutorato tengo anche ripetizioni private, su prenotazione.</p>
+                        <a href="/ripetizioni/" class="link-accent inline-block mt-2 text-xs">Prenota una ripetizione</a>
+                    </div>
+                </section>
+
+                <!-- RICHIESTA (Tally) -->
+                <section id="richiesta" class="scroll-mt-20 card card-white theme-salvia overflow-hidden flex flex-col">
+                    <div class="px-6 pt-5 pb-4 border-b border-stone-100 space-y-2">
+                        <span class="eyebrow">Chiedi o segnala</span>
+                        <p class="text-sm text-muted leading-relaxed">
+                            Un passaggio non chiaro, un <strong class="text-accent-strong">link che non funziona</strong>, una fonte o un esercizio in più: scrivimi qui e ti rispondo al contatto che indichi.
+                        </p>
+                        <div id="prefillNote" class="hidden fade-in"><span class="chip !text-[11px] !whitespace-normal">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Incontro: <b id="prefillName"></b></span>
+                        </span></div>
+                    </div>
+                    <div class="relative px-3 sm:px-4 pb-2 min-h-[420px]">
+                        <div id="tallySkeleton" class="absolute inset-0 p-6 space-y-4 pointer-events-none z-10 bg-white">
+                            <div class="skeleton h-5 w-40 rounded-lg"></div>
+                            <div class="skeleton h-11 w-full rounded-xl"></div>
+                            <div class="skeleton h-5 w-36 rounded-lg"></div>
+                            <div class="skeleton h-11 w-full rounded-xl"></div>
+                            <div class="skeleton h-5 w-28 rounded-lg"></div>
+                            <div class="skeleton h-11 w-full rounded-xl"></div>
+                            <p class="text-xs text-muted text-center pt-2">Caricamento del modulo…</p>
+                        </div>
+                        <iframe id="tallyFrame" title="Chiedi o segnala" width="100%" height="420" frameborder="0" marginheight="0" marginwidth="0" loading="lazy"></iframe>
+                    </div>
+                    <div class="px-6 py-3 border-t border-stone-100 text-[11px] text-muted">
+                        Non si carica? <a href="https://tally.so/r/LZRvby" target="_blank" rel="noopener" class="link-accent" id="tallyOut">Apri il modulo in una nuova scheda</a>.
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <dialog id="incDialog" aria-labelledby="dlgTitle" tabindex="-1"><div id="dlgBody"></div></dialog>
+
+    <footer class="border-t border-stone-200/70 py-6 mt-10">
+        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-1 text-xs text-muted text-center sm:text-left">
+            <p>&copy; 2026 Daniele De Michele · Materiale condiviso a scopo didattico<span id="updatedAt"></span></p>
+            <p class="text-[10px] opacity-70">Gli appunti integrano il corso e non sostituiscono il materiale del docente.</p>
+        </div>
+    </footer>
+
+    <script>
+        /* =====================================================================
+           DATI
+           In produzione arriveranno da tutorato/incontri.json, generato da Notion con un GitHub Action
+           (come triennale/materie.json). Gli allegati Notion verranno scaricati in tutorato/appunti/.
+           Qui sotto: dati reali dell'A.A. 2025/26 (Gestionale), usati come anteprima e come riserva.
+           corsi:     "civile" | "gestionale" | "ambientale" (anche più di uno)
+           argomenti: etichette brevi, usate per il filtro
+           allegati:  { nome, file } → file è relativo a tutorato/appunti/
+           ===================================================================== */
+        const CORSI = {
+            civile:     { nome: "Civile e Architettura", insegnamento: "Scienza delle Costruzioni" },
+            gestionale: { nome: "Gestionale",            insegnamento: "Principi di progettazione meccanica",
+                          obiettivi: [
+                              ["Conoscenza e comprensione", "Fondamenti del comportamento meccanico dei materiali per uso strutturale e metodi per prevedere sforzi, deformazioni e resistenza di elementi monodimensionali sotto carichi statici."],
+                              ["Capacità di applicare", "Analizzare stati deformativi e tensionali di elementi strutturali e scegliere i materiali in base alle proprietà più significative."],
+                              ["Autonomia di giudizio", "Valutare proprietà deformative e di resistenza di componenti meccanici per una data applicazione strutturale."],
+                              ["Abilità comunicative", "Discutere requisiti, prestazioni e approcci progettuali con interlocutori specialisti e non."],
+                              ["Capacità di apprendimento", "Affrontare in autonomia problemi nuovi su progetto, verifica e realizzazione di componenti soggetti a carichi statici."],
+                          ] },
+            ambientale: { nome: "Ambientale",            insegnamento: "Scienza delle Costruzioni" },
+        };
+
+        const AA = {
+            "2025/26": [
+                { data: "2026-04-09", inizio: "17:30", fine: "19:30", argomenti: ["Strutture isostatiche"],                        corsi: ["gestionale"], allegati: [] },
+                { data: "2026-04-17", inizio: "17:30", fine: "19:30", argomenti: ["Strutture isostatiche"],                        corsi: ["gestionale"], allegati: [{ nome: "Notes_260417_1738", file: "Notes_260417_1738.pdf" }] },
+                { data: "2026-04-23", inizio: "17:30", fine: "19:30", argomenti: ["Geometria delle aree"],                         corsi: ["gestionale"], allegati: [{ nome: "Notes_260423_1929", file: "Notes_260423_1929.pdf" }] },
+                { data: "2026-05-07", inizio: "17:30", fine: "19:30", argomenti: ["Geometria delle aree", "Navier e Jourawski"],    corsi: ["gestionale"], allegati: [{ nome: "Notes_260512_1629", file: "Notes_260512_1629.pdf" }] },
+                { data: "2026-05-14", inizio: "17:30", fine: "19:30", argomenti: ["Navier e Jourawski"],                           corsi: ["gestionale"], allegati: [{ nome: "Notes_260514_1925", file: "Notes_260514_1925.pdf" }] },
+                { data: "2026-05-21", inizio: "17:30", fine: "19:30", argomenti: ["Strutture iperstatiche"],                       corsi: ["gestionale"], allegati: [] },
+                { data: "2026-05-28", inizio: "17:30", fine: "19:45", argomenti: ["Strutture iperstatiche"],                       corsi: ["gestionale"], allegati: [{ nome: "Notes_260528_1918", file: "Notes_260528_1918.pdf" }] },
+                { data: "2026-06-04", inizio: "17:00", fine: "19:30", argomenti: ["Spostamenti"],                                  corsi: ["gestionale"], allegati: [{ nome: "Notes_260604_1708", file: "Notes_260604_1708.pdf" }] },
+            ],
+        };
+
+        const APPUNTI_DIR = "appunti/";
+        const TALLY_ID = "LZRvby";
+        const TALLY_BASE = `https://tally.so/embed/${TALLY_ID}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`;
+
+        /* ---------- Icone ---------- */
+        const I = {
+            clock:'<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+            doc:  '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.6a1 1 0 01.7.3l5.4 5.4a1 1 0 01.3.7V19a2 2 0 01-2 2z"/></svg>',
+            ask:  '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.4-4 8-9 8a9.9 9.9 0 01-4.3-.9L3 20l1.4-3.7A7.6 7.6 0 013 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg>',
+            cal:  '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
+            open: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>',
+            down: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>',
+            back: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>',
+            x:    '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M6 18L18 6M6 6l12 12"/></svg>',
+            chev: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>',
+        };
+        const svg = (k, cls = "w-4 h-4") => I[k].replace("<svg", `<svg class="${cls}"`);
+
+        /* ---------- Utilità ---------- */
+        const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+        const toDate = s => new Date(s + "T12:00:00");
+        const fmt = (s, o) => toDate(s).toLocaleDateString("it-IT", o);
+        const minuti = (a, b) => { const [h1, m1] = a.split(":").map(Number), [h2, m2] = b.split(":").map(Number); return (h2 * 60 + m2) - (h1 * 60 + m1); };
+        const durata = m => `${Math.floor(m / 60)} h${m % 60 ? " " + (m % 60) + " min" : ""}`;
+        const titolo = x => x.argomenti.join(" · ");
+        const etichetta = x => `${fmt(x.data, { day: "numeric", month: "short", year: "numeric" })} · ${titolo(x)}`;
+        const badges = x => x.corsi.map(c => `<span class="badge-corso c-${c}"><span class="dot"></span>${esc(CORSI[c].nome)}</span>`).join("");
+
+        /* ---------- Stato ---------- */
+        const state = { aa: Object.keys(AA).sort().at(-1), corso: "all", arg: "all", q: "" };
+        const incontri = () => AA[state.aa];
+
+        // Numero progressivo per corso (Incontro 1, 2, …): è un'informazione reale, l'ordine conta
+        function numera(list) {
+            const cont = {};
+            [...list].sort((a, b) => a.data.localeCompare(b.data)).forEach(x => {
+                x.n = {}; x.corsi.forEach(c => { cont[c] = (cont[c] || 0) + 1; x.n[c] = cont[c]; });
+            });
+        }
+
+        function filtrati() {
+            const q = norm(state.q.trim());
+            return incontri().filter(x =>
+                (state.corso === "all" || x.corsi.includes(state.corso)) &&
+                (state.arg === "all" || x.argomenti.includes(state.arg)) &&
+                (!q || norm([...x.argomenti, fmt(x.data, { day: "numeric", month: "long" }), x.data, ...x.allegati.map(a => a.nome)].join(" ")).includes(q))
+            ).sort((a, b) => a.data.localeCompare(b.data));
+        }
+
+        /* ---------- Rendering ---------- */
+        function renderTabs() {
+            document.getElementById("aaTabs").innerHTML = Object.keys(AA).sort().reverse().map(aa =>
+                `<button type="button" data-aa="${aa}" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap ${aa === state.aa ? "active-view-tab" : ""}" aria-selected="${aa === state.aa}">A.A. ${aa}<span class="tab-count">${AA[aa].length}</span></button>`
+            ).join("");
+        }
+
+        function renderFiltri() {
+            const list = incontri();
+            const n = c => list.filter(x => c === "all" || x.corsi.includes(c)).length;
+            document.getElementById("corsoFilter").innerHTML =
+                `<button type="button" data-corso="all" aria-pressed="${state.corso === "all"}">Tutti i corsi</button>` +
+                Object.entries(CORSI).map(([k, c]) =>
+                    `<button type="button" data-corso="${k}" class="c-${k}" aria-pressed="${state.corso === k}"><span class="dot"></span>${esc(c.nome)}<span class="opacity-60 tnum">${n(k)}</span></button>`).join("");
+
+            const args = [...new Set(list.filter(x => state.corso === "all" || x.corsi.includes(state.corso)).flatMap(x => x.argomenti))];
+            if (state.arg !== "all" && !args.includes(state.arg)) state.arg = "all";
+            document.getElementById("argFilter").innerHTML = `<option value="all">Tutti gli argomenti</option>` +
+                args.map(a => `<option value="${esc(a)}" ${a === state.arg ? "selected" : ""}>${esc(a)}</option>`).join("");
+
+            const vis = list.filter(x => state.corso === "all" || x.corsi.includes(state.corso));
+            const ore = vis.reduce((s, x) => s + minuti(x.inizio, x.fine), 0);
+            const app = vis.filter(x => x.allegati.length).length;
+            document.getElementById("totals").innerHTML = `
+                <span class="chip">${I.cal}<span class="tnum">${vis.length}</span> incontri</span>
+                <span class="chip">${I.clock}<span class="tnum">${Math.round(ore / 60)}</span> ore</span>
+                <span class="chip">${I.doc}<span class="tnum">${app}</span> con appunti</span>`;
+        }
+
+        function renderCorsoInfo() {
+            const box = document.getElementById("corsoInfo");
+            const c = CORSI[state.corso];
+            if (!c) { box.innerHTML = ""; return; }
+            box.innerHTML = `
+            <section class="card card-white p-5 sm:p-6 c-${state.corso} fade-in">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <span class="badge-corso"><span class="dot"></span>Ingegneria ${esc(c.nome)}</span>
+                        <h2 class="mt-2 text-xl font-serif font-bold tracking-tight">${esc(c.insegnamento)}</h2>
+                    </div>
+                    <a href="/triennale/" class="text-xs link-accent">Tutte le materie della triennale</a>
+                </div>
+                ${c.obiettivi ? `
+                <details class="obiettivi mt-4 rounded-2xl bg-[var(--soft)] border border-[var(--border)]">
+                    <summary class="flex items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-accent-strong">
+                        Obiettivi formativi dell'insegnamento <span class="chev">${svg("chev")}</span>
+                    </summary>
+                    <dl class="px-4 pb-4 grid gap-3 sm:grid-cols-2">
+                        ${c.obiettivi.map(([t, d]) => `<div><dt class="text-[11px] font-bold uppercase tracking-[.06em] text-accent">${esc(t)}</dt><dd class="mt-1 text-sm text-muted leading-relaxed">${esc(d)}</dd></div>`).join("")}
+                    </dl>
+                </details>` : ""}
+            </section>`;
+        }
+
+        function incontroRow(x, i) {
+            const d = toDate(x.data);
+            const corsoN = state.corso !== "all" ? x.n[state.corso] : (x.corsi.length === 1 ? x.n[x.corsi[0]] : null);
+            const files = x.allegati.length
+                ? `<span class="act act-files">${I.doc}${x.allegati.length === 1 ? "Appunti" : x.allegati.length + " file"}</span>`
+                : `<span class="act act-disabled" title="Appunti non ancora caricati">${I.clock}In arrivo</span>`;
+            return `
+            <article class="incontro fade-in" style="animation-delay:${i * 30}ms" tabindex="0" role="button" data-id="${x.data}" aria-label="Apri l'incontro del ${fmt(x.data, { day: "numeric", month: "long" })}">
+                <div class="datebox tnum" aria-hidden="true">
+                    <span class="wd">${d.toLocaleDateString("it-IT", { weekday: "short" })}</span>
+                    <span class="d">${d.getDate()}</span>
+                    <span class="m">${d.toLocaleDateString("it-IT", { month: "short" })}</span>
+                </div>
+                <div class="min-w-0 flex flex-col gap-2">
+                    <h3>${corsoN ? `<span class="inc-n">Incontro ${corsoN}</span>` : ""}${esc(titolo(x))}</h3>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                        <span class="meta tnum">${I.clock}${x.inizio}–${x.fine} · ${durata(minuti(x.inizio, x.fine))}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">${state.corso === "all" ? badges(x) : ""}</div>
+                </div>
+                <div class="inc-actions">
+                    ${files}
+                    <button type="button" class="act act-ask" data-ask="${x.data}">${I.ask}Chiedi</button>
+                </div>
+            </article>`;
+        }
+
+        function render() {
+            renderFiltri();
+            renderCorsoInfo();
+            const list = filtrati();
+            const mesi = {};
+            list.forEach(x => (mesi[x.data.slice(0, 7)] ||= []).push(x));
+            let i = 0;
+            document.getElementById("mesi").innerHTML = Object.entries(mesi).map(([ym, items]) => {
+                const nome = toDate(ym + "-15").toLocaleDateString("it-IT", { month: "long", year: "numeric" });
+                const ore = items.reduce((s, x) => s + minuti(x.inizio, x.fine), 0);
+                return `
+                <section class="card p-5 sm:p-6">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <h2 class="text-xl font-serif font-bold tracking-tight capitalize">${nome}</h2>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="chip">${I.cal}<span class="tnum">${items.length}</span> ${items.length === 1 ? "incontro" : "incontri"}</span>
+                            <span class="chip">${I.clock}<span class="tnum">${durata(ore)}</span></span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-3">${items.map(x => incontroRow(x, i++)).join("")}</div>
+                </section>`;
+            }).join("");
+
+            const empty = document.getElementById("empty");
+            empty.classList.toggle("hidden", list.length > 0);
+            if (!list.length) {
+                const c = CORSI[state.corso];
+                empty.innerHTML = c && !incontri().some(x => x.corsi.includes(state.corso))
+                    ? `<span class="block font-serif text-lg font-bold text-[var(--text)]">Nessun incontro per ${esc(c.nome)} in questo anno</span>
+                       <span class="block mt-1">Quando il tutorato partirà, gli incontri compariranno qui con data, argomenti e appunti.</span>`
+                    : "Nessun incontro corrisponde ai filtri selezionati.";
+            }
+        }
+
+        function renderCorsiList() {
+            document.getElementById("corsiList").innerHTML = Object.entries(CORSI).map(([k, c]) => `
+                <li class="c-${k} flex items-start gap-3 rounded-2xl bg-white/70 border border-[var(--border)] px-3.5 py-2.5">
+                    <span class="dot mt-1.5"></span>
+                    <span class="min-w-0 text-sm leading-snug"><b class="text-[var(--text)]">${esc(c.nome)}</b><br><span class="text-muted">${esc(c.insegnamento)}</span></span>
+                </li>`).join("");
+        }
+
+        /* ---------- Eventi filtri ---------- */
+        document.getElementById("aaTabs").addEventListener("click", e => {
+            const b = e.target.closest("[data-aa]"); if (!b) return;
+            state.aa = b.dataset.aa; state.arg = "all"; renderTabs(); render();
+        });
+        document.getElementById("corsoFilter").addEventListener("click", e => {
+            const b = e.target.closest("[data-corso]"); if (!b) return;
+            state.corso = b.dataset.corso;
+            history.replaceState(null, "", state.corso === "all" ? location.pathname : "#" + state.corso);
+            render();
+        });
+        document.getElementById("argFilter").addEventListener("change", e => { state.arg = e.target.value; render(); });
+        document.getElementById("search").addEventListener("input", e => { state.q = e.target.value; render(); });
+
+        /* ---------- Tally: caricamento + precompilazione ---------- */
+        const frame = document.getElementById("tallyFrame");
+        const tallySkeleton = document.getElementById("tallySkeleton");
+        frame.addEventListener("load", () => { if (frame.getAttribute("src")) tallySkeleton.remove(); });
+        setTimeout(() => { if (tallySkeleton.isConnected) tallySkeleton.remove(); }, 8000);
+        // Campi nascosti Tally: "incontro" e "corso" (da creare nel modulo con questi nomi)
+        function askAbout(x, file) {
+            const corso = state.corso !== "all" ? state.corso : x.corsi[0];
+            const label = etichetta(x) + (file ? ` · ${file}` : "");
+            const qs = `incontro=${encodeURIComponent(label)}&corso=${encodeURIComponent(CORSI[corso].nome)}`;
+            frame.src = `${TALLY_BASE}&${qs}`;
+            document.getElementById("tallyOut").href = `https://tally.so/r/${TALLY_ID}?${qs}`;
+            document.getElementById("prefillName").textContent = label;
+            document.getElementById("prefillNote").classList.remove("hidden");
+            const box = document.getElementById("richiesta");
+            box.scrollIntoView({ behavior: "smooth", block: "start" });
+            box.classList.remove("flash"); void box.offsetWidth; box.classList.add("flash");
+        }
+
+        /* ---------- Popup incontro + visualizzatore appunti ---------- */
+        const dlg = document.getElementById("incDialog");
+        const byId = id => incontri().find(x => x.data === id);
+
+        function openIncontro(x, push = true) {
+            dlg.classList.remove("wide");
+            const corsoN = state.corso !== "all" ? x.n[state.corso] : (x.corsi.length === 1 ? x.n[x.corsi[0]] : null);
+            const files = x.allegati.length
+                ? x.allegati.map((a, k) => `
+                    <button type="button" class="file-row" data-view="${k}">
+                        <span class="file-icon">PDF</span>
+                        <span class="flex-grow min-w-0">
+                            <span class="block text-sm font-semibold truncate">${esc(a.nome)}</span>
+                            <span class="block text-[11px] text-muted">Appunti dell'incontro · si apre qui</span>
+                        </span>
+                        <span class="text-xs font-semibold text-accent whitespace-nowrap">Leggi</span>
+                    </button>`).join("")
+                : `<div class="info-tile flex items-center gap-3 !p-4">
+                       <span class="w-9 h-9 rounded-xl grid place-items-center bg-[var(--soft)] text-accent flex-shrink-0">${svg("clock")}</span>
+                       <p class="text-sm text-muted">Gli appunti di questo incontro non sono ancora stati caricati. Se ti servono, chiedili dal modulo.</p>
+                   </div>`;
+
+            document.getElementById("dlgBody").innerHTML = `
+                <div class="dlg-head px-6 pt-5 pb-5 flex items-start gap-4">
+                    <div class="flex-grow min-w-0">
+                        <span class="eyebrow">${corsoN ? `Incontro ${corsoN} · ` : ""}${fmt(x.data, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
+                        <h2 id="dlgTitle" class="mt-2 text-2xl font-serif font-bold tracking-tight leading-tight">${esc(titolo(x))}</h2>
+                    </div>
+                    <button type="button" class="dlg-close w-9 h-9 rounded-full grid place-items-center flex-shrink-0" data-close aria-label="Chiudi">${svg("x")}</button>
+                </div>
+                <div class="dlg-scroll px-6 py-5 space-y-6">
+                    <dl class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        <div class="info-tile"><dt>Orario</dt><dd class="tnum">${x.inizio}–${x.fine}</dd></div>
+                        <div class="info-tile"><dt>Durata</dt><dd class="tnum">${durata(minuti(x.inizio, x.fine))}</dd></div>
+                        <div class="info-tile col-span-2 sm:col-span-1"><dt>Anno accademico</dt><dd>${state.aa}</dd></div>
+                        <div class="info-tile col-span-2 sm:col-span-3"><dt>Corsi di laurea</dt><dd class="flex flex-wrap gap-1.5 mt-1">${badges(x)}</dd></div>
+                    </dl>
+                    <section class="space-y-3">
+                        <span class="eyebrow">Argomenti</span>
+                        <div class="flex flex-wrap gap-1.5">${x.argomenti.map(a => `<button type="button" class="pill-arg" data-arg="${esc(a)}" title="Mostra tutti gli incontri su questo argomento">${esc(a)}</button>`).join("")}</div>
+                    </section>
+                    <section class="space-y-3">
+                        <span class="eyebrow">Appunti</span>
+                        <div class="space-y-2">${files}</div>
+                    </section>
+                </div>
+                <div class="dlg-foot px-6 py-4 border-t border-[var(--border)] bg-white/60 flex flex-wrap items-center gap-2">
+                    <p class="text-[11px] text-muted flex-grow">Qualcosa non è chiaro o un file non si apre?</p>
+                    <button type="button" class="btn-accent inline-flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2" data-dlg-ask>${svg("ask")}Chiedi o segnala</button>
+                </div>`;
+
+            dlg.querySelector("[data-close]").onclick = () => dlg.close();
+            dlg.querySelector("[data-dlg-ask]").onclick = () => { dlg.close(); askAbout(x); };
+            dlg.querySelectorAll("[data-view]").forEach(b => b.onclick = () => openViewer(x, +b.dataset.view));
+            dlg.querySelectorAll("[data-arg]").forEach(b => b.onclick = () => {
+                dlg.close(); state.arg = b.dataset.arg; render();
+                document.getElementById("mesi").scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+            if (!dlg.open) dlg.showModal();
+            dlg.focus({ preventScroll: true });
+            if (push) history.replaceState(null, "", "#" + x.data);
+        }
+
+        async function openViewer(x, k) {
+            const a = x.allegati[k];
+            const url = APPUNTI_DIR + a.file;
+            dlg.classList.add("wide");
+            document.getElementById("dlgBody").innerHTML = `
+                <div class="dlg-head px-4 sm:px-5 py-3 flex items-center gap-2">
+                    <button type="button" class="dlg-close w-9 h-9 rounded-full grid place-items-center flex-shrink-0" data-back aria-label="Torna all'incontro">${svg("back")}</button>
+                    <div class="flex-grow min-w-0 px-1">
+                        <p class="text-sm font-semibold truncate">${esc(a.nome)}</p>
+                        <p class="text-[11px] text-muted truncate">${esc(etichetta(x))}</p>
+                    </div>
+                    <a href="${esc(url)}" download class="btn-ghost hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2">${svg("down", "w-3.5 h-3.5")}Scarica</a>
+                    <a href="${esc(url)}" target="_blank" rel="noopener" class="btn-ghost inline-flex items-center gap-1.5 text-xs font-semibold rounded-full px-3 py-2" title="Apri in una nuova scheda">${svg("open", "w-3.5 h-3.5")}<span class="hidden sm:inline">Nuova scheda</span></a>
+                    <button type="button" class="dlg-close w-9 h-9 rounded-full grid place-items-center flex-shrink-0" data-close aria-label="Chiudi">${svg("x")}</button>
+                </div>
+                <div class="viewer" id="viewer"><div class="viewer-msg"><div class="skeleton w-48 h-64 rounded-xl"></div></div></div>
+                <div class="dlg-foot px-4 sm:px-5 py-3 border-t border-[var(--border)] bg-white/60 flex flex-wrap items-center gap-2">
+                    <p class="text-[11px] text-muted flex-grow">Una pagina illeggibile o mancante?</p>
+                    <button type="button" class="btn-accent inline-flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2" data-dlg-ask>${svg("ask")}Segnala questo file</button>
+                </div>`;
+            dlg.querySelector("[data-back]").onclick = () => openIncontro(x, false);
+            dlg.querySelector("[data-close]").onclick = () => dlg.close();
+            dlg.querySelector("[data-dlg-ask]").onclick = () => { dlg.close(); askAbout(x, a.nome); };
+
+            const viewer = document.getElementById("viewer");
+            let ok = false;
+            try { ok = (await fetch(url, { method: "HEAD", cache: "no-store" })).ok; } catch { ok = false; }
+            if (!viewer.isConnected) return;
+            viewer.innerHTML = ok
+                ? `<iframe src="${esc(url)}#view=FitH" title="${esc(a.nome)}"></iframe>`
+                : `<div class="viewer-msg"><div class="max-w-sm">
+                       <span class="mx-auto w-12 h-12 rounded-2xl grid place-items-center bg-white text-accent border border-[var(--border)]">${svg("doc", "w-5 h-5")}</span>
+                       <p class="mt-3 font-serif text-lg font-bold">Il file non è disponibile</p>
+                       <p class="mt-1 text-sm text-muted">Gli appunti non si sono caricati. Segnalalo dal pulsante qui sotto e lo ricarico al più presto.</p>
+                   </div></div>`;
+        }
+
+        dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+        dlg.addEventListener("close", () => { dlg.classList.remove("wide"); history.replaceState(null, "", state.corso === "all" ? location.pathname : "#" + state.corso); });
+
+        const mesiBox = document.getElementById("mesi");
+        mesiBox.addEventListener("click", e => {
+            const ask = e.target.closest("[data-ask]");
+            if (ask) { askAbout(byId(ask.dataset.ask)); return; }
+            const row = e.target.closest(".incontro");
+            if (row) openIncontro(byId(row.dataset.id));
+        });
+        mesiBox.addEventListener("keydown", e => {
+            const row = e.target.closest(".incontro");
+            if (row && e.target === row && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); row.click(); }
+        });
+
+        /* Link diretti: /tutorato/#gestionale oppure /tutorato/#2026-05-14 */
+        function fromHash() {
+            const h = location.hash.slice(1);
+            if (CORSI[h]) { state.corso = h; render(); return; }
+            const x = byId(h);
+            render();
+            if (x) openIncontro(x, false);
+        }
+
+        Object.values(AA).forEach(numera);
+        renderTabs();
+        renderCorsiList();
+        fromHash();
+        frame.src = TALLY_BASE;
+    </script>
+</body>
+</html>
