@@ -67,6 +67,19 @@
         .eyebrow::before { content: ""; width: .5rem; height: .5rem; border-radius: 9999px; background: currentColor; }
         .chip { display: inline-flex; align-items: center; gap: .4rem; font-size: .75rem; font-weight: 600; color: var(--accent-hover); background: rgba(255,255,255,.7); border: 1px solid var(--border); padding: .35rem .75rem; border-radius: 9999px; white-space: nowrap; }
         .chip svg { width: .9rem; height: .9rem; color: var(--accent); }
+
+        /* ===== Intro: testo al centro, riepilogo in colonna a destra ===== */
+        .intro-grid { display: grid; gap: 1.25rem; align-items: center; }
+        .intro-text { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+        .totals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
+        .totals .chip { justify-content: flex-start; padding: .5rem .85rem; }
+        a.chip { transition: border-color .2s ease, background .2s ease; }
+        a.chip:hover { border-color: var(--accent); background: #fff; }
+        @media (min-width: 640px) {
+            .intro-grid { grid-template-columns: minmax(0, 1fr) auto; gap: 1.75rem; }
+            .intro-title { white-space: nowrap; text-wrap: nowrap; }
+            .totals { grid-template-columns: 1fr; min-width: 10.5rem; padding-left: 1.75rem; border-left: 1px solid var(--border); }
+        }
         .logo-badge { background: var(--accent); box-shadow: 0 8px 18px -8px rgba(154, 52, 18, .6); }
         .btn-accent { background: var(--accent); color: #fff; transition: background .2s ease, transform .2s ease; }
         .btn-accent:hover { background: var(--accent-hover); transform: translateY(-1px); }
@@ -221,15 +234,15 @@
 
                 <!-- Intro + filtri -->
                 <section class="card p-6 sm:p-7 flex flex-col gap-5">
-                    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                    <div class="intro-grid">
                         <div class="min-w-0">
                             <span class="eyebrow" id="aaEyebrow">Tutorato universitario</span>
-                            <h2 class="mt-2 text-2xl sm:text-[1.75rem] leading-tight font-serif font-bold tracking-tight">Gli incontri, uno per uno</h2>
-                            <p class="mt-2 text-sm text-muted leading-relaxed max-w-xl">
+                            <h2 class="intro-title mt-2 text-2xl sm:text-[1.75rem] leading-tight font-serif font-bold tracking-tight">Gli incontri, uno per uno</h2>
+                            <p class="intro-text mt-3 text-sm text-muted leading-relaxed">
                                 Scegli il tuo corso di laurea per vedere solo gli incontri che ti riguardano. Apri un incontro per leggere gli <strong class="text-accent-strong">appunti</strong> direttamente qui, oppure usa <em>Chiedi</em> per un chiarimento o per segnalare un file che non si apre.
                             </p>
                         </div>
-                        <div class="flex flex-wrap sm:flex-nowrap gap-2 flex-shrink-0" id="totals"></div>
+                        <div class="totals" id="totals" aria-label="Riepilogo"></div>
                     </div>
 
                     <div class="flex flex-col gap-3">
