@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Tutorato Scienza delle Costruzioni</title>
-    <meta name="description" content="Gli incontri di tutorato di Scienza delle Costruzioni per Ingegneria Civile e Architettura, Gestionale e Ambientale: argomenti, appunti e modulo per chiarimenti.">
+    <meta name="description" content="Gli incontri di tutorato di Scienza delle Costruzioni per Ingegneria Civile, Architettura, Ingegneria Gestionale e Ambientale: incontri, appunti, compiti svolti e modulo per chiarimenti.">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
@@ -101,6 +101,7 @@
         /* ===== Corsi: pallino e badge ===== */
         .dot { width: .55rem; height: .55rem; border-radius: 9999px; flex-shrink: 0; background: var(--c); }
         .c-civile     { --c: #9a3412; --c-soft: #f6e9df; --c-border: #ecd5c4; }
+        .c-architettura { --c: #6b3f8c; --c-soft: #f3effa; --c-border: #e0d8ef; }
         .c-gestionale { --c: #1e3a8a; --c-soft: #e9eef7; --c-border: #d3dcea; }
         .c-ambientale { --c: #2f5d50; --c-soft: #e4eae7; --c-border: #cfdad4; }
         .badge-corso { display: inline-flex; align-items: center; gap: .35rem; font-size: .68rem; font-weight: 600; padding: .18rem .55rem; border-radius: .45rem; color: var(--c); background: var(--c-soft); border: 1px solid var(--c-border); white-space: nowrap; }
@@ -250,6 +251,9 @@
                 <!-- Incontri raggruppati per mese (generati da JS) -->
                 <div id="mesi" class="space-y-5 lg:space-y-6"></div>
                 <p id="empty" class="hidden card p-8 text-center text-sm text-muted"></p>
+
+                <!-- Compiti svolti (solo Ingegneria Civile e Architettura) -->
+                <section id="compiti" class="card card-white p-5 sm:p-6 scroll-mt-20"></section>
             </div>
 
             <!-- ===================== DESTRA: COME FUNZIONA + MODULO ===================== -->
@@ -257,16 +261,11 @@
 
                 <section class="card theme-oceano p-6 flex flex-col gap-4">
                     <span class="eyebrow">Come funziona</span>
-                    <h2 class="text-xl font-serif font-bold tracking-tight leading-snug">Un tutorato, tre corsi di laurea</h2>
+                    <h2 class="text-xl font-serif font-bold tracking-tight leading-snug">Un tutorato, quattro corsi di laurea</h2>
                     <p class="text-sm text-muted leading-relaxed">
-                        Gli incontri affiancano il corso con esercizi svolti alla lavagna. Dopo ogni incontro carico gli appunti in PDF: li trovi nella scheda dell'incontro.
+                        Gli incontri affiancano il corso con esercizi svolti alla lavagna. Dopo ogni incontro carico gli appunti in PDF: li trovi nella scheda dell'incontro. Per Ingegneria Civile e Architettura trovi anche i compiti d'esame svolti.
                     </p>
                     <ul class="space-y-2" id="corsiList"></ul>
-                    <div class="rounded-2xl bg-white/70 border border-[var(--border)] p-4 text-sm leading-relaxed">
-                        <p class="font-semibold text-accent-strong">Ti serve un aiuto individuale?</p>
-                        <p class="text-muted mt-1">Oltre al tutorato tengo anche ripetizioni private, su prenotazione.</p>
-                        <a href="/ripetizioni/" class="link-accent inline-block mt-2 text-xs">Prenota una ripetizione</a>
-                    </div>
                 </section>
 
                 <!-- RICHIESTA (Tally) -->
@@ -313,37 +312,47 @@
     <script>
         /* =====================================================================
            DATI
-           In produzione arriveranno da tutorato/incontri.json, generato da Notion con un GitHub Action
-           (come triennale/materie.json). Gli allegati Notion verranno scaricati in tutorato/appunti/.
-           Qui sotto: dati reali dell'A.A. 2025/26 (Gestionale), usati come anteprima e come riserva.
-           corsi:     "civile" | "gestionale" | "ambientale" (anche più di uno)
+           Fonte: database Notion "Tutorato" (proprietà Titolo, Tipo, Corso, Argomenti, Anno accademico,
+           Data, Allegato). In produzione arriveranno da tutorato/incontri.json, generato da un GitHub Action
+           (come triennale/materie.json), che scaricherà anche gli allegati in tutorato/appunti/.
+           Qui sotto: dati reali dell'A.A. 2025/26, usati come anteprima e come riserva.
+           corsi:     "civile" | "architettura" | "gestionale" | "ambientale" (anche più di uno)
            argomenti: etichette brevi, usate per il filtro
            allegati:  { nome, file } → file è relativo a tutorato/appunti/
+           COMPITI:   compiti d'esame svolti (Tipo = "Compito svolto" su Notion), solo Civile e Architettura
            ===================================================================== */
         const CORSI = {
-            civile:     { nome: "Civile e Architettura", insegnamento: "Scienza delle Costruzioni" },
-            gestionale: { nome: "Gestionale",            insegnamento: "Principi di progettazione meccanica",
-                          obiettivi: [
-                              ["Conoscenza e comprensione", "Fondamenti del comportamento meccanico dei materiali per uso strutturale e metodi per prevedere sforzi, deformazioni e resistenza di elementi monodimensionali sotto carichi statici."],
-                              ["Capacità di applicare", "Analizzare stati deformativi e tensionali di elementi strutturali e scegliere i materiali in base alle proprietà più significative."],
-                              ["Autonomia di giudizio", "Valutare proprietà deformative e di resistenza di componenti meccanici per una data applicazione strutturale."],
-                              ["Abilità comunicative", "Discutere requisiti, prestazioni e approcci progettuali con interlocutori specialisti e non."],
-                              ["Capacità di apprendimento", "Affrontare in autonomia problemi nuovi su progetto, verifica e realizzazione di componenti soggetti a carichi statici."],
-                          ] },
-            ambientale: { nome: "Ambientale",            insegnamento: "Scienza delle Costruzioni" },
+            civile:       { nome: "Civile",       titolo: "Ingegneria Civile",     insegnamento: "Scienza delle Costruzioni", compiti: true },
+            architettura: { nome: "Architettura", titolo: "Architettura",          insegnamento: "Scienza delle Costruzioni", compiti: true },
+            gestionale:   { nome: "Gestionale",   titolo: "Ingegneria Gestionale", insegnamento: "Principi di progettazione meccanica",
+                            obiettivi: [
+                                ["Conoscenza e comprensione", "Fondamenti del comportamento meccanico dei materiali per uso strutturale e metodi per prevedere sforzi, deformazioni e resistenza di elementi monodimensionali sotto carichi statici."],
+                                ["Capacità di applicare", "Analizzare stati deformativi e tensionali di elementi strutturali e scegliere i materiali in base alle proprietà più significative."],
+                                ["Autonomia di giudizio", "Valutare proprietà deformative e di resistenza di componenti meccanici per una data applicazione strutturale."],
+                                ["Abilità comunicative", "Discutere requisiti, prestazioni e approcci progettuali con interlocutori specialisti e non."],
+                                ["Capacità di apprendimento", "Affrontare in autonomia problemi nuovi su progetto, verifica e realizzazione di componenti soggetti a carichi statici."],
+                            ] },
+            ambientale:   { nome: "Ambientale",   titolo: "Ingegneria Ambientale", insegnamento: "Scienza delle Costruzioni" },
         };
 
         const AA = {
+            "2026/27": [],
             "2025/26": [
-                { data: "2026-04-09", inizio: "17:30", fine: "19:30", argomenti: ["Strutture isostatiche"],                        corsi: ["gestionale"], allegati: [] },
-                { data: "2026-04-17", inizio: "17:30", fine: "19:30", argomenti: ["Strutture isostatiche"],                        corsi: ["gestionale"], allegati: [{ nome: "Notes_260417_1738", file: "Notes_260417_1738.pdf" }] },
-                { data: "2026-04-23", inizio: "17:30", fine: "19:30", argomenti: ["Geometria delle aree"],                         corsi: ["gestionale"], allegati: [{ nome: "Notes_260423_1929", file: "Notes_260423_1929.pdf" }] },
-                { data: "2026-05-07", inizio: "17:30", fine: "19:30", argomenti: ["Geometria delle aree", "Navier e Jourawski"],    corsi: ["gestionale"], allegati: [{ nome: "Notes_260512_1629", file: "Notes_260512_1629.pdf" }] },
-                { data: "2026-05-14", inizio: "17:30", fine: "19:30", argomenti: ["Navier e Jourawski"],                           corsi: ["gestionale"], allegati: [{ nome: "Notes_260514_1925", file: "Notes_260514_1925.pdf" }] },
-                { data: "2026-05-21", inizio: "17:30", fine: "19:30", argomenti: ["Strutture iperstatiche"],                       corsi: ["gestionale"], allegati: [] },
-                { data: "2026-05-28", inizio: "17:30", fine: "19:45", argomenti: ["Strutture iperstatiche"],                       corsi: ["gestionale"], allegati: [{ nome: "Notes_260528_1918", file: "Notes_260528_1918.pdf" }] },
-                { data: "2026-06-04", inizio: "17:00", fine: "19:30", argomenti: ["Spostamenti"],                                  corsi: ["gestionale"], allegati: [{ nome: "Notes_260604_1708", file: "Notes_260604_1708.pdf" }] },
+                { data: "2026-04-09", inizio: "17:30", fine: "19:30", argomenti: ["Strutture isostatiche"],                     corsi: ["gestionale"], allegati: [] },
+                { data: "2026-04-17", inizio: "17:30", fine: "19:30", argomenti: ["Strutture isostatiche"],                     corsi: ["gestionale"], allegati: [{ nome: "Notes_260417_173832", file: "Notes_260417_173832.pdf" }] },
+                { data: "2026-04-23", inizio: "17:30", fine: "19:30", argomenti: ["Geometria delle aree"],                      corsi: ["gestionale"], allegati: [{ nome: "Notes_260423_192930", file: "Notes_260423_192930.pdf" }] },
+                { data: "2026-05-07", inizio: "17:30", fine: "19:30", argomenti: ["Geometria delle aree", "Navier e Jourawski"], corsi: ["gestionale"], allegati: [{ nome: "Notes_260512_162949", file: "Notes_260512_162949.pdf" }] },
+                { data: "2026-05-14", inizio: "17:30", fine: "19:30", argomenti: ["Navier e Jourawski"],                        corsi: ["gestionale"], allegati: [{ nome: "Notes_260514_192549", file: "Notes_260514_192549.pdf" }] },
+                { data: "2026-05-21", inizio: "17:30", fine: "19:30", argomenti: ["Strutture iperstatiche"],                    corsi: ["gestionale"], allegati: [] },
+                { data: "2026-05-28", inizio: "17:30", fine: "19:45", argomenti: ["Strutture iperstatiche"],                    corsi: ["gestionale"], allegati: [{ nome: "Notes_260528_191829", file: "Notes_260528_191829.pdf" }] },
+                { data: "2026-06-04", inizio: "17:00", fine: "19:30", argomenti: ["Spostamenti"],                               corsi: ["gestionale"], allegati: [{ nome: "Notes_260604_170813", file: "Notes_260604_170813.pdf" }] },
             ],
+        };
+
+        // Compiti d'esame svolti: { data (giorno dell'appello), titolo, corsi, argomenti, allegati }
+        const COMPITI = {
+            "2026/27": [],
+            "2025/26": [],
         };
 
         const APPUNTI_DIR = "appunti/";
@@ -371,13 +380,16 @@
         const fmt = (s, o) => toDate(s).toLocaleDateString("it-IT", o);
         const minuti = (a, b) => { const [h1, m1] = a.split(":").map(Number), [h2, m2] = b.split(":").map(Number); return (h2 * 60 + m2) - (h1 * 60 + m1); };
         const durata = m => `${Math.floor(m / 60)} h${m % 60 ? " " + (m % 60) + " min" : ""}`;
-        const titolo = x => x.argomenti.join(" · ");
+        const titolo = x => x.titolo || x.argomenti.join(" · ");
         const etichetta = x => `${fmt(x.data, { day: "numeric", month: "short", year: "numeric" })} · ${titolo(x)}`;
         const badges = x => x.corsi.map(c => `<span class="badge-corso c-${c}"><span class="dot"></span>${esc(CORSI[c].nome)}</span>`).join("");
 
         /* ---------- Stato ---------- */
         const state = { aa: Object.keys(AA).sort().at(-1), corso: "all", arg: "all", q: "" };
-        const incontri = () => AA[state.aa];
+        const incontri = () => AA[state.aa] || [];
+        const compiti = () => COMPITI[state.aa] || [];
+        const conCompiti = () => state.corso === "all" || !!(CORSI[state.corso] && CORSI[state.corso].compiti);
+        const prevAA = () => Object.keys(AA).sort().reverse().find(a => a < state.aa && (AA[a].length || (COMPITI[a] || []).length));
 
         // Numero progressivo per corso (Incontro 1, 2, …): è un'informazione reale, l'ordine conta
         function numera(list) {
@@ -387,31 +399,32 @@
             });
         }
 
-        function filtrati() {
+        function corrisponde(x) {
             const q = norm(state.q.trim());
-            return incontri().filter(x =>
-                (state.corso === "all" || x.corsi.includes(state.corso)) &&
+            return (state.corso === "all" || x.corsi.includes(state.corso)) &&
                 (state.arg === "all" || x.argomenti.includes(state.arg)) &&
-                (!q || norm([...x.argomenti, fmt(x.data, { day: "numeric", month: "long" }), x.data, ...x.allegati.map(a => a.nome)].join(" ")).includes(q))
-            ).sort((a, b) => a.data.localeCompare(b.data));
+                (!q || norm([x.titolo || "", ...x.argomenti, fmt(x.data, { day: "numeric", month: "long" }), x.data, ...x.allegati.map(a => a.nome)].join(" ")).includes(q));
         }
+        const filtrati = () => incontri().filter(corrisponde).sort((a, b) => a.data.localeCompare(b.data));
+        const compitiFiltrati = () => compiti().filter(corrisponde).sort((a, b) => b.data.localeCompare(a.data));
 
         /* ---------- Rendering ---------- */
         function renderTabs() {
             document.getElementById("aaTabs").innerHTML = Object.keys(AA).sort().reverse().map(aa =>
-                `<button type="button" data-aa="${aa}" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap ${aa === state.aa ? "active-view-tab" : ""}" aria-selected="${aa === state.aa}">A.A. ${aa}<span class="tab-count">${AA[aa].length}</span></button>`
+                `<button type="button" data-aa="${aa}" class="view-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap ${aa === state.aa ? "active-view-tab" : ""}" aria-selected="${aa === state.aa}">A.A. ${aa}<span class="tab-count">${AA[aa].length + (COMPITI[aa] || []).length}</span></button>`
             ).join("");
         }
 
         function renderFiltri() {
             const list = incontri();
-            const n = c => list.filter(x => c === "all" || x.corsi.includes(c)).length;
+            const tutti = [...list, ...compiti()];
+            const n = c => tutti.filter(x => c === "all" || x.corsi.includes(c)).length;
             document.getElementById("corsoFilter").innerHTML =
                 `<button type="button" data-corso="all" aria-pressed="${state.corso === "all"}">Tutti i corsi</button>` +
                 Object.entries(CORSI).map(([k, c]) =>
                     `<button type="button" data-corso="${k}" class="c-${k}" aria-pressed="${state.corso === k}"><span class="dot"></span>${esc(c.nome)}<span class="opacity-60 tnum">${n(k)}</span></button>`).join("");
 
-            const args = [...new Set(list.filter(x => state.corso === "all" || x.corsi.includes(state.corso)).flatMap(x => x.argomenti))];
+            const args = [...new Set(tutti.filter(x => state.corso === "all" || x.corsi.includes(state.corso)).flatMap(x => x.argomenti))];
             if (state.arg !== "all" && !args.includes(state.arg)) state.arg = "all";
             document.getElementById("argFilter").innerHTML = `<option value="all">Tutti gli argomenti</option>` +
                 args.map(a => `<option value="${esc(a)}" ${a === state.arg ? "selected" : ""}>${esc(a)}</option>`).join("");
@@ -422,7 +435,8 @@
             document.getElementById("totals").innerHTML = `
                 <span class="chip">${I.cal}<span class="tnum">${vis.length}</span> incontri</span>
                 <span class="chip">${I.clock}<span class="tnum">${Math.round(ore / 60)}</span> ore</span>
-                <span class="chip">${I.doc}<span class="tnum">${app}</span> con appunti</span>`;
+                <span class="chip">${I.doc}<span class="tnum">${app}</span> con appunti</span>
+                ${conCompiti() ? `<a href="#compiti" class="chip" data-scroll-compiti>${I.doc}<span class="tnum">${compiti().filter(x => state.corso === "all" || x.corsi.includes(state.corso)).length}</span> compiti svolti</a>` : ""}`;
         }
 
         function renderCorsoInfo() {
@@ -433,10 +447,13 @@
             <section class="card card-white p-5 sm:p-6 c-${state.corso} fade-in">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="min-w-0">
-                        <span class="badge-corso"><span class="dot"></span>Ingegneria ${esc(c.nome)}</span>
+                        <span class="badge-corso"><span class="dot"></span>${esc(c.titolo)}</span>
                         <h2 class="mt-2 text-xl font-serif font-bold tracking-tight">${esc(c.insegnamento)}</h2>
                     </div>
-                    <a href="/triennale/" class="text-xs link-accent">Tutte le materie della triennale</a>
+                    <div class="flex flex-wrap gap-x-4 gap-y-1">
+                        ${c.compiti ? `<a href="#compiti" class="text-xs link-accent" data-scroll-compiti>Compiti svolti</a>` : ""}
+                        <a href="/triennale/" class="text-xs link-accent">Tutte le materie della triennale</a>
+                    </div>
                 </div>
                 ${c.obiettivi ? `
                 <details class="obiettivi mt-4 rounded-2xl bg-[var(--soft)] border border-[var(--border)]">
@@ -457,7 +474,7 @@
                 ? `<span class="act act-files">${I.doc}${x.allegati.length === 1 ? "Appunti" : x.allegati.length + " file"}</span>`
                 : `<span class="act act-disabled" title="Appunti non ancora caricati">${I.clock}In arrivo</span>`;
             return `
-            <article class="incontro fade-in" style="animation-delay:${i * 30}ms" tabindex="0" role="button" data-id="${x.data}" aria-label="Apri l'incontro del ${fmt(x.data, { day: "numeric", month: "long" })}">
+            <article class="incontro fade-in" style="animation-delay:${i * 30}ms" tabindex="0" role="button" data-id="${x.id}" aria-label="Apri l'incontro del ${fmt(x.data, { day: "numeric", month: "long" })}">
                 <div class="datebox tnum" aria-hidden="true">
                     <span class="wd">${d.toLocaleDateString("it-IT", { weekday: "short" })}</span>
                     <span class="d">${d.getDate()}</span>
@@ -472,9 +489,56 @@
                 </div>
                 <div class="inc-actions">
                     ${files}
-                    <button type="button" class="act act-ask" data-ask="${x.data}">${I.ask}Chiedi</button>
+                    <button type="button" class="act act-ask" data-ask="${x.id}">${I.ask}Chiedi</button>
                 </div>
             </article>`;
+        }
+
+        function compitoRow(x, i) {
+            const d = toDate(x.data);
+            const files = x.allegati.length
+                ? `<span class="act act-files">${I.doc}Svolgimento</span>`
+                : `<span class="act act-disabled" title="Svolgimento non ancora caricato">${I.clock}In arrivo</span>`;
+            return `
+            <article class="incontro fade-in" style="animation-delay:${i * 30}ms" tabindex="0" role="button" data-id="${x.id}" aria-label="Apri il compito del ${fmt(x.data, { day: "numeric", month: "long", year: "numeric" })}">
+                <div class="datebox tnum" aria-hidden="true">
+                    <span class="wd">${d.toLocaleDateString("it-IT", { weekday: "short" })}</span>
+                    <span class="d">${d.getDate()}</span>
+                    <span class="m">${d.toLocaleDateString("it-IT", { month: "short" })}</span>
+                </div>
+                <div class="min-w-0 flex flex-col gap-2">
+                    <h3><span class="inc-n">Appello del ${fmt(x.data, { day: "numeric", month: "long", year: "numeric" })}</span>${esc(titolo(x))}</h3>
+                    ${x.argomenti.length ? `<div class="flex flex-wrap gap-1.5">${x.argomenti.map(a => `<span class="pill-arg">${esc(a)}</span>`).join("")}</div>` : ""}
+                    <div class="flex flex-wrap gap-1.5">${state.corso === "all" ? badges(x) : ""}</div>
+                </div>
+                <div class="inc-actions">
+                    ${files}
+                    <button type="button" class="act act-ask" data-ask="${x.id}">${I.ask}Chiedi</button>
+                </div>
+            </article>`;
+        }
+
+        function renderCompiti() {
+            const box = document.getElementById("compiti");
+            box.hidden = !conCompiti();
+            if (box.hidden) return;
+            const list = compitiFiltrati();
+            const filtri = state.arg !== "all" || state.q.trim();
+            box.innerHTML = `
+                <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+                    <div class="min-w-0">
+                        <span class="eyebrow">Compiti svolti</span>
+                        <h2 class="mt-1 text-xl font-serif font-bold tracking-tight">Prove d'esame risolte</h2>
+                        <p class="mt-1 text-sm text-muted leading-relaxed max-w-xl">Tracce degli appelli di Scienza delle Costruzioni svolte passo passo, per Ingegneria Civile e Architettura.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5"><span class="badge-corso c-civile"><span class="dot"></span>Civile</span><span class="badge-corso c-architettura"><span class="dot"></span>Architettura</span></div>
+                </div>
+                ${list.length
+                    ? `<div class="flex flex-col gap-3">${list.map(compitoRow).join("")}</div>`
+                    : `<div class="rounded-2xl bg-[var(--soft)] border border-[var(--border)] p-5 text-sm text-muted">
+                           ${filtri ? "Nessun compito corrisponde ai filtri selezionati."
+                                    : `Nessun compito svolto per l'A.A. ${state.aa}. Quando ne pubblico uno, lo trovi qui con la traccia e lo svolgimento in PDF.`}
+                       </div>`}`;
         }
 
         function render() {
@@ -502,9 +566,15 @@
 
             const empty = document.getElementById("empty");
             empty.classList.toggle("hidden", list.length > 0);
+            renderCompiti();
             if (!list.length) {
                 const c = CORSI[state.corso];
-                empty.innerHTML = c && !incontri().some(x => x.corsi.includes(state.corso))
+                const prev = prevAA();
+                empty.innerHTML = !incontri().length
+                    ? `<span class="block font-serif text-lg font-bold text-[var(--text)]">Il tutorato dell'A.A. ${state.aa} non è ancora iniziato</span>
+                       <span class="block mt-1">Gli incontri compariranno qui con data, argomenti e appunti, man mano che si svolgono.</span>
+                       ${prev ? `<button type="button" class="btn-ghost inline-flex items-center gap-2 text-xs font-semibold rounded-full px-4 py-2 mt-4" data-goto-aa="${prev}">Vedi gli incontri dell'A.A. ${prev}</button>` : ""}`
+                    : c && !incontri().some(x => x.corsi.includes(state.corso))
                     ? `<span class="block font-serif text-lg font-bold text-[var(--text)]">Nessun incontro per ${esc(c.nome)} in questo anno</span>
                        <span class="block mt-1">Quando il tutorato partirà, gli incontri compariranno qui con data, argomenti e appunti.</span>`
                     : "Nessun incontro corrisponde ai filtri selezionati.";
@@ -515,7 +585,7 @@
             document.getElementById("corsiList").innerHTML = Object.entries(CORSI).map(([k, c]) => `
                 <li class="c-${k} flex items-start gap-3 rounded-2xl bg-white/70 border border-[var(--border)] px-3.5 py-2.5">
                     <span class="dot mt-1.5"></span>
-                    <span class="min-w-0 text-sm leading-snug"><b class="text-[var(--text)]">${esc(c.nome)}</b><br><span class="text-muted">${esc(c.insegnamento)}</span></span>
+                    <span class="min-w-0 text-sm leading-snug"><b class="text-[var(--text)]">${esc(c.titolo)}</b><br><span class="text-muted">${esc(c.insegnamento)}</span></span>
                 </li>`).join("");
         }
 
@@ -542,7 +612,7 @@
         function askAbout(x, file) {
             const corso = state.corso !== "all" ? state.corso : x.corsi[0];
             const label = etichetta(x) + (file ? ` · ${file}` : "");
-            const qs = `incontro=${encodeURIComponent(label)}&corso=${encodeURIComponent(CORSI[corso].nome)}`;
+            const qs = `incontro=${encodeURIComponent(label)}&corso=${encodeURIComponent(CORSI[corso].titolo)}`;
             frame.src = `${TALLY_BASE}&${qs}`;
             document.getElementById("tallyOut").href = `https://tally.so/r/${TALLY_ID}?${qs}`;
             document.getElementById("prefillName").textContent = label;
@@ -554,47 +624,48 @@
 
         /* ---------- Popup incontro + visualizzatore appunti ---------- */
         const dlg = document.getElementById("incDialog");
-        const byId = id => incontri().find(x => x.data === id);
+        const byId = id => [...incontri(), ...compiti()].find(x => x.id === id);
 
         function openIncontro(x, push = true) {
             dlg.classList.remove("wide");
-            const corsoN = state.corso !== "all" ? x.n[state.corso] : (x.corsi.length === 1 ? x.n[x.corsi[0]] : null);
+            const comp = x.tipo === "compito";
+            const corsoN = comp ? null : (state.corso !== "all" ? x.n[state.corso] : (x.corsi.length === 1 ? x.n[x.corsi[0]] : null));
             const files = x.allegati.length
                 ? x.allegati.map((a, k) => `
                     <button type="button" class="file-row" data-view="${k}">
                         <span class="file-icon">PDF</span>
                         <span class="flex-grow min-w-0">
                             <span class="block text-sm font-semibold truncate">${esc(a.nome)}</span>
-                            <span class="block text-[11px] text-muted">Appunti dell'incontro · si apre qui</span>
+                            <span class="block text-[11px] text-muted">${comp ? "Svolgimento del compito" : "Appunti dell'incontro"} · si apre qui</span>
                         </span>
                         <span class="text-xs font-semibold text-accent whitespace-nowrap">Leggi</span>
                     </button>`).join("")
                 : `<div class="info-tile flex items-center gap-3 !p-4">
                        <span class="w-9 h-9 rounded-xl grid place-items-center bg-[var(--soft)] text-accent flex-shrink-0">${svg("clock")}</span>
-                       <p class="text-sm text-muted">Gli appunti di questo incontro non sono ancora stati caricati. Se ti servono, chiedili dal modulo.</p>
+                       <p class="text-sm text-muted">${comp ? "Lo svolgimento di questo compito" : "Gli appunti di questo incontro"} non sono ancora stati caricati. Se ti servono, chiedili dal modulo.</p>
                    </div>`;
 
             document.getElementById("dlgBody").innerHTML = `
                 <div class="dlg-head px-6 pt-5 pb-5 flex items-start gap-4">
                     <div class="flex-grow min-w-0">
-                        <span class="eyebrow">${corsoN ? `Incontro ${corsoN} · ` : ""}${fmt(x.data, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
+                        <span class="eyebrow">${comp ? "Compito svolto · appello del " : ""}${corsoN ? `Incontro ${corsoN} · ` : ""}${fmt(x.data, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</span>
                         <h2 id="dlgTitle" class="mt-2 text-2xl font-serif font-bold tracking-tight leading-tight">${esc(titolo(x))}</h2>
                     </div>
                     <button type="button" class="dlg-close w-9 h-9 rounded-full grid place-items-center flex-shrink-0" data-close aria-label="Chiudi">${svg("x")}</button>
                 </div>
                 <div class="dlg-scroll px-6 py-5 space-y-6">
                     <dl class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                        <div class="info-tile"><dt>Orario</dt><dd class="tnum">${x.inizio}–${x.fine}</dd></div>
-                        <div class="info-tile"><dt>Durata</dt><dd class="tnum">${durata(minuti(x.inizio, x.fine))}</dd></div>
-                        <div class="info-tile col-span-2 sm:col-span-1"><dt>Anno accademico</dt><dd>${state.aa}</dd></div>
+                        ${comp ? "" : `<div class="info-tile"><dt>Orario</dt><dd class="tnum">${x.inizio}–${x.fine}</dd></div>
+                        <div class="info-tile"><dt>Durata</dt><dd class="tnum">${durata(minuti(x.inizio, x.fine))}</dd></div>`}
+                        <div class="info-tile ${comp ? "col-span-2 sm:col-span-3" : "col-span-2 sm:col-span-1"}"><dt>Anno accademico</dt><dd>${state.aa}</dd></div>
                         <div class="info-tile col-span-2 sm:col-span-3"><dt>Corsi di laurea</dt><dd class="flex flex-wrap gap-1.5 mt-1">${badges(x)}</dd></div>
                     </dl>
-                    <section class="space-y-3">
+                    ${x.argomenti.length ? `<section class="space-y-3">
                         <span class="eyebrow">Argomenti</span>
-                        <div class="flex flex-wrap gap-1.5">${x.argomenti.map(a => `<button type="button" class="pill-arg" data-arg="${esc(a)}" title="Mostra tutti gli incontri su questo argomento">${esc(a)}</button>`).join("")}</div>
-                    </section>
+                        <div class="flex flex-wrap gap-1.5">${x.argomenti.map(a => `<button type="button" class="pill-arg" data-arg="${esc(a)}" title="Mostra tutto il materiale su questo argomento">${esc(a)}</button>`).join("")}</div>
+                    </section>` : ""}
                     <section class="space-y-3">
-                        <span class="eyebrow">Appunti</span>
+                        <span class="eyebrow">${comp ? "Svolgimento" : "Appunti"}</span>
                         <div class="space-y-2">${files}</div>
                     </section>
                 </div>
@@ -656,27 +727,44 @@
         dlg.addEventListener("close", () => { dlg.classList.remove("wide"); history.replaceState(null, "", state.corso === "all" ? location.pathname : "#" + state.corso); });
 
         const mesiBox = document.getElementById("mesi");
-        mesiBox.addEventListener("click", e => {
+        // Incontri, compiti svolti e stato vuoto condividono gli stessi gestori
+        const onListClick = e => {
+            const go = e.target.closest("[data-goto-aa]");
+            if (go) { state.aa = go.dataset.gotoAa; state.arg = "all"; renderTabs(); render(); return; }
             const ask = e.target.closest("[data-ask]");
             if (ask) { askAbout(byId(ask.dataset.ask)); return; }
             const row = e.target.closest(".incontro");
             if (row) openIncontro(byId(row.dataset.id));
-        });
-        mesiBox.addEventListener("keydown", e => {
+        };
+        const onListKey = e => {
             const row = e.target.closest(".incontro");
             if (row && e.target === row && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); row.click(); }
+        };
+        for (const el of [mesiBox, document.getElementById("compiti"), document.getElementById("empty")]) {
+            el.addEventListener("click", onListClick);
+            el.addEventListener("keydown", onListKey);
+        }
+        document.addEventListener("click", e => {
+            const a = e.target.closest("[data-scroll-compiti]"); if (!a) return;
+            e.preventDefault();
+            document.getElementById("compiti").scrollIntoView({ behavior: "smooth", block: "start" });
         });
 
         /* Link diretti: /tutorato/#gestionale oppure /tutorato/#2026-05-14 */
         function fromHash() {
             const h = location.hash.slice(1);
             if (CORSI[h]) { state.corso = h; render(); return; }
+            // Un incontro o compito può stare in un anno accademico diverso da quello mostrato
+            const aa = Object.keys(AA).find(a => [...AA[a], ...(COMPITI[a] || [])].some(y => y.id === h));
+            if (aa) state.aa = aa;
+            renderTabs();
             const x = byId(h);
             render();
             if (x) openIncontro(x, false);
         }
 
-        Object.values(AA).forEach(numera);
+        Object.values(AA).forEach(list => { list.forEach(x => { x.tipo = "incontro"; x.id = x.data; }); numera(list); });
+        Object.values(COMPITI).forEach(list => list.forEach(x => { x.tipo = "compito"; x.id = "compito-" + x.data; }));
         renderTabs();
         renderCorsiList();
         fromHash();

@@ -119,14 +119,16 @@ Gli elenchi `TRIENNALE` / `MAGISTRALE` dentro `triennale/index.html` sono solo *
 
 ## 🧑‍🏫 Tutorato — Scienza delle Costruzioni (`/tutorato`) · anteprima
 
-Pagina per gli studenti del tutorato universitario di **Scienza delle Costruzioni** (Ingegneria Civile e Architettura, Gestionale, Ambientale). Sostituirà la pagina Notion "Tutoraggio – Principi di progettazione meccanica", ancora collegata dalla home.
+Pagina per gli studenti del tutorato universitario di **Scienza delle Costruzioni** (Ingegneria Civile, Architettura, Ingegneria Gestionale, Ingegneria Ambientale). Sostituirà la pagina Notion "Tutorato – Scienza delle Costruzioni", ancora collegata dalla home.
 
-- **Schede** per anno accademico; filtro per **corso di laurea** (un colore per corso), per argomento e ricerca.
-- Incontri raggruppati per mese, con numero progressivo per corso, orario e durata. Scegliendo un corso compaiono il nome dell'insegnamento e gli obiettivi formativi (richiudibili).
-- Il popup dell'incontro apre gli **appunti PDF in un visualizzatore interno** (da `tutorato/appunti/`), con Scarica, Nuova scheda e "Segnala questo file".
+- **Schede** per anno accademico (2026/27 e 2025/26). Un anno senza incontri mostra un avviso con il collegamento all'anno precedente.
+- Filtro per **corso di laurea** (un colore per corso), per argomento e ricerca. Scegliendo un corso compaiono il nome dell'insegnamento e, se presenti, gli obiettivi formativi (richiudibili).
+- **Incontri** raggruppati per mese, con numero progressivo per corso, orario e durata.
+- **Compiti svolti**: sezione dedicata alle prove d'esame risolte per Ingegneria Civile e Architettura, visibile con "Tutti i corsi", "Civile" o "Architettura".
+- Il popup apre gli **appunti PDF in un visualizzatore interno** (da `tutorato/appunti/`), con Scarica, Nuova scheda e "Segnala questo file".
 - **Chiedi o segnala**: modulo Tally `LZRvby` incorporato, precompilato con i campi nascosti `incontro` e `corso` (da creare nel modulo).
-- **Link diretti**: `#gestionale` (o `#civile`, `#ambientale`) filtra per corso; `#AAAA-MM-GG` apre l'incontro di quel giorno.
-- **Dati**: per ora dentro `tutorato/index.html` (A.A. 2025/26, Gestionale). Previsto: `tutorato/incontri.json` generato da Notion con un GitHub Action, che scarica anche gli allegati in `tutorato/appunti/` (i link ai file di Notion scadono dopo circa un'ora).
+- **Link diretti**: `#gestionale` (o `#civile`, `#architettura`, `#ambientale`) filtra per corso; `#AAAA-MM-GG` apre l'incontro di quel giorno, `#compito-AAAA-MM-GG` il compito svolto; `#compiti` porta alla sezione.
+- **Dati**: per ora dentro `tutorato/index.html` (A.A. 2025/26, Gestionale). La fonte è il database Notion **"Tutorato"** (proprietà Titolo, Tipo = Incontro / Compito svolto, Corso, Argomenti, Anno accademico, Data, Allegato). Previsto: `tutorato/incontri.json` generato da un GitHub Action, che scarica anche gli allegati in `tutorato/appunti/` (i link ai file di Notion scadono dopo circa un'ora).
 
 ---
 
