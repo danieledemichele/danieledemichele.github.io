@@ -138,12 +138,16 @@
            Il fondo grigio è disegnato dentro l'iframe di Calendly e non si può colorare da fuori:
            su desktop allarghiamo l'iframe di --cal-crop per lato e nascondiamo l'eccedenza. */
         .cal-frame { position: relative; overflow: hidden; flex-grow: 1; }
-        .calendly-inline-widget { min-width: 320px; height: 1000px; }
+        /* Telefono e tablet: altezza di partenza; poi lo script la adatta al contenuto reale
+           di Calendly (evento calendly.page_height), così sotto il calendario non resta spazio vuoto. */
+        .calendly-inline-widget { min-width: 320px; height: 680px; transition: height .2s ease; }
+        .calendly-inline-widget iframe { height: 100% !important; }
         @media (min-width: 1280px) {
             .cal-frame { height: var(--cal-visible); flex-grow: 0; }
+            /* Desktop: altezza fissa con ritaglio del fondo grigio (l'adattamento automatico è ignorato) */
             .cal-frame .calendly-inline-widget {
                 width: calc(100% + 2 * var(--cal-crop));
-                height: calc(var(--cal-visible) + 2 * var(--cal-crop) + 60px);
+                height: calc(var(--cal-visible) + 2 * var(--cal-crop) + 60px) !important;
                 margin: calc(-1 * var(--cal-crop)) 0 0 calc(-1 * var(--cal-crop));
             }
         }
@@ -318,7 +322,8 @@
                     <!-- hide_event_type_details / hide_gdpr_banner: rimuovono riquadro evento e banner cookie interni.
                          I parametri colore vengono applicati solo con un piano Calendly a pagamento. -->
                     <div class="calendly-inline-widget"
-                         data-url="https://calendly.com/daniele-danieledemichele/ripetizioni?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=9a3412&text_color=2c2825&background_color=ffffff"></div>
+                         data-url="https://calendly.com/daniele-danieledemichele/ripetizioni?hide_event_type_details=1&hide_gdpr_banner=1&primary_color=9a3412&text_color=2c2825&background_color=ffffff"
+                         data-resize="true"></div>
                 </div>
             </section>
         </div>
@@ -356,6 +361,19 @@
             });
             obs.observe(widget, { childList: true, subtree: true });
             setTimeout(() => { if (skeleton.isConnected) skeleton.remove(); }, 8000);
+        })();
+
+        // Telefono/tablet: adatta l'altezza del widget al contenuto di Calendly a ogni passaggio
+        // (calendario → orari → modulo), così la scheda non è più lunga del necessario.
+        (function () {
+            const widget = document.querySelector('.calendly-inline-widget');
+            const desktop = window.matchMedia('(min-width: 1280px)');
+            window.addEventListener('message', e => {
+                if (e.origin !== 'https://calendly.com' || !e.data || e.data.event !== 'calendly.page_height') return;
+                if (desktop.matches) return;
+                const px = parseInt(e.data.payload && e.data.payload.height, 10);
+                if (px > 300) widget.style.height = (px + 8) + 'px';
+            });
         })();
 
         // Conferma dopo la prenotazione (evento Calendly, disponibile anche nel piano gratuito).
