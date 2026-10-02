@@ -257,7 +257,32 @@ def main():
             f.write(embed(template, page))
 
     cities.sort(key=lambda c: (c["start"] or "", c["name"]), reverse=True)  # più recente prima
-    data = {"updated": datetime.date.today().isoformat(), "cities": cities}
+
+    # Prossimi viaggi: le città In Planning o Want to go (senza pagina città, solo scheda e globo)
+    STATI = {"In Planning": "In pianificazione", "Want to go": "Da visitare"}
+    upcoming = []
+    for pg in query_all(DESTINATIONS_DB, {"or": [{"property": "Status", "status": {"equals": s}} for s in STATI]}):
+        name = prop(pg, "Name")
+        x = EXTRA.get(name, {})
+        slug = x.get("slug", name)
+        folder = os.path.join(OUT, "prossimi", slug)
+        os.makedirs(folder, exist_ok=True)
+        cover = save_cover(pg, folder)
+        if cover and not cover.startswith("http"):
+            cover = "prossimi/" + cover
+        upcoming.append({
+            "name": name, "slug": slug, "label": x.get("label", name),
+            "country": x.get("country", ""), "flag": x.get("flag", ""), "iso": x.get("iso"),
+            "lat": x.get("lat"), "lng": x.get("lng"),
+            "status": STATI.get(prop(pg, "Status"), ""),
+            "planned": prop(pg, "Date (Planned)") or "", "nights": prop(pg, "Nights"),
+            "duration": prop(pg, "Duration") or [], "type": prop(pg, "Type") or [],
+            "season": prop(pg, "Time to Travel") or [], "budget": prop(pg, "Budget") or [],
+            "transport": prop(pg, "Transportation") or [], "cover": cover,
+        })
+    # prima quelli in pianificazione, poi per data prevista
+    upcoming.sort(key=lambda u: (u["status"] != "In pianificazione", u["planned"] or "9999", u["label"]))
+    data = {"updated": datetime.date.today().isoformat(), "cities": cities, "upcoming": upcoming}
     with open(os.path.join(OUT, "viaggi.json"), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     with open(os.path.join(OUT, "index.html"), "w", encoding="utf-8") as f:

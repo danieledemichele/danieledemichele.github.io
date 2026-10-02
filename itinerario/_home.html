@@ -120,6 +120,19 @@ main{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;
 .yearhead h4{font-family:var(--serif);font-size:19px;margin:0}
 .yearhead span{font-size:12px;color:var(--sub);white-space:nowrap}
 .yearhead::after{content:"";flex:1;height:1px;background:var(--line2)}
+.upgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.upcard{display:flex;flex-direction:column;background:var(--paper);border:1px dashed var(--line2);border-radius:20px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.upcard.flash{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.upcard .uc{height:110px;background:linear-gradient(150deg,var(--accent-bg),var(--chip)) center/cover no-repeat;display:grid;place-items:center;font-size:38px;position:relative}
+.upcard .uc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.85)}
+.upcard .ub{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.upcard h5{font-family:var(--serif);font-size:18px;font-weight:700;margin:0;line-height:1.2}
+.ustat{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:6px;background:var(--chip);color:var(--ink2)}
+.ustat.plan{background:var(--badge-bg);color:var(--badge)}
+.uchips{display:flex;flex-wrap:wrap;gap:5px}
+.uchips span{font-size:11px;font-weight:500;padding:3px 8px;border-radius:999px;background:var(--chip);color:var(--ink2)}
+.g-city.up i{background:transparent;border:2px dashed var(--pin);box-shadow:none}
+@media (max-width:520px){.upgrid{grid-template-columns:1fr}}
 .nolist{background:var(--paper);border:1px dashed var(--line2);border-radius:20px;padding:22px;text-align:center;color:var(--sub);font-size:13.5px}
 .card{display:flex;gap:18px;background:var(--paper);border:1px solid var(--line2);border-radius:24px;padding:14px;cursor:pointer;transition:border-color .15s,box-shadow .15s;text-align:left;width:100%;font:inherit;color:inherit}
 .card:hover{border-color:var(--accent);box-shadow:0 6px 20px rgba(68,64,60,.08)}
@@ -384,7 +397,20 @@ function renderCards(){
     el.addEventListener('click', e => { if(e.target.closest('[data-link]')) return; openModal(c); });
     el.addEventListener('keydown', e => { if(e.target === el && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); openModal(c); } });
   });
-  if(window.__globeFilter) window.__globeFilter(new Set([...home, ...shown].map(([c]) => c.name)));
+  const ups = DATA.upcoming || [];
+  if(ups.length){
+    box.insertAdjacentHTML('beforeend', `<section class="yeargroup" aria-label="Prossimi viaggi"><div class="yearhead"><h4>Prossimi viaggi</h4><span>${ups.length} ${ups.length === 1 ? 'meta' : 'mete'} in programma</span></div>
+      <div class="upgrid">${ups.map(u => `
+        <article class="upcard" id="up-${esc(u.slug)}">
+          <div class="uc" aria-hidden="true">${u.cover ? `<img src="${esc(u.cover)}" alt="" loading="lazy">` : (u.flag || '')}</div>
+          <div class="ub">
+            <span class="ustat${u.status === 'In pianificazione' ? ' plan' : ''}">${esc(u.status || 'In programma')}</span>
+            <h5>${u.flag || ''} ${esc(u.label)}</h5>
+            <div class="uchips">${[u.planned && new Date(u.planned).toLocaleDateString('it-IT', {month: 'long', year: 'numeric'}), u.nights && `${u.nights} notti`, ...u.duration.map(tr), ...u.season.map(tr), ...u.type.map(tr)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('')}</div>
+          </div>
+        </article>`).join('')}</div></section>`);
+  }
+  if(window.__globeFilter) window.__globeFilter(new Set([...home, ...shown].map(([c]) => c.name).concat(ups.map(u => u.name))));
 }
 
 /* ===== POPUP CITTÀ ===== */
@@ -461,7 +487,8 @@ function initGlobe(cities){
   const tip = document.getElementById('g-tip');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const RAD = Math.PI / 180;
-  const pins = cities.filter(c => c.lat != null && c.lng != null);
+  const ups = (DATA.upcoming || []).filter(u => u.lat != null && u.lng != null).map(u => ({...u, up: true, places: []}));
+  const pins = cities.filter(c => c.lat != null && c.lng != null).concat(ups);
 
   /* maschera delle terre: rosso = terra, verde = paese visitato */
   const world = JSON.parse(document.getElementById('world-data').textContent);
@@ -487,7 +514,7 @@ function initGlobe(cities){
   /* archi: dalla città in cui vivo verso ogni viaggio; senza "Based", in ordine di viaggio */
   const homeCity = pins.find(c => c.based);
   const order = [...pins].sort((a, b) => String(a.start || a.year).localeCompare(String(b.start || b.year)));
-  const pairs = homeCity ? pins.filter(c => !c.based).map(c => [homeCity, c]) : order.slice(1).map((c, i) => [order[i], c]);
+  const pairs = homeCity ? pins.filter(c => !c.based && !c.up).map(c => [homeCity, c]) : order.filter(c => !c.up).slice(1).map((c, i, a) => [order.filter(x => !x.up)[i], c]);
   const arcs = [];
   for(const [p0, p1] of pairs){
     const a = [p0.lng, p0.lat], b = [p1.lng, p1.lat];
@@ -499,7 +526,7 @@ function initGlobe(cities){
   let col = {};
   const readColors = () => {
     const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
-    col = {hi: g('--g-hi'), lo: g('--g-lo'), glow: g('--g-glow'), glow0: g('--g-glow-0'), dot: g('--g-dot'), vis: g('--g-visited'), grat: g('--g-grat'), arc: g('--g-arc'), pin: g('--pin'), home: g('--accent'), ink: g('--ink'), bg: g('--bg'), font: g('--sans')};
+    col = {hi: g('--g-hi'), lo: g('--g-lo'), glow: g('--g-glow'), glow0: g('--g-glow-0'), dot: g('--g-dot'), vis: g('--g-visited'), grat: g('--g-grat'), arc: g('--g-arc'), pin: g('--pin'), sub: g('--sub'), home: g('--accent'), ink: g('--ink'), bg: g('--bg'), font: g('--sans')};
   };
   readColors();
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
@@ -567,7 +594,7 @@ function initGlobe(cities){
       const q = project(c.lng, c.lat); c._q = q;
       if(q.z <= .05) return;
       const on = hover === c, inF = !shownSet || shownSet.has(c.name);
-      if(inF){
+      if(inF && !c.up){
         ctx.globalAlpha = (1 - pulse) * .55;
         ctx.fillStyle = col.pin; ctx.beginPath(); ctx.arc(q.x, q.y, 6 + pulse * 14, 0, 2 * Math.PI); ctx.fill();
       }
@@ -579,6 +606,10 @@ function initGlobe(cities){
         ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
         ctx.beginPath(); ctx.moveTo(q.x - 5, q.y); ctx.lineTo(q.x, q.y - 4.5); ctx.lineTo(q.x + 5, q.y); ctx.moveTo(q.x - 3.5, q.y - 1); ctx.lineTo(q.x - 3.5, q.y + 4.5); ctx.lineTo(q.x + 3.5, q.y + 4.5); ctx.lineTo(q.x + 3.5, q.y - 1);
         ctx.lineWidth = 1.8; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+      } else if(c.up){
+        /* prossimo viaggio: cerchio vuoto tratteggiato */
+        ctx.beginPath(); ctx.arc(q.x, q.y, on ? 7.5 : 6.5, 0, 2 * Math.PI); ctx.fillStyle = col.bg; ctx.fill();
+        ctx.setLineDash([3, 2.5]); ctx.lineWidth = 2.2; ctx.strokeStyle = col.pin; ctx.stroke(); ctx.setLineDash([]);
       } else {
         ctx.beginPath(); ctx.arc(q.x, q.y, on ? 7.5 : 6, 0, 2 * Math.PI); ctx.fillStyle = col.pin; ctx.fill();
         ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
@@ -586,7 +617,7 @@ function initGlobe(cities){
       const lx = q.x + (c.based ? 15 : 12);
       ctx.font = `600 ${on ? 13.5 : 12.5}px ${col.font}`;
       ctx.lineWidth = 4; ctx.strokeStyle = col.bg; ctx.lineJoin = 'round';
-      ctx.strokeText(c.label, lx, q.y + 4.5); ctx.fillStyle = col.ink; ctx.fillText(c.label, lx, q.y + 4.5);
+      ctx.strokeText(c.label, lx, q.y + 4.5); ctx.fillStyle = c.up ? col.sub : col.ink; ctx.fillText(c.label, lx, q.y + 4.5);
       ctx.globalAlpha = 1;
     });
   }
@@ -652,6 +683,17 @@ function initGlobe(cities){
   let tipFor = null;
   function showTip(c){
     if(!c._q || c._q.z <= .05){ tip.hidden = true; return; }
+    if(tipFor !== c && c.up){
+      const chips = [c.planned && new Date(c.planned).toLocaleDateString('it-IT', {month: 'long', year: 'numeric'}), c.nights && `${c.nights} notti`, ...c.duration.map(tr), ...c.season.map(tr)].filter(Boolean);
+      tip.innerHTML = `
+        <div class="th" style="${c.cover ? `background-image:url('${esc(c.cover)}')` : ''}">${c.cover ? '' : (c.flag || '')}</div>
+        <div class="bd">
+          <div><div class="nm">${c.flag || ''} ${esc(c.label)}</div><div class="sm">Prossimo viaggio · ${esc(c.status || '')}</div></div>
+          ${chips.length ? `<div class="uchips">${chips.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}
+          <div class="go">Clicca per vedere la scheda →</div>
+        </div>`;
+      tipFor = c;
+    }
     if(tipFor !== c){
       const cats = Object.keys(CATS).map(k => [k, c.places.filter(p => p.category === k).length]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]).slice(0, 3);
       const mx = Math.max(1, ...cats.map(([, n]) => n));
@@ -682,7 +724,7 @@ function initGlobe(cities){
 
   /* elenco città sotto il globo (anche per tastiera) */
   document.getElementById('g-legend').innerHTML = pins.map((c, i) =>
-    `<button type="button" class="g-city${c.based ? ' home' : ''}" data-i="${i}"><i></i>${esc(c.label)} <span>${c.based ? 'Based' : esc(c.year || '')}</span></button>`).join('');
+    `<button type="button" class="g-city${c.based ? ' home' : ''}${c.up ? ' up' : ''}" data-i="${i}"><i></i>${esc(c.label)} <span>${c.based ? 'Based' : c.up ? 'Prossimo' : esc(c.year || '')}</span></button>`).join('');
   document.querySelectorAll('.g-city').forEach(b => {
     const c = pins[+b.dataset.i];
     b.addEventListener('click', () => focusCity(c));
@@ -691,6 +733,11 @@ function initGlobe(cities){
   });
 
   function focusCity(c){
+    if(c.up){
+      const card = document.getElementById('up-' + c.slug);
+      if(card){ card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'}); card.classList.add('flash'); setTimeout(() => card.classList.remove('flash'), 1600); }
+      return;
+    }
     held = true; vel = [0, 0]; tip.hidden = true;
     const to = [-c.lng, -c.lat, 0], from = [...rot];
     to[0] = from[0] + ((((to[0] - from[0]) % 360) + 540) % 360 - 180);

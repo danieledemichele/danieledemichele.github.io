@@ -777,30 +777,6 @@ main{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;
 .stop .notes{display:block;font-size:12.5px;color:var(--sub);font-weight:400;margin-top:2px}
 .stop .type{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:5px;background:var(--chip);color:var(--ink2)}
 .stop:hover .type,.stop.on .type{background:var(--paper)}
-.stop .hchip{display:inline-flex;align-items:center;gap:4px;margin:5px 0 0 6px;font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:5px;color:var(--accent);background:var(--accent-bg)}
-.stop[aria-expanded="true"]{background:var(--chip)}
-.hist{margin:0 20px 10px 100px;padding:12px 14px;border-radius:14px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--dc,var(--accent));display:flex;flex-direction:column;gap:8px}
-.hist .hmeta{display:flex;flex-wrap:wrap;gap:6px}
-.hist .hmeta span{font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--paper);color:var(--ink2);border:1px solid var(--line)}
-.hist .hmeta span.y{color:#fff;background:var(--dc,var(--accent));border-color:transparent}
-.hist p{margin:0;font-size:13px;line-height:1.6;color:var(--ink2)}
-.hist .hsrc{font-size:11.5px;color:var(--sub)}
-.hist .hsrc a{color:var(--accent);font-weight:600;text-decoration:none}
-.hist .hsrc a:hover{text-decoration:underline}
-.draft{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a6110;background:#fdf3d8;border-radius:5px;padding:1px 6px;margin-left:auto}
-@media (max-width:520px){.hist{margin-left:20px}}
-.chrono{display:flex;flex-direction:column;gap:6px;padding-top:4px}
-.chrono .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);display:flex;align-items:center;gap:6px}
-.chrono ol{list-style:none;margin:0;padding:6px 2px 2px;display:flex;gap:0;overflow-x:auto;scrollbar-width:thin;position:relative}
-.chrono li{flex:1 0 92px;min-width:92px;position:relative;padding-top:14px}
-.chrono li::before{content:"";position:absolute;top:5px;left:0;right:0;height:2px;background:var(--line2)}
-.chrono li:first-child::before{left:50%}.chrono li:last-child::before{right:50%}
-.chrono button{font:inherit;background:none;border:0;padding:0 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;width:100%;color:inherit;text-align:center}
-.chrono button::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:50%;background:var(--paper);border:3px solid var(--dc,var(--accent))}
-.chrono b{font-family:var(--serif);font-size:14px;font-variant-numeric:tabular-nums}
-.chrono span{font-size:11px;color:var(--sub);line-height:1.25}
-.chrono button:hover span,.chrono button:focus-visible span{color:var(--ink)}
-.chrono button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
 .photos{display:flex;flex-direction:column}
 .car{position:relative;flex:1;min-height:0;background:#111;overflow:hidden}
@@ -1021,7 +997,7 @@ function drawMap(days){
     d.stops.forEach(s => {
       if(s.lat == null) return;
       const m = L.marker([s.lat, s.lng], {icon: pinIcon(s.num, color), keyboard: false, title: s.name})
-        .bindPopup(`<b>${esc(s.name)}</b><br><span style="color:#78716c">${dayLabel(d.date)} · ${esc(s.time)}${s.notes ? ' · ' + esc(s.notes) : ''}</span>${s.history ? `<div style="margin-top:6px;max-width:240px;font-size:12px;line-height:1.45"><b style="font-size:12px;color:#9a3412">${esc(s.history.period || s.history.year || '')}</b> · ${esc(firstSentence(s.history.text))}</div>` : ''}`, {maxWidth: 260})
+        .bindPopup(`<b>${esc(s.name)}</b><br><span style="color:#78716c">${dayLabel(d.date)} · ${esc(s.time)}${s.notes ? ' · ' + esc(s.notes) : ''}</span>`)
         .addTo(layer);
       m.on('click', () => highlight(s));
       markers.push({s, m, d});
@@ -1048,28 +1024,6 @@ function highlight(s, fly){
 /* scorre in orizzontale solo il contenitore, senza muovere la pagina */
 function centerX(el){ const p = el.parentElement; p.scrollLeft = el.offsetLeft - p.offsetLeft - p.clientWidth / 2 + el.offsetWidth / 2; }
 
-/* ===== STORIA ===== */
-const BOOK = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5V21h16"/></svg>';
-let histSeq = 0;
-const yearLabel = y => y < 1000 ? `${y} d.C.` : String(y);
-const firstSentence = t => { const m = String(t || '').match(/^.*?[.!?](\s|$)/); return (m ? m[0] : String(t || '')).trim(); };
-const sourceName = u => { try{ const h = new URL(u).hostname.replace(/^www\./, ''); return h.includes('wikipedia') ? 'Wikipedia' : h; }catch(e){ return 'fonte'; } };
-/* linea del tempo: i monumenti della vista in ordine di epoca */
-function chronoHtml(stops, where){
-  const hs = stops.filter(s => s.history && s.history.year != null).sort((a, b) => a.history.year - b.history.year);
-  if(hs.length < 2) return '';
-  const span = hs[hs.length - 1].history.year - hs[0].history.year;
-  return `<div class="chrono"><div class="lbl">${BOOK}${span >= 150 ? 'Oltre ' + Math.round(span / 100) + ' secoli' : span >= 100 ? 'Oltre un secolo' : span + ' anni'} di storia ${where}</div>
-    <ol>${hs.map(s => `<li><button type="button" data-name="${esc(s.name)}"><b>${esc(yearLabel(s.history.year))}</b><span>${esc(s.name)}</span></button></li>`).join('')}</ol></div>`;
-}
-document.addEventListener('click', e => {
-  const b = e.target.closest('.chrono button'); if(!b) return;
-  const li = [...document.querySelectorAll('#stops li')].find(x => x.__stop && x.__stop.name === b.dataset.name); if(!li) return;
-  const st = li.querySelector('.stop'), h = li.querySelector('.hist');
-  if(h && h.hidden){ h.hidden = false; st.setAttribute('aria-expanded', 'true'); }
-  highlight(li.__stop, true); st.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-});
-
 /* ===== GIORNO ===== */
 function select(key){
   sel = key;
@@ -1085,12 +1039,10 @@ function select(key){
       <div class="when"><i></i>${longDate(one.date)}</div>
       <h2>${esc(one.title || dayLabel(one.date))}</h2>
       <div class="chips">${[one.stops.filter(s => s.cat !== 'spostamenti').length + ' tappe', one.km && fmt(one.km) + ' km', one.steps && fmt(one.steps) + ' passi', one.temp != null && one.temp + '°C', one.photos.length && one.photos.length + ' foto'].filter(Boolean).map(c => `<span class="chip">${c}</span>`).join('')}</div>
-      ${one.lede ? `<p>${esc(one.lede)}</p>` : ''}
-      ${chronoHtml(one.stops, 'in questa giornata')}` : `
+      ${one.lede ? `<p>${esc(one.lede)}</p>` : ''}` : `
       <div class="when"><i></i>${esc(D.dates || '')}</div>
       <h2>Tutto il viaggio</h2>
-      <p>${D.days.length} giorni e ${D.days.flatMap(d => d.stops).filter(s => s.cat !== 'spostamenti').length} tappe. Scegli un giorno per seguirne il percorso sulla mappa.</p>
-      ${chronoHtml(D.days.flatMap(d => d.stops), 'in questo viaggio')}`;
+      <p>${D.days.length} giorni e ${D.days.flatMap(d => d.stops).filter(s => s.cat !== 'spostamenti').length} tappe. Scegli un giorno per seguirne il percorso sulla mappa.</p>`;
   card.innerHTML = `<div class="dayhead">${head}</div><ol class="stops" id="stops"></ol>`;
   const ol = document.getElementById('stops');
   days.forEach(d => {
@@ -1098,26 +1050,12 @@ function select(key){
     if(!d.stops.length){ const li = document.createElement('li'); li.className = 'muted'; li.style.cssText = 'padding:10px 20px;font-size:13px'; li.textContent = 'Nessuna tappa segnata.'; ol.appendChild(li); }
     d.stops.forEach(s => {
       const li = document.createElement('li');
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'stop'; b.__stop = s; li.__stop = s;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'stop'; b.__stop = s;
       b.style.setProperty('--dc', dayVar(d.i));
       b.innerHTML = `<span class="t">${esc(s.time)}</span><span class="n${s.num ? '' : ' off'}">${s.num || '·'}</span>
-        <span class="name">${esc(s.name)}${s.notes ? `<span class="notes">${esc(s.notes)}</span>` : ''}<span class="type">${TYPE_LABEL[s.cat] || ''}</span>${s.history ? `<span class="hchip">${BOOK}Storia${s.history.year ? ' · ' + esc(yearLabel(s.history.year)) : ''}</span>` : ''}</span>`;
-      li.appendChild(b);
-      if(s.history){
-        const h = document.createElement('div'); h.className = 'hist'; h.hidden = true; h.id = 'hist-' + (++histSeq);
-        h.style.setProperty('--dc', dayVar(d.i));
-        const meta = [s.history.period && `<span class="y">${esc(s.history.period)}</span>`, s.history.who && `<span>${esc(s.history.who)}</span>`].filter(Boolean).join('');
-        h.innerHTML = `${meta || s.history.draft ? `<div class="hmeta">${meta}${s.history.draft ? '<span class="draft">Bozza da verificare</span>' : ''}</div>` : ''}
-          <p>${esc(s.history.text)}</p>
-          ${s.history.source ? `<div class="hsrc">Fonte: <a href="${esc(s.history.source)}" target="_blank" rel="noopener">${esc(sourceName(s.history.source))} ↗</a></div>` : ''}`;
-        b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', h.id);
-        li.appendChild(h);
-      }
-      b.addEventListener('click', () => {
-        if(s.history){ const h = li.querySelector('.hist'), open = h.hidden; h.hidden = !open; b.setAttribute('aria-expanded', String(open)); }
-        highlight(s, true);
-      });
-      ol.appendChild(li);
+        <span class="name">${esc(s.name)}${s.notes ? `<span class="notes">${esc(s.notes)}</span>` : ''}<span class="type">${TYPE_LABEL[s.cat] || ''}</span></span>`;
+      b.addEventListener('click', () => highlight(s, true));
+      li.appendChild(b); ol.appendChild(li);
     });
   });
   drawMap(days);

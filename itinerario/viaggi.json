@@ -277,5 +277,70 @@
       ],
       "based": false
     }
+  ],
+  "upcoming": [
+    {
+      "name": "Tuscany",
+      "slug": "Toscana",
+      "label": "Toscana",
+      "country": "Italia",
+      "flag": "🇮🇹",
+      "iso": "380",
+      "lat": 43.7696,
+      "lng": 11.2558,
+      "status": "In pianificazione",
+      "planned": "",
+      "nights": 10,
+      "duration": [
+        "Two weeks"
+      ],
+      "type": [
+        "City Trip",
+        "Rural & Slow Travel"
+      ],
+      "season": [
+        "Spring"
+      ],
+      "budget": [
+        "€"
+      ],
+      "transport": [
+        "Car"
+      ],
+      "cover": ""
+    },
+    {
+      "name": "Vietnam",
+      "slug": "Vietnam",
+      "label": "Vietnam",
+      "country": "Vietnam",
+      "flag": "🇻🇳",
+      "iso": "704",
+      "lat": 16.05,
+      "lng": 108.2,
+      "status": "Da visitare",
+      "planned": "",
+      "nights": null,
+      "duration": [
+        "Two weeks"
+      ],
+      "type": [
+        "Road trip",
+        "Culture",
+        "City Trip"
+      ],
+      "season": [
+        "Winter",
+        "Spring"
+      ],
+      "budget": [
+        "€",
+        "€€"
+      ],
+      "transport": [
+        "Plane"
+      ],
+      "cover": ""
+    }
   ]
 }

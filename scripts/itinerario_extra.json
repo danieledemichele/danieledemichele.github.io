@@ -1,5 +1,5 @@
 {
-  "_nota": "Dati che Notion non contiene. Una voce per città (chiave = Name in Destinations). Le tappe, gli orari e le coordinate arrivano invece dall'Itinerary su Notion. 'poster' è l'illustrazione del popup: un file nella cartella della città (es. itinerario/Londra/poster.jpg). 'based': true indica la città in cui vivo (oppure la casella Based su Notion).",
+  "_nota": "Dati che Notion non contiene. Una voce per città (chiave = Name in Destinations). Le tappe, gli orari e le coordinate arrivano invece dall'Itinerary su Notion. 'poster' è l'illustrazione del popup: un file nella cartella della città (es. itinerario/Londra/poster.jpg). 'based': true indica la città in cui vivo (oppure la casella Based su Notion). Le voci dei prossimi viaggi (In Planning / Want to go) servono solo per nome, paese e coordinate sul globo.",
   "London": {
     "slug": "Londra",
     "label": "Londra",
@@ -97,5 +97,23 @@
     "dates": "Agosto 2026",
     "days": {},
     "poster": "poster.jpg"
+  },
+  "Vietnam": {
+    "slug": "Vietnam",
+    "label": "Vietnam",
+    "country": "Vietnam",
+    "flag": "🇻🇳",
+    "iso": "704",
+    "lat": 16.05,
+    "lng": 108.2
+  },
+  "Tuscany": {
+    "slug": "Toscana",
+    "label": "Toscana",
+    "country": "Italia",
+    "flag": "🇮🇹",
+    "iso": "380",
+    "lat": 43.7696,
+    "lng": 11.2558
   }
 }
