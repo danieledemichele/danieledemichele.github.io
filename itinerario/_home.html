@@ -96,6 +96,7 @@ main{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;
 .g-city{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);background:var(--paper);border:1px solid var(--line2);border-radius:999px;padding:6px 12px 6px 8px;cursor:pointer}
 .g-city:hover{border-color:var(--accent)}
 .g-city i{width:10px;height:10px;border-radius:50%;background:var(--pin);box-shadow:0 0 0 3px color-mix(in srgb,var(--pin) 25%,transparent)}
+.g-city.home i{background:var(--accent);border-radius:3px;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
 .g-city span{font-weight:500;color:var(--sub)}
 .globe-hint{font-size:12px;color:var(--sub);text-align:center;max-width:46ch;margin:0}
 
@@ -110,17 +111,15 @@ main{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;
 .seg button:hover{color:var(--ink)}
 .seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(28,25,23,.14)}
 .seg button[aria-pressed="true"] span{color:var(--accent)}
-.based{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--sub);padding-right:4px}
-.based svg{color:var(--accent)}
-.based select{font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);background:var(--paper);border:1px solid var(--line2);border-radius:12px;padding:7px 12px;cursor:pointer;max-width:180px}
-.seg button:focus-visible,.based select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.seg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.tb-hint{font-size:12px;color:var(--sub);padding-right:8px}
+.card.home{border-color:color-mix(in srgb,var(--accent) 45%,var(--line2));background:linear-gradient(135deg,var(--accent-bg),var(--paper) 55%)}
+.basedbadge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;background:var(--accent);padding:3px 9px;border-radius:6px}
 .yeargroup{display:flex;flex-direction:column;gap:12px}
 .yearhead{display:flex;align-items:center;gap:10px;margin-top:4px}
 .yearhead h4{font-family:var(--serif);font-size:19px;margin:0}
 .yearhead span{font-size:12px;color:var(--sub);white-space:nowrap}
 .yearhead::after{content:"";flex:1;height:1px;background:var(--line2)}
-.basedchip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--ink2);background:var(--chip);padding:3px 8px;border-radius:6px}
-.basedchip svg{color:var(--accent)}
 .nolist{background:var(--paper);border:1px dashed var(--line2);border-radius:20px;padding:22px;text-align:center;color:var(--sub);font-size:13.5px}
 .card{display:flex;gap:18px;background:var(--paper);border:1px solid var(--line2);border-radius:24px;padding:14px;cursor:pointer;transition:border-color .15s,box-shadow .15s;text-align:left;width:100%;font:inherit;color:inherit}
 .card:hover{border-color:var(--accent);box-shadow:0 6px 20px rgba(68,64,60,.08)}
@@ -234,11 +233,10 @@ footer{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:0 32px;f
     </div>
 
     <div class="cities-col">
-      <div class="cities-head"><h3>Città visitate</h3><span class="muted" id="count-label" style="font-size:12.5px"></span></div>
+      <div class="cities-head"><h3>Le mie città</h3><span class="muted" id="count-label" style="font-size:12.5px"></span></div>
       <div class="toolbar" id="toolbar">
         <div class="seg" id="f-year" role="group" aria-label="Filtra per anno"></div>
-        <label class="based" for="f-based"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Based in
-          <select id="f-based"><option value="">Ovunque</option></select></label>
+        <span class="tb-hint" id="tb-hint"></span>
       </div>
       <div id="cards" style="display:flex;flex-direction:column;gap:22px"></div>
     </div>
@@ -302,11 +300,12 @@ function coverHtml(c, cls='cover'){
 
 function render(){
   const cities = DATA.cities;
+  const trips = cities.filter(c => !c.based);
   const places = cities.flatMap(c => c.places);
-  const countries = new Set(cities.map(c => c.country).filter(Boolean));
-  const nights = cities.reduce((s,c) => s + (c.nights || 0), 0);
+  const countries = new Set(trips.map(c => c.country).filter(Boolean));
+  const nights = trips.reduce((s,c) => s + (c.nights || 0), 0);
   document.getElementById('stats').innerHTML = [
-    [cities.length, cities.length === 1 ? 'Città' : 'Città'], [countries.size, countries.size === 1 ? 'Paese' : 'Paesi'],
+    [trips.length, trips.length === 1 ? 'Viaggio' : 'Viaggi'], [countries.size, countries.size === 1 ? 'Paese visitato' : 'Paesi visitati'],
     [places.length, 'Posti visitati'], [nights, 'Notti fuori']
   ].map(([n,l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
 
@@ -332,34 +331,29 @@ function render(){
 
 /* ===== FILTRI: anno e città in cui vivevo (Based) ===== */
 const HOME_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>';
-let fYear = 'all', fBased = '';
+let fYear = 'all';
 const yearOf = c => String(c.start || c.year || '').slice(0, 4) || '—';
-const passes = c => (fYear === 'all' || yearOf(c) === fYear) && (!fBased || c.based === fBased);
+const passes = c => fYear === 'all' || yearOf(c) === fYear;
 
 function buildFilters(cities){
-  const years = [...new Set(cities.map(yearOf))].sort().reverse();
+  const trips = cities.filter(c => !c.based);
+  const years = [...new Set(trips.map(yearOf))].sort().reverse();
   const yb = document.getElementById('f-year');
-  yb.innerHTML = `<button type="button" data-y="all">Tutti <span>${cities.length}</span></button>` +
-    years.map(y => `<button type="button" data-y="${y}">${y} <span>${cities.filter(c => yearOf(c) === y).length}</span></button>`).join('');
+  yb.innerHTML = `<button type="button" data-y="all">Tutti <span>${trips.length}</span></button>` +
+    years.map(y => `<button type="button" data-y="${y}">${y} <span>${trips.filter(c => yearOf(c) === y).length}</span></button>`).join('');
   yb.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { fYear = b.dataset.y; renderCards(); }));
-  const bases = [...new Set(cities.map(c => c.based).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'it'));
-  const sel = document.getElementById('f-based');
-  sel.innerHTML = '<option value="">Ovunque</option>' + bases.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
-  sel.closest('.based').hidden = bases.length === 0;
-  sel.addEventListener('change', () => { fBased = sel.value; renderCards(); });
 }
 
 function cardHtml(c, i){
   return `
-    <article class="card" tabindex="0" role="button" data-i="${i}" aria-label="Dettagli di ${esc(c.label)}">
+    <article class="card${c.based ? ' home' : ''}" tabindex="0" role="button" data-i="${i}" aria-label="Dettagli di ${esc(c.label)}">
       ${coverHtml(c)}
       <div class="card-body">
         <div>
-          <div class="badges"><span class="badge">${esc(c.country)}</span><span class="date">${esc(c.dates || c.year || '')}</span>${c.favorite ? '<span class="date" style="color:var(--accent)">★ Preferita</span>' : ''}</div>
+          <div class="badges">${c.based ? `<span class="basedbadge">${HOME_ICON}Based</span>` : ''}<span class="badge">${esc(c.country)}</span><span class="date">${esc(c.based ? 'La città in cui vivo' : (c.dates || c.year || ''))}</span>${c.favorite && !c.based ? '<span class="date" style="color:var(--accent)">★ Preferita</span>' : ''}</div>
           <h4>${c.flag || ''} ${esc(c.label)}</h4>
           <div class="sub">${c.places.length} ${c.places.length === 1 ? 'posto visitato' : 'posti visitati'}${c.nights ? ` · ${c.nights} notti` : ''}</div>
         </div>
-        ${c.based ? `<div><span class="basedchip">${HOME_ICON}Based in ${esc(c.based)}</span></div>` : ''}
         <div class="counts">${countsOf(c).map(([k,n]) => `<span class="count c-${k}">${CATS[k]} ${n}</span>`).join('')}</div>
         <div class="actions">
           <button type="button" class="btn btn-primary" data-open="${i}">Dettagli</button>
@@ -372,20 +366,25 @@ function cardHtml(c, i){
 function renderCards(){
   const cities = DATA.cities;
   document.querySelectorAll('#f-year button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.y === fYear)));
-  const shown = cities.map((c, i) => [c, i]).filter(([c]) => passes(c));
-  document.getElementById('count-label').textContent = shown.length === cities.length ? `${cities.length} città` : `${shown.length} di ${cities.length} città`;
+  const all = cities.map((c, i) => [c, i]);
+  const home = all.filter(([c]) => c.based);
+  const trips = all.filter(([c]) => !c.based);
+  const shown = trips.filter(([c]) => passes(c));
+  document.getElementById('count-label').textContent = shown.length === trips.length ? `${trips.length} ${trips.length === 1 ? 'viaggio' : 'viaggi'}` : `${shown.length} di ${trips.length} viaggi`;
+  document.getElementById('tb-hint').textContent = fYear === 'all' ? 'Viaggi per anno' : `Viaggi del ${fYear}`;
   const years = [...new Set(shown.map(([c]) => yearOf(c)))].sort().reverse();
   const box = document.getElementById('cards');
-  box.innerHTML = shown.length ? years.map(y => {
+  const homeHtml = home.length ? `<section class="yeargroup" aria-label="La città in cui vivo"><div class="yearhead"><h4>Based</h4><span>la città in cui vivo</span></div>${home.map(([c, i]) => cardHtml(c, i)).join('')}</section>` : '';
+  box.innerHTML = homeHtml + (shown.length ? years.map(y => {
     const list = shown.filter(([c]) => yearOf(c) === y);
     return `<section class="yeargroup" aria-label="Viaggi del ${y}"><div class="yearhead"><h4>${y}</h4><span>${list.length} ${list.length === 1 ? 'viaggio' : 'viaggi'}</span></div>${list.map(([c, i]) => cardHtml(c, i)).join('')}</section>`;
-  }).join('') : '<div class="nolist">Nessun viaggio con questi filtri.</div>';
+  }).join('') : '<div class="nolist">Nessun viaggio in questo anno.</div>');
   box.querySelectorAll('.card').forEach(el => {
     const c = cities[+el.dataset.i];
     el.addEventListener('click', e => { if(e.target.closest('[data-link]')) return; openModal(c); });
     el.addEventListener('keydown', e => { if(e.target === el && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); openModal(c); } });
   });
-  if(window.__globeFilter) window.__globeFilter(new Set(shown.map(([c]) => c.name)));
+  if(window.__globeFilter) window.__globeFilter(new Set([...home, ...shown].map(([c]) => c.name)));
 }
 
 /* ===== POPUP CITTÀ ===== */
@@ -409,7 +408,7 @@ function openModal(c){
   sheet.innerHTML = `
     <button type="button" class="sheet-close" id="sheet-close" aria-label="Chiudi">×</button>
     <header class="sh-head">
-      <div class="badges"><span class="badge">${esc(c.country)}</span><span class="date">${esc(c.dates || c.year || '')}</span>${c.based ? `<span class="basedchip">${HOME_ICON}Based in ${esc(c.based)}</span>` : ''}${c.favorite ? '<span class="date" style="color:var(--accent)">★ Preferita</span>' : ''}</div>
+      <div class="badges"><span class="badge">${esc(c.country)}</span><span class="date">${esc(c.dates || c.year || '')}</span>${c.based ? `<span class="basedbadge">${HOME_ICON}Based · la città in cui vivo</span>` : ''}${c.favorite ? '<span class="date" style="color:var(--accent)">★ Preferita</span>' : ''}</div>
       <h2 id="sheet-title">${esc(c.title || c.label)}</h2>
       ${desc ? `<p>${esc(desc)}</p>` : ''}
     </header>
@@ -485,10 +484,13 @@ function initGlobe(cities){
   }
 
   /* arco tra le città nell'ordine del viaggio */
+  /* archi: dalla città in cui vivo verso ogni viaggio; senza "Based", in ordine di viaggio */
+  const homeCity = pins.find(c => c.based);
   const order = [...pins].sort((a, b) => String(a.start || a.year).localeCompare(String(b.start || b.year)));
+  const pairs = homeCity ? pins.filter(c => !c.based).map(c => [homeCity, c]) : order.slice(1).map((c, i) => [order[i], c]);
   const arcs = [];
-  for(let i = 1; i < order.length; i++){
-    const a = [order[i-1].lng, order[i-1].lat], b = [order[i].lng, order[i].lat];
+  for(const [p0, p1] of pairs){
+    const a = [p0.lng, p0.lat], b = [p1.lng, p1.lat];
     const interp = d3.geoInterpolate(a, b), lift = Math.min(.35, d3.geoDistance(a, b) * .5);
     arcs.push(d3.range(0, 1.0001, 1 / 64).map(t => [...interp(t), lift * Math.sin(Math.PI * t)]));
   }
@@ -497,7 +499,7 @@ function initGlobe(cities){
   let col = {};
   const readColors = () => {
     const cs = getComputedStyle(document.documentElement), g = n => cs.getPropertyValue(n).trim();
-    col = {hi: g('--g-hi'), lo: g('--g-lo'), glow: g('--g-glow'), glow0: g('--g-glow-0'), dot: g('--g-dot'), vis: g('--g-visited'), grat: g('--g-grat'), arc: g('--g-arc'), pin: g('--pin'), ink: g('--ink'), bg: g('--bg'), font: g('--sans')};
+    col = {hi: g('--g-hi'), lo: g('--g-lo'), glow: g('--g-glow'), glow0: g('--g-glow-0'), dot: g('--g-dot'), vis: g('--g-visited'), grat: g('--g-grat'), arc: g('--g-arc'), pin: g('--pin'), home: g('--accent'), ink: g('--ink'), bg: g('--bg'), font: g('--sans')};
   };
   readColors();
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
@@ -570,11 +572,21 @@ function initGlobe(cities){
         ctx.fillStyle = col.pin; ctx.beginPath(); ctx.arc(q.x, q.y, 6 + pulse * 14, 0, 2 * Math.PI); ctx.fill();
       }
       ctx.globalAlpha = inF ? 1 : .35;
-      ctx.beginPath(); ctx.arc(q.x, q.y, on ? 7.5 : 6, 0, 2 * Math.PI); ctx.fillStyle = col.pin; ctx.fill();
-      ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+      if(c.based){
+        /* casa: quadrato arrotondato con il tetto */
+        const r = on ? 10 : 9;
+        ctx.beginPath(); ctx.roundRect(q.x - r, q.y - r, r * 2, r * 2, 5); ctx.fillStyle = col.home; ctx.fill();
+        ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(q.x - 5, q.y); ctx.lineTo(q.x, q.y - 4.5); ctx.lineTo(q.x + 5, q.y); ctx.moveTo(q.x - 3.5, q.y - 1); ctx.lineTo(q.x - 3.5, q.y + 4.5); ctx.lineTo(q.x + 3.5, q.y + 4.5); ctx.lineTo(q.x + 3.5, q.y - 1);
+        ctx.lineWidth = 1.8; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.arc(q.x, q.y, on ? 7.5 : 6, 0, 2 * Math.PI); ctx.fillStyle = col.pin; ctx.fill();
+        ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+      }
+      const lx = q.x + (c.based ? 15 : 12);
       ctx.font = `600 ${on ? 13.5 : 12.5}px ${col.font}`;
       ctx.lineWidth = 4; ctx.strokeStyle = col.bg; ctx.lineJoin = 'round';
-      ctx.strokeText(c.label, q.x + 12, q.y + 4.5); ctx.fillStyle = col.ink; ctx.fillText(c.label, q.x + 12, q.y + 4.5);
+      ctx.strokeText(c.label, lx, q.y + 4.5); ctx.fillStyle = col.ink; ctx.fillText(c.label, lx, q.y + 4.5);
       ctx.globalAlpha = 1;
     });
   }
@@ -647,7 +659,7 @@ function initGlobe(cities){
       tip.innerHTML = `
         <div class="th" style="${c.cover ? `background-image:url('${esc(c.cover)}')` : ''}">${c.cover ? '' : (c.flag || '')}</div>
         <div class="bd">
-          <div><div class="nm">${c.flag || ''} ${esc(c.label)}</div><div class="sm">${esc(c.dates || c.year || '')}${c.based ? ` · Based in ${esc(c.based)}` : ''}</div></div>
+          <div><div class="nm">${c.flag || ''} ${esc(c.label)}</div><div class="sm">${esc(c.based ? 'Based · la città in cui vivo' : (c.dates || c.year || ''))}</div></div>
           <div class="kv">${kv.map(([v, l]) => `<div><b>${v}</b>${l}</div>`).join('')}</div>
           ${cats.length ? `<div style="display:flex;flex-direction:column;gap:4px">${cats.map(([k, n]) => `<div class="mb c-${k}"><span>${CATS[k]}</span><i style="width:${Math.round(n / mx * 100)}%"></i><b>${n}</b></div>`).join('')}</div>` : ''}
           <div class="go">Clicca per aprire →</div>
@@ -670,7 +682,7 @@ function initGlobe(cities){
 
   /* elenco città sotto il globo (anche per tastiera) */
   document.getElementById('g-legend').innerHTML = pins.map((c, i) =>
-    `<button type="button" class="g-city" data-i="${i}"><i></i>${esc(c.label)} <span>${esc(c.year || '')}</span></button>`).join('');
+    `<button type="button" class="g-city${c.based ? ' home' : ''}" data-i="${i}"><i></i>${esc(c.label)} <span>${c.based ? 'Based' : esc(c.year || '')}</span></button>`).join('');
   document.querySelectorAll('.g-city').forEach(b => {
     const c = pins[+b.dataset.i];
     b.addEventListener('click', () => focusCity(c));

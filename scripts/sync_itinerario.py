@@ -244,8 +244,8 @@ def main():
             "duration": prop(pg, "Duration") or [], "type": prop(pg, "Type") or [],
             "season": prop(pg, "Time to Travel") or [], "budget": prop(pg, "Budget") or [],
             "transport": prop(pg, "Transportation") or [], "favorite": bool(prop(pg, "Favorite")),
-            # Città in cui vivevo al momento del viaggio (proprietà "Based" in Destinations)
-            "based": prop(pg, "Based") or x.get("based", ""),
+            # Città in cui vivo (casella "Based" in Destinations, o "based": true in itinerario_extra.json)
+            "based": bool(prop(pg, "Based")) or bool(x.get("based")),
             "intro": found["intro"], "places": places,
         }
         cities.append(city)

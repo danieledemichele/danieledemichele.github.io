@@ -1,5 +1,5 @@
 {
-  "_nota": "Dati che Notion non contiene. Una voce per città (chiave = Name in Destinations). Le tappe, gli orari e le coordinate arrivano invece dall'Itinerary su Notion. 'poster' è l'illustrazione del popup: un file nella cartella della città (es. itinerario/Londra/poster.jpg).",
+  "_nota": "Dati che Notion non contiene. Una voce per città (chiave = Name in Destinations). Le tappe, gli orari e le coordinate arrivano invece dall'Itinerary su Notion. 'poster' è l'illustrazione del popup: un file nella cartella della città (es. itinerario/Londra/poster.jpg). 'based': true indica la città in cui vivo (oppure la casella Based su Notion).",
   "London": {
     "slug": "Londra",
     "label": "Londra",
@@ -88,6 +88,7 @@
     "label": "Cagliari",
     "country": "Italia",
     "flag": "🇮🇹",
+    "based": true,
     "iso": "380",
     "lat": 39.2238,
     "lng": 9.1217,

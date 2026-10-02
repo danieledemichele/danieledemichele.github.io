@@ -42,7 +42,7 @@
           "category": "locali"
         }
       ],
-      "based": ""
+      "based": true
     },
     {
       "name": "London",
@@ -275,7 +275,7 @@
           "category": "negozi"
         }
       ],
-      "based": ""
+      "based": false
     }
   ]
 }
