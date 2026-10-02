@@ -76,7 +76,21 @@ main{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;
 .g-zoom button{font:inherit;font-size:17px;width:34px;height:34px;border-radius:12px;border:1px solid var(--line2);background:color-mix(in srgb,var(--paper) 82%,transparent);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:var(--ink);cursor:pointer}
 .g-zoom button:hover{border-color:var(--accent)}
 .g-zoom button:focus-visible,.g-city:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.g-tip{position:absolute;pointer-events:none;transform:translate(-50%,calc(-100% - 14px));background:var(--ink);color:var(--bg);font-size:12px;line-height:1.35;padding:6px 10px;border-radius:10px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.g-tip{position:absolute;z-index:5;pointer-events:none;width:252px;background:var(--paper);color:var(--ink);border:1px solid var(--line2);border-radius:16px;box-shadow:0 16px 36px rgba(28,25,23,.22);overflow:hidden;font-size:12px;line-height:1.35}
+@media (prefers-reduced-motion:no-preference){.g-tip:not([hidden]){animation:tipin .16s ease-out}}
+@keyframes tipin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.g-tip .th{height:84px;background:var(--chip) center/cover no-repeat;display:grid;place-items:center;font-size:30px}
+.g-tip .bd{padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.g-tip .nm{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.15}
+.g-tip .sm{color:var(--sub);font-size:11.5px;margin-top:2px}
+.g-tip .kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.g-tip .kv div{background:var(--chip);border-radius:9px;padding:5px 8px;color:var(--sub);font-size:10.5px}
+.g-tip .kv b{display:block;font-family:var(--serif);font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.g-tip .mb{display:grid;grid-template-columns:112px minmax(0,1fr) 20px;gap:6px;align-items:center;font-size:11px;color:var(--ink2)}
+.g-tip .mb i{display:block;height:5px;border-radius:3px;background:var(--c)}
+.g-tip .mb b{text-align:right;font-variant-numeric:tabular-nums}
+.g-tip .go{font-size:11px;font-weight:600;color:var(--accent)}
+.g-city.dim{opacity:.45}
 .g-tip b{font-family:var(--serif);font-size:13.5px}
 .g-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
 .g-city{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);background:var(--paper);border:1px solid var(--line2);border-radius:999px;padding:6px 12px 6px 8px;cursor:pointer}
@@ -89,6 +103,25 @@ main{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;
 .cities-col{display:flex;flex-direction:column;gap:16px;min-width:0}
 .cities-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .cities-head h3{font-size:22px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;background:var(--panel);border:1px solid var(--line2);border-radius:18px;padding:6px}
+.seg{display:flex;gap:2px;flex-wrap:wrap}
+.seg button{font:inherit;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:13px;border:0;background:transparent;color:var(--ink2);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.seg button span{font-size:11px;color:var(--sub);font-variant-numeric:tabular-nums}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(28,25,23,.14)}
+.seg button[aria-pressed="true"] span{color:var(--accent)}
+.based{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--sub);padding-right:4px}
+.based svg{color:var(--accent)}
+.based select{font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);background:var(--paper);border:1px solid var(--line2);border-radius:12px;padding:7px 12px;cursor:pointer;max-width:180px}
+.seg button:focus-visible,.based select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.yeargroup{display:flex;flex-direction:column;gap:12px}
+.yearhead{display:flex;align-items:center;gap:10px;margin-top:4px}
+.yearhead h4{font-family:var(--serif);font-size:19px;margin:0}
+.yearhead span{font-size:12px;color:var(--sub);white-space:nowrap}
+.yearhead::after{content:"";flex:1;height:1px;background:var(--line2)}
+.basedchip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;letter-spacing:.03em;color:var(--ink2);background:var(--chip);padding:3px 8px;border-radius:6px}
+.basedchip svg{color:var(--accent)}
+.nolist{background:var(--paper);border:1px dashed var(--line2);border-radius:20px;padding:22px;text-align:center;color:var(--sub);font-size:13.5px}
 .card{display:flex;gap:18px;background:var(--paper);border:1px solid var(--line2);border-radius:24px;padding:14px;cursor:pointer;transition:border-color .15s,box-shadow .15s;text-align:left;width:100%;font:inherit;color:inherit}
 .card:hover{border-color:var(--accent);box-shadow:0 6px 20px rgba(68,64,60,.08)}
 .card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -202,7 +235,12 @@ footer{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:0 32px;f
 
     <div class="cities-col">
       <div class="cities-head"><h3>Città visitate</h3><span class="muted" id="count-label" style="font-size:12.5px"></span></div>
-      <div id="cards" style="display:flex;flex-direction:column;gap:14px"></div>
+      <div class="toolbar" id="toolbar">
+        <div class="seg" id="f-year" role="group" aria-label="Filtra per anno"></div>
+        <label class="based" for="f-based"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Based in
+          <select id="f-based"><option value="">Ovunque</option></select></label>
+      </div>
+      <div id="cards" style="display:flex;flex-direction:column;gap:22px"></div>
     </div>
   </section>
 
@@ -271,29 +309,9 @@ function render(){
     [cities.length, cities.length === 1 ? 'Città' : 'Città'], [countries.size, countries.size === 1 ? 'Paese' : 'Paesi'],
     [places.length, 'Posti visitati'], [nights, 'Notti fuori']
   ].map(([n,l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
-  document.getElementById('count-label').textContent = `${cities.length} ${cities.length === 1 ? 'città' : 'città'}`;
 
-  document.getElementById('cards').innerHTML = cities.map((c,i) => `
-    <article class="card" tabindex="0" role="button" data-i="${i}" aria-label="Dettagli di ${esc(c.label)}">
-      ${coverHtml(c)}
-      <div class="card-body">
-        <div>
-          <div class="badges"><span class="badge">${esc(c.country)}</span><span class="date">${esc(c.dates || c.year || '')}</span>${c.favorite ? '<span class="date" style="color:var(--accent)">★ Preferita</span>' : ''}</div>
-          <h4>${c.flag || ''} ${esc(c.label)}</h4>
-          <div class="sub">${c.places.length} ${c.places.length === 1 ? 'posto visitato' : 'posti visitati'}${c.nights ? ` · ${c.nights} notti` : ''}</div>
-        </div>
-        <div class="counts">${countsOf(c).map(([k,n]) => `<span class="count c-${k}">${CATS[k]} ${n}</span>`).join('')}</div>
-        <div class="actions">
-          <button type="button" class="btn btn-primary" data-open="${i}">Dettagli</button>
-          <a class="btn btn-ghost" href="${CITY_HREF(c)}" data-link>Apri l'itinerario →</a>
-        </div>
-      </div>
-    </article>`).join('');
-  document.querySelectorAll('.card').forEach(el => {
-    const c = cities[+el.dataset.i];
-    el.addEventListener('click', e => { if(e.target.closest('[data-link]')) return; openModal(c); });
-    el.addEventListener('keydown', e => { if(e.target === el && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); openModal(c); } });
-  });
+  buildFilters(cities);
+  renderCards();
 
   const sale = cities.find(c => c.sale);
   if(sale){
@@ -309,6 +327,65 @@ function render(){
   }
   const d = DATA.updated ? new Date(DATA.updated) : null;
   document.getElementById('updated').textContent = d ? 'Aggiornato il ' + d.toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'}) : '';
+}
+
+
+/* ===== FILTRI: anno e città in cui vivevo (Based) ===== */
+const HOME_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>';
+let fYear = 'all', fBased = '';
+const yearOf = c => String(c.start || c.year || '').slice(0, 4) || '—';
+const passes = c => (fYear === 'all' || yearOf(c) === fYear) && (!fBased || c.based === fBased);
+
+function buildFilters(cities){
+  const years = [...new Set(cities.map(yearOf))].sort().reverse();
+  const yb = document.getElementById('f-year');
+  yb.innerHTML = `<button type="button" data-y="all">Tutti <span>${cities.length}</span></button>` +
+    years.map(y => `<button type="button" data-y="${y}">${y} <span>${cities.filter(c => yearOf(c) === y).length}</span></button>`).join('');
+  yb.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { fYear = b.dataset.y; renderCards(); }));
+  const bases = [...new Set(cities.map(c => c.based).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'it'));
+  const sel = document.getElementById('f-based');
+  sel.innerHTML = '<option value="">Ovunque</option>' + bases.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
+  sel.closest('.based').hidden = bases.length === 0;
+  sel.addEventListener('change', () => { fBased = sel.value; renderCards(); });
+}
+
+function cardHtml(c, i){
+  return `
+    <article class="card" tabindex="0" role="button" data-i="${i}" aria-label="Dettagli di ${esc(c.label)}">
+      ${coverHtml(c)}
+      <div class="card-body">
+        <div>
+          <div class="badges"><span class="badge">${esc(c.country)}</span><span class="date">${esc(c.dates || c.year || '')}</span>${c.favorite ? '<span class="date" style="color:var(--accent)">★ Preferita</span>' : ''}</div>
+          <h4>${c.flag || ''} ${esc(c.label)}</h4>
+          <div class="sub">${c.places.length} ${c.places.length === 1 ? 'posto visitato' : 'posti visitati'}${c.nights ? ` · ${c.nights} notti` : ''}</div>
+        </div>
+        ${c.based ? `<div><span class="basedchip">${HOME_ICON}Based in ${esc(c.based)}</span></div>` : ''}
+        <div class="counts">${countsOf(c).map(([k,n]) => `<span class="count c-${k}">${CATS[k]} ${n}</span>`).join('')}</div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" data-open="${i}">Dettagli</button>
+          <a class="btn btn-ghost" href="${CITY_HREF(c)}" data-link>Apri l'itinerario →</a>
+        </div>
+      </div>
+    </article>`;
+}
+
+function renderCards(){
+  const cities = DATA.cities;
+  document.querySelectorAll('#f-year button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.y === fYear)));
+  const shown = cities.map((c, i) => [c, i]).filter(([c]) => passes(c));
+  document.getElementById('count-label').textContent = shown.length === cities.length ? `${cities.length} città` : `${shown.length} di ${cities.length} città`;
+  const years = [...new Set(shown.map(([c]) => yearOf(c)))].sort().reverse();
+  const box = document.getElementById('cards');
+  box.innerHTML = shown.length ? years.map(y => {
+    const list = shown.filter(([c]) => yearOf(c) === y);
+    return `<section class="yeargroup" aria-label="Viaggi del ${y}"><div class="yearhead"><h4>${y}</h4><span>${list.length} ${list.length === 1 ? 'viaggio' : 'viaggi'}</span></div>${list.map(([c, i]) => cardHtml(c, i)).join('')}</section>`;
+  }).join('') : '<div class="nolist">Nessun viaggio con questi filtri.</div>';
+  box.querySelectorAll('.card').forEach(el => {
+    const c = cities[+el.dataset.i];
+    el.addEventListener('click', e => { if(e.target.closest('[data-link]')) return; openModal(c); });
+    el.addEventListener('keydown', e => { if(e.target === el && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); openModal(c); } });
+  });
+  if(window.__globeFilter) window.__globeFilter(new Set(shown.map(([c]) => c.name)));
 }
 
 /* ===== POPUP CITTÀ ===== */
@@ -332,7 +409,7 @@ function openModal(c){
   sheet.innerHTML = `
     <button type="button" class="sheet-close" id="sheet-close" aria-label="Chiudi">×</button>
     <header class="sh-head">
-      <div class="badges"><span class="badge">${esc(c.country)}</span><span class="date">${esc(c.dates || c.year || '')}</span>${c.favorite ? '<span class="date" style="color:var(--accent)">★ Preferita</span>' : ''}</div>
+      <div class="badges"><span class="badge">${esc(c.country)}</span><span class="date">${esc(c.dates || c.year || '')}</span>${c.based ? `<span class="basedchip">${HOME_ICON}Based in ${esc(c.based)}</span>` : ''}${c.favorite ? '<span class="date" style="color:var(--accent)">★ Preferita</span>' : ''}</div>
       <h2 id="sheet-title">${esc(c.title || c.label)}</h2>
       ${desc ? `<p>${esc(desc)}</p>` : ''}
     </header>
@@ -427,6 +504,7 @@ function initGlobe(cities){
   new MutationObserver(readColors).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
 
   /* stato */
+  let shownSet = null, overGlobe = false;
   let W = 0, dpr = 1, rot = [-8, -38, 0], zoom = 1, vel = [0, 0], held = false, dragging = false, idleAt = 0, anim = null, hover = null, t0 = performance.now();
   const resize = () => {
     dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -486,15 +564,18 @@ function initGlobe(cities){
     pins.forEach(c => {
       const q = project(c.lng, c.lat); c._q = q;
       if(q.z <= .05) return;
-      const on = hover === c;
-      ctx.globalAlpha = (1 - pulse) * .55;
-      ctx.fillStyle = col.pin; ctx.beginPath(); ctx.arc(q.x, q.y, 6 + pulse * 14, 0, 2 * Math.PI); ctx.fill();
-      ctx.globalAlpha = 1;
+      const on = hover === c, inF = !shownSet || shownSet.has(c.name);
+      if(inF){
+        ctx.globalAlpha = (1 - pulse) * .55;
+        ctx.fillStyle = col.pin; ctx.beginPath(); ctx.arc(q.x, q.y, 6 + pulse * 14, 0, 2 * Math.PI); ctx.fill();
+      }
+      ctx.globalAlpha = inF ? 1 : .35;
       ctx.beginPath(); ctx.arc(q.x, q.y, on ? 7.5 : 6, 0, 2 * Math.PI); ctx.fillStyle = col.pin; ctx.fill();
       ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
       ctx.font = `600 ${on ? 13.5 : 12.5}px ${col.font}`;
       ctx.lineWidth = 4; ctx.strokeStyle = col.bg; ctx.lineJoin = 'round';
       ctx.strokeText(c.label, q.x + 12, q.y + 4.5); ctx.fillStyle = col.ink; ctx.fillText(c.label, q.x + 12, q.y + 4.5);
+      ctx.globalAlpha = 1;
     });
   }
 
@@ -508,8 +589,8 @@ function initGlobe(cities){
       if(Math.abs(vel[0]) + Math.abs(vel[1]) > .01){
         rot = [rot[0] + vel[0], Math.max(-80, Math.min(80, rot[1] + vel[1])), 0];
         vel = vel.map(v => v * .94);
-      } else if(!held && !reduce && now > idleAt){
-        rot = [rot[0] + .1, rot[1], 0];
+      } else if(!held && !overGlobe && now > idleAt){
+        rot = [rot[0] + (reduce ? .05 : .12), rot[1], 0];
       }
     }
     draw(now);
@@ -520,7 +601,7 @@ function initGlobe(cities){
   /* puntatore: trascinamento, pizzico, passaggio sulle città */
   const pts = new Map(); let last = null, moved = 0, pinch = null;
   const local = e => { const b = cv.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
-  const hit = ([x, y]) => pins.find(c => c._q && c._q.z > .05 && Math.hypot(c._q.x - x, c._q.y - y) < 16) || null;
+  const hit = ([x, y]) => pins.find(c => c._q && c._q.z > .05 && Math.hypot(c._q.x - x, c._q.y - y) < 24) || null;
   cv.addEventListener('pointerdown', e => {
     cv.setPointerCapture(e.pointerId); pts.set(e.pointerId, local(e));
     if(pts.size === 1){ dragging = true; last = local(e); moved = 0; vel = [0, 0]; anim = null; cv.classList.add('grabbing'); }
@@ -541,10 +622,7 @@ function initGlobe(cities){
     }
     const h = hit(p);
     if(h !== hover){ hover = h; cv.classList.toggle('over', !!h); }
-    if(h){
-      tip.innerHTML = `<b>${esc(h.label)}</b><br>${esc(h.dates || h.year || '')} · ${h.places.length} posti`;
-      tip.style.left = h._q.x + 'px'; tip.style.top = h._q.y + 'px'; tip.hidden = false;
-    } else tip.hidden = true;
+    if(h) showTip(h); else tip.hidden = true;
   });
   const end = e => {
     pts.delete(e.pointerId);
@@ -555,7 +633,35 @@ function initGlobe(cities){
     }
   };
   cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
-  cv.addEventListener('pointerleave', () => { if(!dragging){ hover = null; tip.hidden = true; cv.classList.remove('over'); } });
+  cv.addEventListener('pointerenter', () => { overGlobe = true; });
+  cv.addEventListener('pointerleave', () => { overGlobe = false; idleAt = performance.now() + 800; if(!dragging){ hover = null; tip.hidden = true; cv.classList.remove('over'); } });
+
+  /* mini scheda della città: copertina, date, numeri e categorie principali */
+  let tipFor = null;
+  function showTip(c){
+    if(!c._q || c._q.z <= .05){ tip.hidden = true; return; }
+    if(tipFor !== c){
+      const cats = Object.keys(CATS).map(k => [k, c.places.filter(p => p.category === k).length]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]).slice(0, 3);
+      const mx = Math.max(1, ...cats.map(([, n]) => n));
+      const kv = [[c.places.length, c.places.length === 1 ? 'posto' : 'posti'], c.ndays && [c.ndays, c.ndays === 1 ? 'giorno' : 'giorni'], c.nights ? [c.nights, 'notti'] : c.km && [String(c.km).replace('.', ','), 'km']].filter(Boolean);
+      tip.innerHTML = `
+        <div class="th" style="${c.cover ? `background-image:url('${esc(c.cover)}')` : ''}">${c.cover ? '' : (c.flag || '')}</div>
+        <div class="bd">
+          <div><div class="nm">${c.flag || ''} ${esc(c.label)}</div><div class="sm">${esc(c.dates || c.year || '')}${c.based ? ` · Based in ${esc(c.based)}` : ''}</div></div>
+          <div class="kv">${kv.map(([v, l]) => `<div><b>${v}</b>${l}</div>`).join('')}</div>
+          ${cats.length ? `<div style="display:flex;flex-direction:column;gap:4px">${cats.map(([k, n]) => `<div class="mb c-${k}"><span>${CATS[k]}</span><i style="width:${Math.round(n / mx * 100)}%"></i><b>${n}</b></div>`).join('')}</div>` : ''}
+          <div class="go">Clicca per aprire →</div>
+        </div>`;
+      tipFor = c;
+    }
+    tip.hidden = false;
+    const tw = tip.offsetWidth, th = tip.offsetHeight, pad = 8;
+    let x = c._q.x + 18, y = c._q.y - th / 2;
+    if(x + tw > W - pad) x = c._q.x - 18 - tw;
+    y = Math.max(pad, Math.min(W - th - pad, y));
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  window.__globeFilter = set => { shownSet = set; document.querySelectorAll('.g-city').forEach(b => b.classList.toggle('dim', !set.has(pins[+b.dataset.i].name))); };
   cv.addEventListener('wheel', e => { e.preventDefault(); zoom = Math.max(.8, Math.min(3, zoom * Math.exp(-e.deltaY * .0015))); idleAt = performance.now() + 2500; }, {passive: false});
   const zoomBy = f => { const from = zoom, to = Math.max(.8, Math.min(3, zoom * f)), s = performance.now();
     const step = n => { const k = Math.min(1, (n - s) / 220); zoom = from + (to - from) * k; if(k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
@@ -568,7 +674,8 @@ function initGlobe(cities){
   document.querySelectorAll('.g-city').forEach(b => {
     const c = pins[+b.dataset.i];
     b.addEventListener('click', () => focusCity(c));
-    b.addEventListener('mouseenter', () => { hover = c; }); b.addEventListener('mouseleave', () => { hover = null; });
+    b.addEventListener('mouseenter', () => { hover = c; overGlobe = true; showTip(c); });
+    b.addEventListener('mouseleave', () => { hover = null; overGlobe = false; idleAt = performance.now() + 800; tip.hidden = true; });
   });
 
   function focusCity(c){

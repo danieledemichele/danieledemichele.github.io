@@ -41,7 +41,8 @@
           "name": "Pizzeria Amalfi",
           "category": "locali"
         }
-      ]
+      ],
+      "based": ""
     },
     {
       "name": "London",
@@ -273,7 +274,8 @@
           "name": "Borough Market",
           "category": "negozi"
         }
-      ]
+      ],
+      "based": ""
     }
   ]
 }
