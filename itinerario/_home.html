@@ -112,7 +112,8 @@ main{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;
 .seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 3px rgba(28,25,23,.14)}
 .seg button[aria-pressed="true"] span{color:var(--accent)}
 .seg button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.tb-hint{font-size:12px;color:var(--sub);padding-right:8px}
+.seg-status{margin-left:auto}
+@media (max-width:520px){.toolbar{flex-direction:column;align-items:stretch}.seg-status{margin-left:0;border-top:1px solid var(--line2);padding-top:6px}}
 .card.home{border-color:color-mix(in srgb,var(--accent) 45%,var(--line2));background:linear-gradient(135deg,var(--accent-bg),var(--paper) 55%)}
 .basedbadge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#fff;background:var(--accent);padding:3px 9px;border-radius:6px}
 .yeargroup{display:flex;flex-direction:column;gap:12px}
@@ -249,7 +250,7 @@ footer{max-width:1300px;margin:0 auto;padding-inline:16px;padding-block:0 32px;f
       <div class="cities-head"><h3>Le mie città</h3><span class="muted" id="count-label" style="font-size:12.5px"></span></div>
       <div class="toolbar" id="toolbar">
         <div class="seg" id="f-year" role="group" aria-label="Filtra per anno"></div>
-        <span class="tb-hint" id="tb-hint"></span>
+        <div class="seg seg-status" id="f-status" role="group" aria-label="Filtra per stato"></div>
       </div>
       <div id="cards" style="display:flex;flex-direction:column;gap:22px"></div>
     </div>
@@ -302,6 +303,7 @@ async function load(){
   if(!DATA){ document.getElementById('cards').innerHTML = '<p class="muted">Non riesco a caricare i viaggi. Riprova tra poco.</p>'; return; }
   render();
   initGlobe(DATA.cities);
+  renderCards();   // applica subito il filtro anche ai segnaposto del globo
 }
 
 function countsOf(c){
@@ -322,7 +324,7 @@ function render(){
     [places.length, 'Posti visitati'], [nights, 'Notti fuori']
   ].map(([n,l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
 
-  buildFilters(cities);
+  buildFilters();
   renderCards();
 
   const sale = cities.find(c => c.sale);
@@ -342,18 +344,33 @@ function render(){
 }
 
 
-/* ===== FILTRI: anno e città in cui vivevo (Based) ===== */
+/* ===== FILTRI: stato del viaggio (a destra) e anno (a sinistra) =====
+   Si mostra un solo stato per volta, così l'elenco resta corto anche con tanti viaggi. */
 const HOME_ICON = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>';
-let fYear = 'all';
-const yearOf = c => String(c.start || c.year || '').slice(0, 4) || '—';
+const STATUSES = [['visited', 'Visitato'], ['plan', 'In pianificazione'], ['want', 'Da visitare']];
+let fStatus = 'visited', fYear = 'all';
+const statusOf = u => u.status === 'In pianificazione' ? 'plan' : 'want';
+const yearOf = c => String(c.start || c.planned || c.year || '').slice(0, 4) || '—';
+const yearLabel = y => y === '—' ? 'Senza data' : y;
 const passes = c => fYear === 'all' || yearOf(c) === fYear;
+/* elementi dello stato scelto: viaggi fatti (senza la città Based) o prossime mete */
+function itemsOf(st){
+  if(st === 'visited') return DATA.cities.filter(c => !c.based);
+  return (DATA.upcoming || []).filter(u => statusOf(u) === st);
+}
 
-function buildFilters(cities){
-  const trips = cities.filter(c => !c.based);
-  const years = [...new Set(trips.map(yearOf))].sort().reverse();
+function buildFilters(){
+  const sb = document.getElementById('f-status');
+  sb.innerHTML = STATUSES.map(([k, l]) => `<button type="button" data-s="${k}">${l} <span>${itemsOf(k).length}</span></button>`).join('');
+  sb.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { fStatus = b.dataset.s; fYear = 'all'; buildYears(); renderCards(); }));
+  buildYears();
+}
+function buildYears(){
+  const items = itemsOf(fStatus);
+  const years = [...new Set(items.map(yearOf))].sort().reverse();
   const yb = document.getElementById('f-year');
-  yb.innerHTML = `<button type="button" data-y="all">Tutti <span>${trips.length}</span></button>` +
-    years.map(y => `<button type="button" data-y="${y}">${y} <span>${trips.filter(c => yearOf(c) === y).length}</span></button>`).join('');
+  yb.innerHTML = `<button type="button" data-y="all">Tutti <span>${items.length}</span></button>` +
+    (years.length > 1 || (years.length === 1 && years[0] !== '—') ? years.map(y => `<button type="button" data-y="${y}">${yearLabel(y)} <span>${items.filter(c => yearOf(c) === y).length}</span></button>`).join('') : '');
   yb.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { fYear = b.dataset.y; renderCards(); }));
 }
 
@@ -376,41 +393,54 @@ function cardHtml(c, i){
     </article>`;
 }
 
+function upHtml(u){
+  return `
+    <article class="upcard" id="up-${esc(u.slug)}">
+      <div class="uc" aria-hidden="true">${u.cover ? `<img src="${esc(u.cover)}" alt="" loading="lazy">` : (u.flag || '')}</div>
+      <div class="ub">
+        <span class="ustat${statusOf(u) === 'plan' ? ' plan' : ''}">${esc(u.status || 'Da visitare')}</span>
+        <h5>${u.flag || ''} ${esc(u.label)}</h5>
+        <div class="uchips">${[u.planned && new Date(u.planned).toLocaleDateString('it-IT', {month: 'long', year: 'numeric'}), u.nights && `${u.nights} notti`, ...(u.duration || []).map(tr), ...(u.season || []).map(tr), ...(u.type || []).map(tr)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('')}</div>
+      </div>
+    </article>`;
+}
+
 function renderCards(){
   const cities = DATA.cities;
+  document.querySelectorAll('#f-status button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.s === fStatus)));
   document.querySelectorAll('#f-year button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.y === fYear)));
-  const all = cities.map((c, i) => [c, i]);
-  const home = all.filter(([c]) => c.based);
-  const trips = all.filter(([c]) => !c.based);
-  const shown = trips.filter(([c]) => passes(c));
-  document.getElementById('count-label').textContent = shown.length === trips.length ? `${trips.length} ${trips.length === 1 ? 'viaggio' : 'viaggi'}` : `${shown.length} di ${trips.length} viaggi`;
-  document.getElementById('tb-hint').textContent = fYear === 'all' ? 'Viaggi per anno' : `Viaggi del ${fYear}`;
-  const years = [...new Set(shown.map(([c]) => yearOf(c)))].sort().reverse();
   const box = document.getElementById('cards');
-  const homeHtml = home.length ? `<section class="yeargroup" aria-label="La città in cui vivo"><div class="yearhead"><h4>Based</h4><span>la città in cui vivo</span></div>${home.map(([c, i]) => cardHtml(c, i)).join('')}</section>` : '';
-  box.innerHTML = homeHtml + (shown.length ? years.map(y => {
-    const list = shown.filter(([c]) => yearOf(c) === y);
-    return `<section class="yeargroup" aria-label="Viaggi del ${y}"><div class="yearhead"><h4>${y}</h4><span>${list.length} ${list.length === 1 ? 'viaggio' : 'viaggi'}</span></div>${list.map(([c, i]) => cardHtml(c, i)).join('')}</section>`;
-  }).join('') : '<div class="nolist">Nessun viaggio in questo anno.</div>');
-  box.querySelectorAll('.card').forEach(el => {
-    const c = cities[+el.dataset.i];
-    el.addEventListener('click', e => { if(e.target.closest('[data-link]')) return; openModal(c); });
-    el.addEventListener('keydown', e => { if(e.target === el && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); openModal(c); } });
-  });
-  const ups = DATA.upcoming || [];
-  if(ups.length){
-    box.insertAdjacentHTML('beforeend', `<section class="yeargroup" aria-label="Prossimi viaggi"><div class="yearhead"><h4>Prossimi viaggi</h4><span>${ups.length} ${ups.length === 1 ? 'meta' : 'mete'} in programma</span></div>
-      <div class="upgrid">${ups.map(u => `
-        <article class="upcard" id="up-${esc(u.slug)}">
-          <div class="uc" aria-hidden="true">${u.cover ? `<img src="${esc(u.cover)}" alt="" loading="lazy">` : (u.flag || '')}</div>
-          <div class="ub">
-            <span class="ustat${u.status === 'In pianificazione' ? ' plan' : ''}">${esc(u.status || 'In programma')}</span>
-            <h5>${u.flag || ''} ${esc(u.label)}</h5>
-            <div class="uchips">${[u.planned && new Date(u.planned).toLocaleDateString('it-IT', {month: 'long', year: 'numeric'}), u.nights && `${u.nights} notti`, ...u.duration.map(tr), ...u.season.map(tr), ...u.type.map(tr)].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('')}</div>
-          </div>
-        </article>`).join('')}</div></section>`);
+  const home = cities.map((c, i) => [c, i]).filter(([c]) => c.based);
+  let globeNames;
+
+  if(fStatus === 'visited'){
+    const trips = cities.map((c, i) => [c, i]).filter(([c]) => !c.based);
+    const shown = trips.filter(([c]) => passes(c));
+    document.getElementById('count-label').textContent = shown.length === trips.length ? `${trips.length} ${trips.length === 1 ? 'viaggio' : 'viaggi'}` : `${shown.length} di ${trips.length} viaggi`;
+    const years = [...new Set(shown.map(([c]) => yearOf(c)))].sort().reverse();
+    const homeHtml = home.length && fYear === 'all' ? `<section class="yeargroup" aria-label="La città in cui vivo"><div class="yearhead"><h4>Based</h4><span>la città in cui vivo</span></div>${home.map(([c, i]) => cardHtml(c, i)).join('')}</section>` : '';
+    box.innerHTML = homeHtml + (shown.length ? years.map(y => {
+      const list = shown.filter(([c]) => yearOf(c) === y);
+      return `<section class="yeargroup" aria-label="Viaggi del ${y}"><div class="yearhead"><h4>${yearLabel(y)}</h4><span>${list.length} ${list.length === 1 ? 'viaggio' : 'viaggi'}</span></div>${list.map(([c, i]) => cardHtml(c, i)).join('')}</section>`;
+    }).join('') : '<div class="nolist">Nessun viaggio in questo anno.</div>');
+    box.querySelectorAll('.card').forEach(el => {
+      const c = cities[+el.dataset.i];
+      el.addEventListener('click', e => { if(e.target.closest('[data-link]')) return; openModal(c); });
+      el.addEventListener('keydown', e => { if(e.target === el && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); openModal(c); } });
+    });
+    globeNames = [...home, ...shown].map(([c]) => c.name);
+  } else {
+    const all = itemsOf(fStatus);
+    const shown = all.filter(passes);
+    const word = n => n === 1 ? 'meta' : 'mete';
+    document.getElementById('count-label').textContent = shown.length === all.length ? `${all.length} ${word(all.length)}` : `${shown.length} di ${all.length} mete`;
+    const title = fStatus === 'plan' ? 'In pianificazione' : 'Da visitare';
+    box.innerHTML = shown.length
+      ? `<section class="yeargroup" aria-label="${title}"><div class="yearhead"><h4>${title}</h4><span>${shown.length} ${word(shown.length)}</span></div><div class="upgrid">${shown.map(upHtml).join('')}</div></section>`
+      : `<div class="nolist">${fStatus === 'plan' ? 'Nessun viaggio in pianificazione al momento.' : 'Nessuna meta nella lista dei desideri.'}</div>`;
+    globeNames = home.map(([c]) => c.name).concat(shown.map(u => u.name));
   }
-  if(window.__globeFilter) window.__globeFilter(new Set([...home, ...shown].map(([c]) => c.name).concat(ups.map(u => u.name))));
+  if(window.__globeFilter) window.__globeFilter(new Set(globeNames));
 }
 
 /* ===== POPUP CITTÀ ===== */
@@ -688,7 +718,7 @@ function initGlobe(cities){
       tip.innerHTML = `
         <div class="th" style="${c.cover ? `background-image:url('${esc(c.cover)}')` : ''}">${c.cover ? '' : (c.flag || '')}</div>
         <div class="bd">
-          <div><div class="nm">${c.flag || ''} ${esc(c.label)}</div><div class="sm">Prossimo viaggio · ${esc(c.status || '')}</div></div>
+          <div><div class="nm">${c.flag || ''} ${esc(c.label)}</div><div class="sm">${esc(c.status || 'Da visitare')}</div></div>
           ${chips.length ? `<div class="uchips">${chips.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}
           <div class="go">Clicca per vedere la scheda →</div>
         </div>`;
@@ -724,7 +754,7 @@ function initGlobe(cities){
 
   /* elenco città sotto il globo (anche per tastiera) */
   document.getElementById('g-legend').innerHTML = pins.map((c, i) =>
-    `<button type="button" class="g-city${c.based ? ' home' : ''}${c.up ? ' up' : ''}" data-i="${i}"><i></i>${esc(c.label)} <span>${c.based ? 'Based' : c.up ? 'Prossimo' : esc(c.year || '')}</span></button>`).join('');
+    `<button type="button" class="g-city${c.based ? ' home' : ''}${c.up ? ' up' : ''}" data-i="${i}"><i></i>${esc(c.label)} <span>${c.based ? 'Based' : c.up ? esc(c.status || 'Da visitare') : esc(c.year || '')}</span></button>`).join('');
   document.querySelectorAll('.g-city').forEach(b => {
     const c = pins[+b.dataset.i];
     b.addEventListener('click', () => focusCity(c));
@@ -734,6 +764,9 @@ function initGlobe(cities){
 
   function focusCity(c){
     if(c.up){
+      /* la scheda è visibile solo nel suo stato: se serve cambia filtro */
+      const st = statusOf(c);
+      if(fStatus !== st || !passes(c)){ fStatus = st; fYear = 'all'; buildYears(); renderCards(); }
       const card = document.getElementById('up-' + c.slug);
       if(card){ card.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'center'}); card.classList.add('flash'); setTimeout(() => card.classList.remove('flash'), 1600); }
       return;

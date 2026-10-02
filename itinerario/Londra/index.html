@@ -849,8 +849,9 @@ main{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;
 /* ===== CONFIGURAZIONE ===== */
 const STRIPE_URL = 'https://buy.stripe.com/INCOLLA_QUI_IL_TUO_LINK';
 const PRICE = '';
-const TILES = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-const TILES_ATTR = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © <a href="https://carto.com/attributions">CARTO</a>';
+/* Sfondo della mappa: OpenStreetMap standard (CARTO ora chiede una chiave API). */
+const TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const TILES_ATTR = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 const TYPE_LABEL = {locali:'Locale', luoghi:'Luogo', musei:'Museo', parchi:'Parco', negozi:'Shopping', esperienze:'Esperienza', spostamenti:'Spostamento'};
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -975,7 +976,7 @@ function drawChart(days){
 function initMap(){
   if(typeof L === 'undefined') return;
   map = L.map('map', {scrollWheelZoom: false, zoomControl: true});
-  const tl = L.tileLayer(TILES, {attribution: TILES_ATTR, maxZoom: 19, subdomains: 'abcd'}).addTo(map);
+  const tl = L.tileLayer(TILES, {attribution: TILES_ATTR, maxZoom: 19}).addTo(map);
   let errs = 0;
   tl.on('tileerror', () => { if(++errs > 3) document.getElementById('mapnote').hidden = false; });
   tl.on('tileload', () => { errs = 0; document.getElementById('mapnote').hidden = true; });
