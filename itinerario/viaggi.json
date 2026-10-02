@@ -1,0 +1,279 @@
+{
+  "updated": "2026-10-02",
+  "cities": [
+    {
+      "name": "Cagliari",
+      "slug": "Cagliari",
+      "label": "Cagliari",
+      "country": "Italia",
+      "flag": "🇮🇹",
+      "iso": "380",
+      "lat": 39.2238,
+      "lng": 9.1217,
+      "year": 2026,
+      "dates": "Agosto 2026",
+      "title": "Cagliari",
+      "lede": "",
+      "cover": "",
+      "sale": false,
+      "nights": null,
+      "duration": [
+        "Weekend"
+      ],
+      "type": [],
+      "season": [
+        "Summer"
+      ],
+      "budget": [],
+      "transport": [],
+      "favorite": true,
+      "intro": {
+        "storia": "C'è un punto, affacciato sul golfo, dove il tempo sembra essersi depositato in strati visibili: è Cagliari. Tutto comincia con i Fenici, che intorno all'VIII secolo a.C. fondano Karali.",
+        "paesaggio": "Dal Castello lo sguardo scivola verso il golfo degli Angeli, il Poetto e la Sella del Diavolo; alle spalle, gli stagni di Molentargius e Santa Gilla con i fenicotteri rosa.",
+        "monumenti": "Le torri dell'Elefante e di San Pancrazio, il Bastione di Saint Remy, la Cattedrale di Santa Maria, San Saturnino e il Santuario di Bonaria."
+      },
+      "places": [
+        {
+          "name": "Pizzeria Amalfi",
+          "category": "locali"
+        }
+      ],
+      "start": "2026-08-05",
+      "poster": "Cagliari/poster.jpg",
+      "ndays": 1,
+      "km": null
+    },
+    {
+      "name": "London",
+      "slug": "Londra",
+      "label": "Londra",
+      "country": "Regno Unito",
+      "flag": "🇬🇧",
+      "iso": "826",
+      "lat": 51.5074,
+      "lng": -0.1278,
+      "year": 2026,
+      "dates": "25–30 aprile 2026",
+      "title": "Londra, di casa in casa",
+      "lede": "Sei giorni con base in zona Wood Green. Da lì, in metro ogni giorno verso un quartiere diverso: i graffiti di Shoreditch, i grattacieli della City, una gita a Oxford, il canale di Camden e Westminster, Mayfair e i parchi reali.",
+      "cover": "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/45.jpg",
+      "sale": true,
+      "nights": 5,
+      "duration": [
+        "One week"
+      ],
+      "type": [
+        "City Trip"
+      ],
+      "season": [
+        "Spring"
+      ],
+      "budget": [
+        "€"
+      ],
+      "transport": [
+        "Plane"
+      ],
+      "favorite": true,
+      "intro": {},
+      "places": [
+        {
+          "name": "Old Street: Bezier Apartments e Montcalm East",
+          "category": "luoghi"
+        },
+        {
+          "name": "The Brush, Old St",
+          "category": "luoghi"
+        },
+        {
+          "name": "Nobu Hotel London",
+          "category": "luoghi"
+        },
+        {
+          "name": "Street art a New Inn Yard",
+          "category": "luoghi"
+        },
+        {
+          "name": "Murale a 30 Bethnal Green Rd",
+          "category": "luoghi"
+        },
+        {
+          "name": "Pizzeria 081",
+          "category": "locali"
+        },
+        {
+          "name": "Chinatown",
+          "category": "luoghi"
+        },
+        {
+          "name": "Piccadilly Circus di sera",
+          "category": "luoghi"
+        },
+        {
+          "name": "22 Bishopsgate",
+          "category": "luoghi"
+        },
+        {
+          "name": "Sky Garden",
+          "category": "luoghi"
+        },
+        {
+          "name": "The Gherkin",
+          "category": "luoghi"
+        },
+        {
+          "name": "Passeggiata tra King William St e Gracechurch St",
+          "category": "luoghi"
+        },
+        {
+          "name": "London Bridge",
+          "category": "luoghi"
+        },
+        {
+          "name": "Saïd Business School",
+          "category": "luoghi"
+        },
+        {
+          "name": "New Theatre Oxford",
+          "category": "luoghi"
+        },
+        {
+          "name": "St Michael at the North Gate",
+          "category": "luoghi"
+        },
+        {
+          "name": "Santander Work Café",
+          "category": "locali"
+        },
+        {
+          "name": "Oxford Castle",
+          "category": "luoghi"
+        },
+        {
+          "name": "Nef Istanbul",
+          "category": "locali"
+        },
+        {
+          "name": "Magdalen Bridge",
+          "category": "luoghi"
+        },
+        {
+          "name": "Oxford Botanic Garden",
+          "category": "parchi"
+        },
+        {
+          "name": "High Street e Queen's College",
+          "category": "luoghi"
+        },
+        {
+          "name": "Radcliffe Camera",
+          "category": "luoghi"
+        },
+        {
+          "name": "Bodleian Library",
+          "category": "luoghi"
+        },
+        {
+          "name": "Weston Library",
+          "category": "luoghi"
+        },
+        {
+          "name": "Trinity College",
+          "category": "luoghi"
+        },
+        {
+          "name": "Itsu, Cornmarket St",
+          "category": "locali"
+        },
+        {
+          "name": "Camden High St",
+          "category": "negozi"
+        },
+        {
+          "name": "Regent's Canal",
+          "category": "luoghi"
+        },
+        {
+          "name": "Trafalgar Square e Nelson's Column",
+          "category": "luoghi"
+        },
+        {
+          "name": "The National Gallery",
+          "category": "musei"
+        },
+        {
+          "name": "St Martin-in-the-Fields",
+          "category": "luoghi"
+        },
+        {
+          "name": "Caffè Nero",
+          "category": "locali"
+        },
+        {
+          "name": "Northumberland Ave verso il Tamigi",
+          "category": "luoghi"
+        },
+        {
+          "name": "Hungerford Bridge e Golden Jubilee Bridges",
+          "category": "luoghi"
+        },
+        {
+          "name": "Jubilee Gardens e The Queen's Walk",
+          "category": "parchi"
+        },
+        {
+          "name": "London Eye",
+          "category": "luoghi"
+        },
+        {
+          "name": "Westminster Bridge e Big Ben",
+          "category": "luoghi"
+        },
+        {
+          "name": "Nike Town, Oxford Circus",
+          "category": "negozi"
+        },
+        {
+          "name": "Oxford Street",
+          "category": "negozi"
+        },
+        {
+          "name": "Disney Store",
+          "category": "negozi"
+        },
+        {
+          "name": "Mercato di Mayfair",
+          "category": "negozi"
+        },
+        {
+          "name": "Itsu, Oxford Street",
+          "category": "locali"
+        },
+        {
+          "name": "Hyde Park",
+          "category": "parchi"
+        },
+        {
+          "name": "Wellington Arch",
+          "category": "luoghi"
+        },
+        {
+          "name": "Green Park",
+          "category": "parchi"
+        },
+        {
+          "name": "Buckingham Palace e Queen Victoria Memorial",
+          "category": "luoghi"
+        },
+        {
+          "name": "Borough Market",
+          "category": "negozi"
+        }
+      ],
+      "start": "2026-04-25",
+      "poster": "Londra/poster.jpg",
+      "ndays": 6,
+      "km": 60.8
+    }
+  ]
+}

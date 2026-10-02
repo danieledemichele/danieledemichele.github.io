@@ -1,0 +1,70 @@
+name: Aggiorna itinerari da Notion
+
+on:
+  schedule:
+    - cron: "52 2 * * *"      # ogni notte alle 02:52 UTC, dopo materie e tutorato
+  workflow_dispatch:           # pulsante "Run workflow" nella scheda Actions
+  push:                        # e subito dopo ogni modifica allo script, alla configurazione o ai modelli
+    branches: [main]
+    paths:
+      - scripts/sync_itinerario.py
+      - scripts/itinerario_extra.json
+      - itinerario/_home.html
+      - itinerario/_citta.html
+      - .github/workflows/sync-itinerario.yml
+
+permissions:
+  contents: write
+
+# Stesso gruppo delle altre sincronizzazioni Notion: non scrivono mai insieme.
+concurrency:
+  group: sync-notion
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Leggi il Travel Planner e rigenera le pagine di /itinerario
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        run: python scripts/sync_itinerario.py
+
+      - name: Salva le modifiche (solo se qualcosa è cambiato)
+        run: |
+          if [ -z "$(git status --porcelain -- itinerario)" ]; then
+            echo "Nessuna modifica da Notion."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898341+github-actions[bot]@users.noreply.github.com"
+          mkdir -p "$RUNNER_TEMP/itinerario"
+          cp -r itinerario/. "$RUNNER_TEMP/itinerario/"
+          # Se nel frattempo qualcuno ha modificato il repo, riparte dall'ultima versione e riprova.
+          for tentativo in 1 2 3; do
+            git fetch --quiet origin "$GITHUB_REF_NAME"
+            git reset --quiet --hard "origin/$GITHUB_REF_NAME"
+            cp -r "$RUNNER_TEMP/itinerario/." itinerario/
+            if [ -z "$(git status --porcelain -- itinerario)" ]; then
+              echo "Il repo è già aggiornato."
+              exit 0
+            fi
+            git add -A -- itinerario
+            git commit --quiet -m "Itinerari: aggiornamento automatico da Notion"
+            if git push --quiet origin "HEAD:$GITHUB_REF_NAME"; then
+              echo "Itinerari aggiornati."
+              exit 0
+            fi
+            echo "Push rifiutato (repo cambiato nel frattempo), tentativo $tentativo di 3…"
+            sleep $((tentativo * 5))
+          done
+          exit 1

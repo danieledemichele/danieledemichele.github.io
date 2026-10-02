@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Itinerario</title>
+<link rel="icon" href="/itinerario/favicon-itinerario.svg" type="image/svg+xml">
+<link rel="icon" href="/itinerario/favicon-itinerario.ico" sizes="any">
+<link rel="icon" href="/itinerario/favicon-itinerario-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/itinerario/favicon-itinerario-16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" href="/itinerario/apple-touch-icon-itinerario.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+</style>
+<style>
+/* Layout: sistema della Libreria — intestazione, pannello statistiche, selettore giorni, poi mappa | card del giorno | foto */
+:root{
+  --bg:#fbf8f3; --panel:#f4efe6; --paper:#ffffff; --ink:#2c2825; --ink2:#44403c; --sub:#78716c;
+  --line:#e7e5e4; --line2:#d6d3d1; --accent:#9a3412; --accent-h:#802a0e; --accent-bg:#fff1e6;
+  --badge:#115e59; --badge-bg:#ccfbf1; --chip:#f5f5f4;
+  --d1:#B2434A; --d2:#7A4FB5; --d3:#B7801A; --d4:#2A7BC0; --d5:#3B8C55; --d6:#57534e; --d7:#9a3412;
+  --serif:'Playfair Display',Georgia,'Times New Roman',serif;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1a1817; --panel:#24211f; --paper:#2a2725; --ink:#f0ebe4; --ink2:#d6d0c8; --sub:#a8a29e;
+  --line:#3a3633; --line2:#4a4542; --accent:#e0855a; --accent-h:#ec9a73; --accent-bg:#3a2a22;
+  --badge:#99f6e4; --badge-bg:#134e4a; --chip:#33302d;
+  --d1:#C95A63; --d2:#9373CF; --d3:#BF8A2C; --d4:#478CCB; --d5:#4B9A64; --d6:#a8a29e; --d7:#e0855a;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1a1817; --panel:#24211f; --paper:#2a2725; --ink:#f0ebe4; --ink2:#d6d0c8; --sub:#a8a29e;
+  --line:#3a3633; --line2:#4a4542; --accent:#e0855a; --accent-h:#ec9a73; --accent-bg:#3a2a22;
+  --badge:#99f6e4; --badge-bg:#134e4a; --chip:#33302d;
+  --d1:#C95A63; --d2:#9373CF; --d3:#BF8A2C; --d4:#478CCB; --d5:#4B9A64; --d6:#a8a29e; --d7:#e0855a;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:700;margin:0;text-wrap:balance;letter-spacing:-.01em}
+.muted{color:var(--sub)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+
+.topbar{border-bottom:1px solid var(--line);padding-inline:16px}
+.topbar-in{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:14px;padding-block:12px}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;padding:6px 10px;border-radius:10px;border:1px solid var(--line2)}
+.back:hover{border-color:var(--accent)}
+.back:focus-visible,.btn:focus-visible,.stop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.crumb{font-size:12.5px;color:var(--sub)}
+
+main{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;display:flex;flex-direction:column;gap:22px}
+.hero h1{font-size:clamp(28px,4.5vw,40px);line-height:1.1;margin-top:6px}
+.hero p{margin:8px 0 0;max-width:70ch;color:var(--ink2);font-size:14.5px}
+
+/* statistiche */
+.statsbox{background:var(--panel);border:1px solid var(--line2);border-radius:24px;padding:18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:stretch}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.tile b{display:block;font-family:var(--serif);font-size:24px;line-height:1.15;font-variant-numeric:tabular-nums}
+.tile span{font-size:11.5px;color:var(--sub);font-weight:500}
+.chartbox{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0;position:relative}
+.chartbox h4{font-family:var(--sans);font-size:12px;font-weight:600;color:var(--ink2)}
+.chartbox svg{width:100%;height:150px;display:block;overflow:visible}
+.ax{font-size:10.5px;fill:var(--sub);font-family:var(--sans)}
+.val{font-size:10.5px;fill:var(--ink2);font-weight:600;font-family:var(--sans);font-variant-numeric:tabular-nums}
+.gridl{stroke:var(--line);stroke-width:1}
+.kbar{cursor:pointer}
+.kbar.dim{opacity:.3}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:11.5px;padding:5px 8px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-110%)}
+@media (max-width:900px){.statsbox{grid-template-columns:1fr}}
+@media (max-width:420px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* scheda unica: viste per giorno in alto, poi mappa | itinerario | foto */
+.trip{background:var(--paper);border:1px solid var(--line2);border-radius:24px;overflow:hidden;box-shadow:0 1px 2px rgba(28,25,23,.04),0 12px 32px rgba(28,25,23,.05)}
+.tabs{display:flex;gap:8px;overflow-x:auto;background:var(--panel);border-bottom:1px solid var(--line);padding:12px;scrollbar-width:thin}
+.tab{flex-shrink:0;font:inherit;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 16px 9px;border:1px solid var(--line2);border-radius:14px;background:var(--paper);color:var(--sub);cursor:pointer;text-align:left;box-shadow:0 1px 2px rgba(28,25,23,.05);transition:border-color .15s,background .15s,transform .15s}
+.tab small{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.tab small i{width:7px;height:7px;border-radius:50%;background:var(--dc,var(--accent))}
+.tab span{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap}
+.tab:hover{border-color:var(--dc,var(--accent))}
+@media (prefers-reduced-motion:no-preference){.tab:hover{transform:translateY(-1px)}}
+.tab[aria-selected="true"]{background:var(--dc,var(--accent));border-color:var(--dc,var(--accent));box-shadow:0 4px 12px color-mix(in srgb,var(--dc,var(--accent)) 35%,transparent)}
+.tab[aria-selected="true"] small,.tab[aria-selected="true"] span{color:#fff}
+.tab[aria-selected="true"] small i{background:#fff}
+.tab:focus-visible,.thumbs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tripbody{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,.85fr);height:min(76vh,660px);min-height:520px}
+.tripbody > *{min-width:0;min-height:0}
+
+.mapwrap{position:relative;border-right:1px solid var(--line)}
+#map{width:100%;height:100%;background:var(--chip)}
+.mapnote{position:absolute;left:12px;bottom:12px;z-index:500;font-size:11.5px;background:var(--paper);color:var(--sub);border:1px solid var(--line2);border-radius:8px;padding:4px 8px}
+.pin{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700;font-family:var(--sans);border:2px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.35)}
+.pin.hl{transform:scale(1.3);box-shadow:0 0 0 4px rgba(0,0,0,.18)}
+.leaflet-popup-content{font-family:var(--sans);font-size:13px;margin:10px 12px}
+.leaflet-popup-content b{font-family:var(--serif);font-size:14.5px}
+.leaflet-container a.leaflet-popup-close-button{color:#78716c}
+
+.daycard{display:flex;flex-direction:column;border-right:1px solid var(--line)}
+.dayhead{padding:18px 20px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.dayhead h2{font-size:23px}
+.dayhead .when{font-size:12px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:7px}
+.dayhead .when i{width:8px;height:8px;border-radius:50%;background:var(--dc,var(--accent))}
+.dayhead p{margin:0;font-size:13.5px;color:var(--ink2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--ink2);font-variant-numeric:tabular-nums}
+.stops{list-style:none;margin:0;padding:6px 0;flex:1;overflow-y:auto;min-height:0}
+.daysep{padding:12px 20px 4px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--dc)}
+.stop{display:grid;grid-template-columns:44px 26px minmax(0,1fr);gap:10px;align-items:start;padding:9px 20px;cursor:pointer;border:0;background:none;width:100%;text-align:left;font:inherit;color:inherit}
+.stop:hover,.stop.on{background:var(--chip)}
+.stop .t{font-size:12.5px;color:var(--sub);font-variant-numeric:tabular-nums;padding-top:3px}
+.stop .n{width:22px;height:22px;border-radius:50%;background:var(--dc);color:#fff;font-size:10.5px;font-weight:700;display:grid;place-items:center;margin-top:1px}
+.stop .n.off{background:transparent;border:2px dashed var(--line2);color:var(--sub)}
+.stop .name{font-size:14px;font-weight:600;line-height:1.35}
+.stop .notes{display:block;font-size:12.5px;color:var(--sub);font-weight:400;margin-top:2px}
+.stop .type{display:inline-block;margin-top:5px;font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:5px;background:var(--chip);color:var(--ink2)}
+.stop:hover .type,.stop.on .type{background:var(--paper)}
+
+.photos{display:flex;flex-direction:column}
+.car{position:relative;flex:1;min-height:0;background:#111;overflow:hidden}
+.car-track{display:flex;height:100%;transition:transform .35s ease}
+.car-slide{flex:0 0 100%;height:100%}
+.car-slide img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.car-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.42);color:#fff;border:0;cursor:pointer;font-size:18px;display:grid;place-items:center;backdrop-filter:blur(4px)}
+.car-arrow:hover{background:rgba(0,0,0,.62)}
+.car-arrow:focus-visible{outline:2px solid #fff}
+.car-prev{left:10px}.car-next{right:10px}
+.car-count{position:absolute;top:10px;left:10px;font-size:12px;color:#fff;background:rgba(0,0,0,.45);padding:3px 10px;border-radius:10px;font-variant-numeric:tabular-nums}
+.thumbs{display:flex;gap:6px;overflow-x:auto;padding:8px;border-top:1px solid var(--line);scrollbar-width:thin}
+.thumbs button{flex:0 0 50px;height:50px;padding:0;border:2px solid transparent;border-radius:9px;overflow:hidden;cursor:pointer;background:var(--chip);opacity:.6}
+.thumbs button[aria-current="true"]{border-color:var(--dc,var(--accent));opacity:1}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.nophotos{flex:1;display:grid;place-items:center;text-align:center;padding:20px;color:var(--sub);font-size:13px;background:var(--chip)}
+@media (prefers-reduced-motion:reduce){.car-track{transition:none}}
+
+@media (max-width:1100px){.tripbody{grid-template-columns:minmax(0,1fr) minmax(0,1fr);height:auto;min-height:0}.mapwrap{grid-column:1 / -1;height:400px;border-right:0;border-bottom:1px solid var(--line)}.daycard,.photos{height:560px}}
+@media (max-width:700px){.tripbody{grid-template-columns:1fr}.mapwrap{height:340px}.daycard{height:auto;border-right:0;border-bottom:1px solid var(--line)}.stops{overflow:visible}.photos{height:auto}.car{flex:none;aspect-ratio:4/3}.nophotos{min-height:200px}}
+
+/* acquisto */
+.offer{background:var(--panel);border:1px solid var(--line2);border-radius:24px;padding:22px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.offer h3{font-size:21px;margin-top:4px}
+.offer p{margin:4px 0 0;font-size:13.5px;color:var(--ink2);max-width:60ch}
+.btn{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:600;padding:10px 16px;border-radius:12px;text-decoration:none;background:var(--accent);color:#fff}
+.btn:hover{background:var(--accent-h)}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:2000;background:rgba(10,10,12,.92);display:flex;align-items:center;justify-content:center}
+.lb img{max-width:92vw;max-height:86vh;object-fit:contain;border-radius:6px}
+.lb button{position:absolute;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;border:0;font-size:22px;cursor:pointer;display:grid;place-items:center}
+.lb button:hover{background:rgba(255,255,255,.26)}
+.lb .x{top:calc(16px + env(safe-area-inset-top,0px));right:16px}.lb .p{left:14px;top:50%;transform:translateY(-50%)}.lb .nx{right:14px;top:50%;transform:translateY(-50%)}
+.lb .c{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;color:rgba(255,255,255,.8);font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-in">
+  <a class="back" id="back" href="../">← I miei viaggi</a>
+  <span class="crumb" id="crumb"></span>
+</div></div>
+
+<main>
+  <section class="hero" id="hero"></section>
+  <section class="statsbox" id="statsbox" aria-label="Statistiche del viaggio"></section>
+  <section class="trip" aria-label="Itinerario del viaggio">
+    <div class="tabs" id="days" role="tablist" aria-label="Viste del viaggio"></div>
+    <div class="tripbody" id="tripbody">
+      <div class="mapwrap"><div id="map" role="region" aria-label="Mappa delle tappe"></div><div class="mapnote" id="mapnote" hidden>Sfondo della mappa non disponibile</div></div>
+      <div class="daycard" id="daycard" role="tabpanel"></div>
+      <div class="photos" id="photos"></div>
+    </div>
+  </section>
+  <section id="offer"></section>
+</main>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Foto">
+  <button type="button" class="x" id="lb-x" aria-label="Chiudi">×</button>
+  <button type="button" class="p" id="lb-p" aria-label="Foto precedente">‹</button>
+  <img id="lb-img" alt="">
+  <button type="button" class="nx" id="lb-n" aria-label="Foto successiva">›</button>
+  <div class="c" id="lb-c"></div>
+</div>
+
+<script id="page-data" type="application/json">{"name": "London", "slug": "Londra", "label": "Londra", "country": "Regno Unito", "flag": "🇬🇧", "iso": "826", "lat": 51.5074, "lng": -0.1278, "year": 2026, "dates": "25–30 aprile 2026", "title": "Londra, di casa in casa", "lede": "Sei giorni con base in zona Wood Green. Da lì, in metro ogni giorno verso un quartiere diverso: i graffiti di Shoreditch, i grattacieli della City, una gita a Oxford, il canale di Camden e Westminster, Mayfair e i parchi reali.", "cover": "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/45.jpg", "sale": true, "nights": 5, "duration": ["One week"], "type": ["City Trip"], "season": ["Spring"], "budget": ["€"], "transport": ["Plane"], "favorite": true, "intro": {}, "places": [{"name": "Old Street: Bezier Apartments e Montcalm East", "category": "luoghi"}, {"name": "The Brush, Old St", "category": "luoghi"}, {"name": "Nobu Hotel London", "category": "luoghi"}, {"name": "Street art a New Inn Yard", "category": "luoghi"}, {"name": "Murale a 30 Bethnal Green Rd", "category": "luoghi"}, {"name": "Pizzeria 081", "category": "locali"}, {"name": "Chinatown", "category": "luoghi"}, {"name": "Piccadilly Circus di sera", "category": "luoghi"}, {"name": "22 Bishopsgate", "category": "luoghi"}, {"name": "Sky Garden", "category": "luoghi"}, {"name": "The Gherkin", "category": "luoghi"}, {"name": "Passeggiata tra King William St e Gracechurch St", "category": "luoghi"}, {"name": "London Bridge", "category": "luoghi"}, {"name": "Saïd Business School", "category": "luoghi"}, {"name": "New Theatre Oxford", "category": "luoghi"}, {"name": "St Michael at the North Gate", "category": "luoghi"}, {"name": "Santander Work Café", "category": "locali"}, {"name": "Oxford Castle", "category": "luoghi"}, {"name": "Nef Istanbul", "category": "locali"}, {"name": "Magdalen Bridge", "category": "luoghi"}, {"name": "Oxford Botanic Garden", "category": "parchi"}, {"name": "High Street e Queen's College", "category": "luoghi"}, {"name": "Radcliffe Camera", "category": "luoghi"}, {"name": "Bodleian Library", "category": "luoghi"}, {"name": "Weston Library", "category": "luoghi"}, {"name": "Trinity College", "category": "luoghi"}, {"name": "Itsu, Cornmarket St", "category": "locali"}, {"name": "Camden High St", "category": "negozi"}, {"name": "Regent's Canal", "category": "luoghi"}, {"name": "Trafalgar Square e Nelson's Column", "category": "luoghi"}, {"name": "The National Gallery", "category": "musei"}, {"name": "St Martin-in-the-Fields", "category": "luoghi"}, {"name": "Caffè Nero", "category": "locali"}, {"name": "Northumberland Ave verso il Tamigi", "category": "luoghi"}, {"name": "Hungerford Bridge e Golden Jubilee Bridges", "category": "luoghi"}, {"name": "Jubilee Gardens e The Queen's Walk", "category": "parchi"}, {"name": "London Eye", "category": "luoghi"}, {"name": "Westminster Bridge e Big Ben", "category": "luoghi"}, {"name": "Nike Town, Oxford Circus", "category": "negozi"}, {"name": "Oxford Street", "category": "negozi"}, {"name": "Disney Store", "category": "negozi"}, {"name": "Mercato di Mayfair", "category": "negozi"}, {"name": "Itsu, Oxford Street", "category": "locali"}, {"name": "Hyde Park", "category": "parchi"}, {"name": "Wellington Arch", "category": "luoghi"}, {"name": "Green Park", "category": "parchi"}, {"name": "Buckingham Palace e Queen Victoria Memorial", "category": "luoghi"}, {"name": "Borough Market", "category": "negozi"}], "days": [{"date": "2026-04-25", "title": "Shoreditch", "lede": "Arrivo a pranzo e primo pomeriggio a piedi tra l'architettura di Old Street e i graffiti di Shoreditch, chiuso da una pizza italiana e una serata tra Chinatown e Piccadilly Circus.", "km": 12.0, "steps": 16000, "temp": 20, "photos": ["https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/1.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/2.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/3.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/4.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/5.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/6.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/7.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/8.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/9.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/10.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/11.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day1/12.jpg"], "stops": [{"time": "12:30", "name": "Arrivo a Londra e sistemazione a Wood Green", "type": "✈️ Travel", "cat": "spostamenti", "notes": "Arrivo all'ora di pranzo", "lat": null, "lng": null}, {"time": "14:30", "name": "Old Street: Bezier Apartments e Montcalm East", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Architettura · Bezier Apartments di fronte alla stazione, Montcalm East alle spalle", "lat": 51.5265, "lng": -0.0879}, {"time": "15:00", "name": "The Brush, Old St", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Architettura", "lat": 51.5255, "lng": -0.0839}, {"time": "15:30", "name": "Nobu Hotel London", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Architettura · Great Eastern St", "lat": 51.5259, "lng": -0.081}, {"time": "15:50", "name": "Street art a New Inn Yard", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Street art · civici 20 e 34", "lat": 51.5258, "lng": -0.0797}, {"time": "16:20", "name": "Murale a 30 Bethnal Green Rd", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Street art", "lat": 51.5259, "lng": -0.0757}, {"time": "19:00", "name": "Pizzeria 081", "type": "🍽️ Food", "cat": "locali", "notes": "Cena", "lat": 51.5253, "lng": -0.0824}, {"time": "20:30", "name": "Chinatown", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.5113, "lng": -0.1317}, {"time": "21:00", "name": "Piccadilly Circus di sera", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.5101, "lng": -0.1342}]}, {"date": "2026-04-26", "title": "City of London", "lede": "Il quartiere finanziario dall'alto e da terra: un grattacielo da 278 metri, il giardino panoramico gratuito dello Sky Garden e una passeggiata fino a London Bridge.", "km": 9.0, "steps": 12000, "temp": 17, "photos": ["https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day2/13.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day2/14.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day2/15.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day2/16.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day2/17.jpg"], "stops": [{"time": "10:00", "name": "22 Bishopsgate", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Architettura · 278 m, tra i più alti della City", "lat": 51.5155, "lng": -0.0805}, {"time": "10:45", "name": "Sky Garden", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "35° piano · vista su Gherkin, Shard, Tower Bridge e Torre di Londra", "lat": 51.5113, "lng": -0.0836}, {"time": "12:30", "name": "The Gherkin", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Architettura", "lat": 51.5144, "lng": -0.0803}, {"time": "13:15", "name": "Passeggiata tra King William St e Gracechurch St", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.5115, "lng": -0.0866}, {"time": "14:00", "name": "London Bridge", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.5079, "lng": -0.0877}]}, {"date": "2026-04-27", "title": "Oxford", "lede": "Una giornata intera tra colleges, biblioteche palladiane e l'edificio più antico della città, con pranzo turco su Cowley Rd e un pomeriggio tra giardini botanici e strade storiche.", "km": 13.5, "steps": 18000, "temp": 21, "photos": ["https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/18.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/19.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/20.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/21.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/22.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/23.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/24.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/25.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/26.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/27.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/28.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/29.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/30.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/31.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/32.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/33.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/34.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/35.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day3/36.jpg"], "stops": [{"time": "09:00", "name": "Treno per Oxford", "type": "🚕 Transport", "cat": "spostamenti", "notes": "Gita in giornata", "lat": 51.7526, "lng": -1.27}, {"time": "10:00", "name": "Saïd Business School", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Architettura · Hythe Bridge St", "lat": 51.7534, "lng": -1.262}, {"time": "10:30", "name": "New Theatre Oxford", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Architettura · George St", "lat": 51.7526, "lng": -1.258}, {"time": "11:00", "name": "St Michael at the North Gate", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "L'edificio più antico di Oxford · Cornmarket St", "lat": 51.7534, "lng": -1.2573}, {"time": "11:20", "name": "Santander Work Café", "type": "🍽️ Food", "cat": "locali", "notes": "", "lat": 51.7532, "lng": -1.257}, {"time": "11:45", "name": "Oxford Castle", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Queen St", "lat": 51.7514, "lng": -1.261}, {"time": "13:00", "name": "Nef Istanbul", "type": "🍽️ Food", "cat": "locali", "notes": "Pranzo turco · Cowley Rd", "lat": 51.7489, "lng": -1.2384}, {"time": "14:30", "name": "Magdalen Bridge", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.7511, "lng": -1.2477}, {"time": "14:50", "name": "Oxford Botanic Garden", "type": "🌳 Park", "cat": "parchi", "notes": "", "lat": 51.7502, "lng": -1.2495}, {"time": "15:45", "name": "High Street e Queen's College", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Ingresso del college, edifici storici", "lat": 51.7535, "lng": -1.251}, {"time": "16:00", "name": "Radcliffe Camera", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Biblioteca palladiana", "lat": 51.7534, "lng": -1.254}, {"time": "16:15", "name": "Bodleian Library", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.7538, "lng": -1.2545}, {"time": "16:35", "name": "Weston Library", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Da Catte St a Broad St", "lat": 51.7546, "lng": -1.2554}, {"time": "16:55", "name": "Trinity College", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Dall'esterno", "lat": 51.7548, "lng": -1.2571}, {"time": "17:15", "name": "Itsu, Cornmarket St", "type": "🍽️ Food", "cat": "locali", "notes": "Tè", "lat": 51.753, "lng": -1.2573}, {"time": "18:00", "name": "Rientro a Londra in treno", "type": "🚕 Transport", "cat": "spostamenti", "notes": "", "lat": null, "lng": null}]}, {"date": "2026-04-28", "title": "Camden & Westminster", "lede": "Prima i negozi e i mattoni rossi di Camden lungo il canale, poi il cuore istituzionale, dal Nelson's Column fino a Big Ben passando sui ponti sul Tamigi.", "km": 11.3, "steps": 15000, "temp": 16, "photos": ["https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/37.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/38.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/39.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/40.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/41.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/42.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/43.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/44.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/45.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/46.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/47.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/48.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/49.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/50.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/51.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/52.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/53.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/54.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/55.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/56.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/57.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/58.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/59.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/60.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/61.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/62.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/63.jpg"], "stops": [{"time": "13:00", "name": "Camden High St", "type": "🛍️ Shopping", "cat": "negozi", "notes": "Negozi di souvenir", "lat": 51.5416, "lng": -0.1428}, {"time": "13:45", "name": "Regent's Canal", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Edifici in mattoni rossi", "lat": 51.5433, "lng": -0.1467}, {"time": "15:00", "name": "Trafalgar Square e Nelson's Column", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.508, "lng": -0.1281}, {"time": "15:15", "name": "The National Gallery", "type": "🏛️ Museum", "cat": "musei", "notes": "", "lat": 51.5089, "lng": -0.1283}, {"time": "15:30", "name": "St Martin-in-the-Fields", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.509, "lng": -0.1269}, {"time": "15:45", "name": "Caffè Nero", "type": "🍽️ Food", "cat": "locali", "notes": "Tè", "lat": 51.5083, "lng": -0.1278}, {"time": "16:30", "name": "Northumberland Ave verso il Tamigi", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": null, "lng": null}, {"time": "16:45", "name": "Hungerford Bridge e Golden Jubilee Bridges", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.5067, "lng": -0.1211}, {"time": "17:00", "name": "Jubilee Gardens e The Queen's Walk", "type": "🌳 Park", "cat": "parchi", "notes": "", "lat": 51.5033, "lng": -0.1196}, {"time": "17:15", "name": "London Eye", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Dalla Queen's Walk", "lat": 51.5033, "lng": -0.1196}, {"time": "18:00", "name": "Westminster Bridge e Big Ben", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.5007, "lng": -0.1246}]}, {"date": "2026-04-29", "title": "Mayfair & parchi", "lede": "Shopping su Oxford Street, un mercato dentro una chiesa, poi da Hyde Park a Buckingham Palace attraverso Green Park, per chiudere tra i banchi di Borough Market.", "km": 15.0, "steps": 20000, "temp": 15, "photos": ["https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/64.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/65.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/66.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/67.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/68.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/69.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/70.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/71.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/72.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/73.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/74.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/75.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/76.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/77.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/78.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/79.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/80.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/81.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/82.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/83.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/84.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/85.jpg", "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day5/86.jpg"], "stops": [{"time": "09:30", "name": "Nike Town, Oxford Circus", "type": "🛍️ Shopping", "cat": "negozi", "notes": "", "lat": 51.5152, "lng": -0.1418}, {"time": "10:00", "name": "Oxford Street", "type": "🛍️ Shopping", "cat": "negozi", "notes": "", "lat": null, "lng": null}, {"time": "10:30", "name": "Disney Store", "type": "🛍️ Shopping", "cat": "negozi", "notes": "", "lat": 51.5154, "lng": -0.1447}, {"time": "11:00", "name": "Mercato di Mayfair", "type": "🛍️ Shopping", "cat": "negozi", "notes": "Allestito dentro una chiesa", "lat": 51.5115, "lng": -0.1477}, {"time": "13:00", "name": "Itsu, Oxford Street", "type": "🍽️ Food", "cat": "locali", "notes": "Pranzo", "lat": 51.515, "lng": -0.15}, {"time": "14:00", "name": "Hyde Park", "type": "🌳 Park", "cat": "parchi", "notes": "", "lat": 51.5073, "lng": -0.1657}, {"time": "15:15", "name": "Wellington Arch", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "Piccadilly", "lat": 51.5027, "lng": -0.1517}, {"time": "15:45", "name": "Green Park", "type": "🌳 Park", "cat": "parchi", "notes": "Attraverso Constitution Hill", "lat": 51.504, "lng": -0.145}, {"time": "16:15", "name": "Buckingham Palace e Queen Victoria Memorial", "type": "📸 Sightseeing", "cat": "luoghi", "notes": "", "lat": 51.5014, "lng": -0.1419}, {"time": "17:30", "name": "Borough Market", "type": "🛍️ Shopping", "cat": "negozi", "notes": "2 Stoney St", "lat": 51.5055, "lng": -0.091}]}, {"date": "2026-04-30", "title": "Partenza", "lede": "Ultimo saluto a Wood Green prima di rientrare a casa.", "km": null, "steps": null, "temp": null, "photos": [], "stops": [{"time": "09:00", "name": "Check-out da Wood Green", "type": "🏨 Check-in", "cat": "spostamenti", "notes": "", "lat": null, "lng": null}, {"time": "10:00", "name": "Trasferimento in aeroporto", "type": "🚕 Transport", "cat": "spostamenti", "notes": "", "lat": null, "lng": null}]}], "start": "2026-04-25", "poster": "Londra/poster.jpg", "ndays": 6, "km": 60.8}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* ===== CONFIGURAZIONE ===== */
+const STRIPE_URL = 'https://buy.stripe.com/INCOLLA_QUI_IL_TUO_LINK';
+const PRICE = '';
+const TILES = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+const TILES_ATTR = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · © <a href="https://carto.com/attributions">CARTO</a>';
+
+const TYPE_LABEL = {locali:'Locale', luoghi:'Luogo', musei:'Museo', parchi:'Parco', negozi:'Shopping', esperienze:'Esperienza', spostamenti:'Spostamento'};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const dayVar = i => `var(--d${Math.min(i+1, 7)})`;
+const dayHex = i => css(`--d${Math.min(i+1, 7)}`);
+const fmt = n => n.toLocaleString('it-IT');
+function dayLabel(iso){
+  const d = new Date(iso + 'T12:00:00');
+  const w = d.toLocaleDateString('it-IT', {weekday:'short'}).replace('.', '');
+  return w.charAt(0).toUpperCase() + w.slice(1) + ' ' + d.getDate();
+}
+function longDate(iso){
+  const s = new Date(iso + 'T12:00:00').toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'});
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+let D = null, sel = 'all', map = null, layer = null, markers = [], photoList = [], pIdx = 0;
+
+/* I dati sono incorporati nella pagina dallo script di export: così la pagina
+   funziona anche aperta dal disco, dove il browser blocca fetch(). */
+function readData(){
+  if(window.__DATA__) return window.__DATA__;
+  try{ return JSON.parse(document.getElementById('page-data').textContent); }catch(e){ return null; }
+}
+async function load(){
+  D = readData();
+  if(!D && location.protocol.startsWith('http')){
+    try{ D = await (await fetch('citta.json', {cache:'no-store'})).json(); }catch(e){}
+  }
+  if(!D){ document.getElementById('hero').innerHTML = '<p class="muted">Non riesco a caricare questo itinerario.</p>'; return; }
+  document.title = D.label;
+  D.days.forEach((d,i) => { d.i = i; let n = 0; d.stops.forEach(s => { s.num = (s.lat != null) ? ++n : null; }); });
+  renderStatic();
+  initMap();
+  select(sel);
+}
+
+function renderStatic(){
+  document.getElementById('crumb').textContent = `${D.flag || ''} ${D.label} · ${D.country}`;
+  document.getElementById('hero').innerHTML = `
+    <div class="eyebrow">${esc(D.dates || D.year || '')}</div>
+    <h1>${esc(D.title || D.label)}</h1>
+    ${D.lede ? `<p>${esc(D.lede)}</p>` : ''}`;
+
+  const stops = D.days.flatMap(d => d.stops);
+  const places = stops.filter(s => s.cat !== 'spostamenti');
+  const km = D.days.reduce((a,d) => a + (d.km || 0), 0);
+  const steps = D.days.reduce((a,d) => a + (d.steps || 0), 0);
+  const photos = D.days.reduce((a,d) => a + d.photos.length, 0);
+  const temps = D.days.map(d => d.temp).filter(t => t != null);
+  const tiles = [
+    [D.days.length, D.days.length === 1 ? 'Giorno' : 'Giorni'],
+    [places.length, 'Tappe visitate'],
+    km ? [fmt(Math.round(km*10)/10) + ' km', 'Percorsi a piedi'] : null,
+    steps ? [fmt(steps), 'Passi'] : null,
+    photos ? [photos, 'Foto'] : null,
+    temps.length ? [Math.round(temps.reduce((a,b)=>a+b,0)/temps.length) + '°C', 'Temperatura media'] : [new Set(places.map(p => p.cat)).size, 'Categorie']
+  ].filter(Boolean);
+  const kmDays = D.days.filter(d => d.km);
+  document.getElementById('statsbox').innerHTML = `
+    <div class="tiles">${tiles.map(([v,l]) => `<div class="tile"><b>${v}</b><span>${l}</span></div>`).join('')}</div>
+    ${kmDays.length ? `<div class="chartbox" id="chartbox"><h4>Chilometri a piedi, giorno per giorno</h4><svg id="kmchart" role="img" aria-label="Chilometri per giorno"></svg><div class="tip" id="tip" hidden></div></div>` : ''}`;
+  if(kmDays.length) drawChart(kmDays);
+  if(!document.getElementById('chartbox')) document.getElementById('statsbox').style.gridTemplateColumns = '1fr';
+
+  document.getElementById('days').innerHTML =
+    `<button type="button" role="tab" class="tab" data-d="all" id="day-all"><small><i></i>${D.days.length} giorni</small><span>Tutto il viaggio</span></button>` +
+    D.days.map(d => `<button type="button" role="tab" class="tab" data-d="${d.i}" id="day-${d.i}" style="--dc:${dayVar(d.i)}"><small><i></i>${dayLabel(d.date)}</small><span>${esc(d.title || 'Giorno ' + (d.i + 1))}</span></button>`).join('');
+  const tabs = [...document.querySelectorAll('.tab')];
+  tabs.forEach((b, k) => {
+    b.addEventListener('click', () => select(b.dataset.d));
+    b.addEventListener('keydown', e => {
+      const m = {ArrowRight: 1, ArrowLeft: -1}[e.key]; if(!m) return;
+      e.preventDefault(); const n = tabs[(k + m + tabs.length) % tabs.length]; n.focus(); select(n.dataset.d);
+    });
+  });
+
+  if(D.sale){
+    document.getElementById('offer').innerHTML = `<div class="offer"><div><div class="eyebrow">Itinerario disponibile</div>
+      <h3>Porta con te questo itinerario</h3><p>La versione completa da usare in viaggio: orari, tappe, mappe interattive e foto di ogni giornata.</p></div>
+      <div style="display:flex;align-items:center;gap:14px">${PRICE ? `<span style="font-family:var(--serif);font-size:22px;font-weight:700">${esc(PRICE)}</span>` : ''}
+      <a class="btn" href="${STRIPE_URL}" target="_blank" rel="noopener">Acquista l'itinerario →</a></div></div>`;
+  }
+}
+
+/* grafico km: una barra per giorno, colore del giorno, valore sopra la barra */
+function drawChart(days){
+  const svg = document.getElementById('kmchart');
+  const W = svg.clientWidth || 400, H = 150, top = 18, bottom = 22, left = 4, right = 4;
+  const max = Math.ceil(Math.max(...days.map(d => d.km)) / 5) * 5;
+  const bw = (W - left - right) / days.length, barW = Math.min(44, bw * 0.56);
+  const y = v => top + (H - top - bottom) * (1 - v / max);
+  let s = '';
+  [0, max/2, max].forEach(v => { s += `<line class="gridl" x1="${left}" x2="${W-right}" y1="${y(v)}" y2="${y(v)}"/>`; });
+  days.forEach((d,k) => {
+    const cx = left + bw * k + bw / 2, yy = y(d.km), h = H - bottom - yy;
+    s += `<g class="kbar" data-d="${d.i}" tabindex="0" role="button" aria-label="${dayLabel(d.date)}: ${fmt(d.km)} km">
+      <rect x="${cx - bw/2}" y="${top}" width="${bw}" height="${H - top - bottom}" fill="transparent"/>
+      <path d="M${cx-barW/2},${H-bottom} V${yy+4} Q${cx-barW/2},${yy} ${cx-barW/2+4},${yy} H${cx+barW/2-4} Q${cx+barW/2},${yy} ${cx+barW/2},${yy+4} V${H-bottom} Z" fill="${dayHex(d.i)}"/>
+      <text class="val" x="${cx}" y="${yy - 5}" text-anchor="middle">${fmt(d.km)}</text>
+      <text class="ax" x="${cx}" y="${H - 6}" text-anchor="middle">${dayLabel(d.date)}</text></g>`;
+  });
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = s;
+  const tip = document.getElementById('tip'), box = document.getElementById('chartbox');
+  svg.querySelectorAll('.kbar').forEach(g => {
+    const d = D.days[+g.dataset.d];
+    const show = () => {
+      const r = g.getBoundingClientRect(), b = box.getBoundingClientRect();
+      tip.innerHTML = `<b>${dayLabel(d.date)} · ${esc(d.title || '')}</b><br>${fmt(d.km)} km${d.steps ? ` · ${fmt(d.steps)} passi` : ''}${d.temp != null ? ` · ${d.temp}°C` : ''}`;
+      tip.style.left = (r.left - b.left + r.width / 2) + 'px'; tip.style.top = (r.top - b.top + 14) + 'px'; tip.hidden = false;
+    };
+    g.addEventListener('mouseenter', show); g.addEventListener('focus', show);
+    g.addEventListener('mouseleave', () => tip.hidden = true); g.addEventListener('blur', () => tip.hidden = true);
+    g.addEventListener('click', () => select(String(d.i)));
+    g.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); select(String(d.i)); } });
+  });
+}
+
+/* ===== MAPPA ===== */
+function initMap(){
+  if(typeof L === 'undefined') return;
+  map = L.map('map', {scrollWheelZoom: false, zoomControl: true});
+  const tl = L.tileLayer(TILES, {attribution: TILES_ATTR, maxZoom: 19, subdomains: 'abcd'}).addTo(map);
+  let errs = 0;
+  tl.on('tileerror', () => { if(++errs > 3) document.getElementById('mapnote').hidden = false; });
+  tl.on('tileload', () => { errs = 0; document.getElementById('mapnote').hidden = true; });
+  map.on('focus', () => map.scrollWheelZoom.enable());
+  map.on('blur', () => map.scrollWheelZoom.disable());
+  layer = L.layerGroup().addTo(map);
+}
+function pinIcon(n, color, hl){
+  return L.divIcon({className:'', html:`<div class="pin${hl ? ' hl' : ''}" style="background:${color}">${n}</div>`, iconSize:[24,24], iconAnchor:[12,12], popupAnchor:[0,-12]});
+}
+function drawMap(days){
+  if(!map) return;
+  layer.clearLayers(); markers = [];
+  const pts = [];
+  days.forEach(d => {
+    const color = dayHex(d.i);
+    const line = d.stops.filter(s => s.lat != null).map(s => [s.lat, s.lng]);
+    if(line.length > 1) L.polyline(line, {color, weight: 3, opacity: .7, dashArray: '6 6'}).addTo(layer);
+    d.stops.forEach(s => {
+      if(s.lat == null) return;
+      const m = L.marker([s.lat, s.lng], {icon: pinIcon(s.num, color), keyboard: false, title: s.name})
+        .bindPopup(`<b>${esc(s.name)}</b><br><span style="color:#78716c">${dayLabel(d.date)} · ${esc(s.time)}${s.notes ? ' · ' + esc(s.notes) : ''}</span>`)
+        .addTo(layer);
+      m.on('click', () => highlight(s));
+      markers.push({s, m, d});
+      pts.push([s.lat, s.lng]);
+    });
+  });
+  const fit = () => {
+    map.invalidateSize();
+    if(pts.length) map.fitBounds(pts, {padding: [36, 36], maxZoom: 16});
+    else if(D.lat != null) map.setView([D.lat, D.lng], 12);
+  };
+  fit();
+  requestAnimationFrame(fit);
+}
+function highlight(s, fly){
+  document.querySelectorAll('.stop').forEach(el => el.classList.toggle('on', el.__stop === s));
+  markers.forEach(({s: x, m, d}) => m.setIcon(pinIcon(x.num, dayHex(d.i), x === s)));
+  const hit = markers.find(x => x.s === s);
+  if(hit && fly){ map.flyTo(hit.m.getLatLng(), Math.max(map.getZoom(), 15), {duration: .6}); hit.m.openPopup(); }
+  const el = [...document.querySelectorAll('.stop')].find(e => e.__stop === s);
+  if(el && !fly) el.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+}
+
+/* scorre in orizzontale solo il contenitore, senza muovere la pagina */
+function centerX(el){ const p = el.parentElement; p.scrollLeft = el.offsetLeft - p.offsetLeft - p.clientWidth / 2 + el.offsetWidth / 2; }
+
+/* ===== GIORNO ===== */
+function select(key){
+  sel = key;
+  document.querySelectorAll('.tab').forEach(b => { const on = b.dataset.d === key; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; if(on) centerX(b); });
+  document.getElementById('tripbody').style.setProperty('--dc', key === 'all' ? 'var(--accent)' : dayVar(+key));
+  document.querySelectorAll('.kbar').forEach(g => g.classList.toggle('dim', key !== 'all' && g.dataset.d !== key));
+  const days = key === 'all' ? D.days : [D.days[+key]];
+  const one = key !== 'all' ? days[0] : null;
+
+  const card = document.getElementById('daycard');
+  card.style.setProperty('--dc', one ? dayVar(one.i) : 'var(--accent)');
+  const head = one ? `
+      <div class="when"><i></i>${longDate(one.date)}</div>
+      <h2>${esc(one.title || dayLabel(one.date))}</h2>
+      <div class="chips">${[one.stops.filter(s => s.cat !== 'spostamenti').length + ' tappe', one.km && fmt(one.km) + ' km', one.steps && fmt(one.steps) + ' passi', one.temp != null && one.temp + '°C', one.photos.length && one.photos.length + ' foto'].filter(Boolean).map(c => `<span class="chip">${c}</span>`).join('')}</div>
+      ${one.lede ? `<p>${esc(one.lede)}</p>` : ''}` : `
+      <div class="when"><i></i>${esc(D.dates || '')}</div>
+      <h2>Tutto il viaggio</h2>
+      <p>${D.days.length} giorni e ${D.days.flatMap(d => d.stops).filter(s => s.cat !== 'spostamenti').length} tappe. Scegli un giorno per seguirne il percorso sulla mappa.</p>`;
+  card.innerHTML = `<div class="dayhead">${head}</div><ol class="stops" id="stops"></ol>`;
+  const ol = document.getElementById('stops');
+  days.forEach(d => {
+    if(!one){ const sep = document.createElement('li'); sep.className = 'daysep'; sep.style.setProperty('--dc', dayVar(d.i)); sep.textContent = dayLabel(d.date) + (d.title ? ' · ' + d.title : ''); ol.appendChild(sep); }
+    if(!d.stops.length){ const li = document.createElement('li'); li.className = 'muted'; li.style.cssText = 'padding:10px 20px;font-size:13px'; li.textContent = 'Nessuna tappa segnata.'; ol.appendChild(li); }
+    d.stops.forEach(s => {
+      const li = document.createElement('li');
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'stop'; b.__stop = s;
+      b.style.setProperty('--dc', dayVar(d.i));
+      b.innerHTML = `<span class="t">${esc(s.time)}</span><span class="n${s.num ? '' : ' off'}">${s.num || '·'}</span>
+        <span class="name">${esc(s.name)}${s.notes ? `<span class="notes">${esc(s.notes)}</span>` : ''}<span class="type">${TYPE_LABEL[s.cat] || ''}</span></span>`;
+      b.addEventListener('click', () => highlight(s, true));
+      li.appendChild(b); ol.appendChild(li);
+    });
+  });
+  drawMap(days);
+  photoList = days.flatMap(d => d.photos);
+  pIdx = 0;
+  renderPhotos(one);
+}
+
+/* ===== FOTO ===== */
+function renderPhotos(one){
+  const box = document.getElementById('photos');
+  const label = one ? (one.title || dayLabel(one.date)) : 'tutto il viaggio';
+  if(!photoList.length){ box.innerHTML = `<div class="nophotos">Nessuna foto per ${esc(label)}.</div>`; return; }
+  box.innerHTML = `<div class="car"><div class="car-track" id="track">${photoList.map((u,i) => `<div class="car-slide"><img src="${esc(u)}" alt="Foto ${i+1} di ${photoList.length}" loading="lazy" data-i="${i}"></div>`).join('')}</div>
+    <button type="button" class="car-arrow car-prev" id="cp" aria-label="Foto precedente">‹</button>
+    <button type="button" class="car-arrow car-next" id="cn" aria-label="Foto successiva">›</button>
+    <div class="car-count" id="cc"></div></div>
+    <div class="thumbs" id="thumbs" aria-label="Foto di ${esc(label)}">${photoList.map((u,i) => `<button type="button" data-i="${i}" aria-label="Foto ${i+1}"><img src="${esc(u)}" alt="" loading="lazy"></button>`).join('')}</div>`;
+  box.querySelectorAll('.thumbs button').forEach(b => b.addEventListener('click', () => { pIdx = +b.dataset.i; paint(); }));
+  document.getElementById('cp').addEventListener('click', () => go(-1));
+  document.getElementById('cn').addEventListener('click', () => go(1));
+  box.querySelectorAll('.car-slide img').forEach(img => img.addEventListener('click', () => openLb()));
+  let x0 = null;
+  const car = box.querySelector('.car');
+  car.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, {passive: true});
+  car.addEventListener('touchend', e => { if(x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if(Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); x0 = null; });
+  paint();
+}
+function go(k){ pIdx = (pIdx + k + photoList.length) % photoList.length; paint(); if(!lb.hidden) lbPaint(); }
+function paint(){
+  const t = document.getElementById('track'); if(!t) return;
+  t.style.transform = `translateX(${-pIdx * 100}%)`;
+  document.getElementById('cc').textContent = `${pIdx + 1} / ${photoList.length}`;
+  document.querySelectorAll('.thumbs button').forEach((b, i) => { b.setAttribute('aria-current', String(i === pIdx)); if(i === pIdx) centerX(b); });
+}
+const lb = document.getElementById('lb');
+function openLb(){ lb.hidden = false; lbPaint(); document.getElementById('lb-x').focus(); }
+function lbPaint(){ document.getElementById('lb-img').src = photoList[pIdx]; document.getElementById('lb-c').textContent = `${pIdx + 1} / ${photoList.length}`; }
+function closeLb(){ lb.hidden = true; }
+document.getElementById('lb-x').addEventListener('click', closeLb);
+document.getElementById('lb-p').addEventListener('click', () => go(-1));
+document.getElementById('lb-n').addEventListener('click', () => go(1));
+lb.addEventListener('click', e => { if(e.target === lb) closeLb(); });
+document.addEventListener('keydown', e => {
+  if(lb.hidden) return;
+  if(e.key === 'Escape') closeLb(); if(e.key === 'ArrowRight') go(1); if(e.key === 'ArrowLeft') go(-1);
+});
+let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if(!D) return; const k = D.days.filter(d => d.km); if(k.length){ drawChart(k); document.querySelectorAll('.kbar').forEach(g => g.classList.toggle('dim', sel !== 'all' && g.dataset.d !== sel)); } if(map) map.invalidateSize(); }, 200); });
+
+load();
+</script>
+</body>
+</html>

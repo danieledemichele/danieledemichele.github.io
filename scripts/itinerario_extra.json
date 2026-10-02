@@ -1,0 +1,100 @@
+{
+  "_nota": "Dati che Notion non contiene. Una voce per città (chiave = Name in Destinations). Le tappe, gli orari e le coordinate arrivano invece dall'Itinerary su Notion. 'poster' è l'illustrazione del popup: un file nella cartella della città (es. itinerario/Londra/poster.jpg).",
+  "London": {
+    "slug": "Londra",
+    "label": "Londra",
+    "country": "Regno Unito",
+    "flag": "🇬🇧",
+    "iso": "826",
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "tz": "Europe/London",
+    "title": "Londra, di casa in casa",
+    "dates": "25–30 aprile 2026",
+    "lede": "Sei giorni con base in zona Wood Green. Da lì, in metro ogni giorno verso un quartiere diverso: i graffiti di Shoreditch, i grattacieli della City, una gita a Oxford, il canale di Camden e Westminster, Mayfair e i parchi reali.",
+    "photoBase": "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra",
+    "cover": "day4/45.jpg",
+    "poster": "poster.jpg",
+    "sale": true,
+    "days": {
+      "2026-04-25": {
+        "title": "Shoreditch",
+        "km": 12.0,
+        "steps": 16000,
+        "temp": 20,
+        "photos": [
+          "day1",
+          1,
+          12
+        ],
+        "lede": "Arrivo a pranzo e primo pomeriggio a piedi tra l'architettura di Old Street e i graffiti di Shoreditch, chiuso da una pizza italiana e una serata tra Chinatown e Piccadilly Circus."
+      },
+      "2026-04-26": {
+        "title": "City of London",
+        "km": 9.0,
+        "steps": 12000,
+        "temp": 17,
+        "photos": [
+          "day2",
+          13,
+          17
+        ],
+        "lede": "Il quartiere finanziario dall'alto e da terra: un grattacielo da 278 metri, il giardino panoramico gratuito dello Sky Garden e una passeggiata fino a London Bridge."
+      },
+      "2026-04-27": {
+        "title": "Oxford",
+        "km": 13.5,
+        "steps": 18000,
+        "temp": 21,
+        "photos": [
+          "day3",
+          18,
+          36
+        ],
+        "lede": "Una giornata intera tra colleges, biblioteche palladiane e l'edificio più antico della città, con pranzo turco su Cowley Rd e un pomeriggio tra giardini botanici e strade storiche."
+      },
+      "2026-04-28": {
+        "title": "Camden & Westminster",
+        "km": 11.3,
+        "steps": 15000,
+        "temp": 16,
+        "photos": [
+          "day4",
+          37,
+          63
+        ],
+        "lede": "Prima i negozi e i mattoni rossi di Camden lungo il canale, poi il cuore istituzionale, dal Nelson's Column fino a Big Ben passando sui ponti sul Tamigi."
+      },
+      "2026-04-29": {
+        "title": "Mayfair & parchi",
+        "km": 15.0,
+        "steps": 20000,
+        "temp": 15,
+        "photos": [
+          "day5",
+          64,
+          86
+        ],
+        "lede": "Shopping su Oxford Street, un mercato dentro una chiesa, poi da Hyde Park a Buckingham Palace attraverso Green Park, per chiudere tra i banchi di Borough Market."
+      },
+      "2026-04-30": {
+        "title": "Partenza",
+        "lede": "Ultimo saluto a Wood Green prima di rientrare a casa."
+      }
+    }
+  },
+  "Cagliari": {
+    "slug": "Cagliari",
+    "label": "Cagliari",
+    "country": "Italia",
+    "flag": "🇮🇹",
+    "iso": "380",
+    "lat": 39.2238,
+    "lng": 9.1217,
+    "tz": "Europe/Rome",
+    "title": "Cagliari",
+    "dates": "Agosto 2026",
+    "days": {},
+    "poster": "poster.jpg"
+  }
+}

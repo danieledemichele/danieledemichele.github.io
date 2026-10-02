@@ -40,12 +40,26 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 │   ├── index.html
 │   ├── incontri.json             # generato da Notion (non si modifica a mano)
 │   └── appunti/                  # PDF scaricati da Notion (generati)
+├── itinerario/                   # vedi sezione "I miei viaggi"
+│   ├── index.html                # home dei viaggi (generata da _home.html)
+│   ├── _home.html                # modello della home (non pubblicato: inizia con _)
+│   ├── _citta.html               # modello della pagina città (non pubblicato)
+│   ├── viaggi.json               # dati della home (generato da Notion)
+│   ├── favicon-itinerario.svg / .ico / -16.png / -32.png / apple-touch-icon-itinerario.png
+│   └── <Città>/                  # una cartella per città, es. Londra/, Cagliari/
+│       ├── index.html            # pagina della città (generata da _citta.html)
+│       ├── citta.json            # tappe, giorni e foto (generato da Notion)
+│       ├── cover.*               # copertina della pagina Notion (scaricata dallo script)
+│       └── poster.jpg            # illustrazione del popup (si aggiunge a mano)
 ├── scripts/
 │   ├── sync_materie.py           # Notion → triennale/materie.json
-│   └── sync_tutorato.py          # Notion → tutorato/incontri.json + tutorato/appunti/
+│   ├── sync_tutorato.py          # Notion → tutorato/incontri.json + tutorato/appunti/
+│   ├── sync_itinerario.py        # Notion → itinerario/ (pagine, JSON, copertine)
+│   └── itinerario_extra.json     # dati dei viaggi che Notion non contiene
 ├── .github/workflows/
 │   ├── sync-materie.yml          # GitHub Action che lancia sync_materie.py
-│   └── sync-tutorato.yml         # GitHub Action che lancia sync_tutorato.py
+│   ├── sync-tutorato.yml         # GitHub Action che lancia sync_tutorato.py
+│   └── sync-itinerario.yml       # GitHub Action che lancia sync_itinerario.py
 ├── libreria/                     # vedi sezione "La Mia Libreria" più sotto
 │   ├── index.html
 │   ├── statistiche.html
@@ -71,6 +85,7 @@ Ogni pagina ha la propria favicon, per distinguerla subito tra le schede del bro
 | `index.html` (portfolio) | monogramma "D" su cerchio scuro | `assets/favicon.*` |
 | `libreria/index.html` | libro chiuso con segnalibro | `libreria/favicon-libreria.*` |
 | `libreria/statistiche.html` | istogramma a barre | `libreria/favicon-statistiche.*` |
+| `itinerario/` (home e pagine città) | globo bianco su quadrato ruggine | `itinerario/favicon-itinerario.*` |
 | `ripetizioni/index.html`, `triennale/index.html`, `tutorato/index.html` | stesso monogramma del portfolio | `assets/favicon.*` |
 
 Ogni set include un `.svg` (usato dai browser moderni), un `.ico` multi-risoluzione (fallback), due `.png` (16×16 e 32×32) e un `apple-touch-icon.png` (180×180, per l'aggiunta alla home screen su iOS). Per cambiare un'icona basta rigenerare il set e sovrascrivere i file: gli `<link rel="icon">` nell'`<head>` di ciascuna pagina restano invariati.
@@ -148,6 +163,30 @@ Pagina per gli studenti del tutorato universitario di **Scienza delle Costruzion
 **Aggiungere un incontro o un compito svolto**: crea una riga nel database con Tipo, Corso, Data e PDF in Allegato. Compare sul sito dopo la sincronizzazione notturna o subito con "Run workflow". L'anno accademico, se manca, si ricava dalla data (inizia a settembre).
 
 Gli elenchi `AA` / `COMPITI` dentro `tutorato/index.html` sono solo **dati di riserva**, usati se `incontri.json` non si carica.
+
+---
+
+## 🧭 I miei viaggi (`/itinerario`)
+
+Vetrina dei viaggi fatti, alimentata dal **Travel Planner** su Notion. Stesso stile della Libreria (Playfair Display + Inter, accento ruggine), tema chiaro e scuro.
+
+- **Live**: <https://www.danieledemichele.it/itinerario/> · esempio di città: <https://www.danieledemichele.it/itinerario/Londra/>
+- **Home (`itinerario/index.html`)** — panoramica con i numeri dei viaggi; a sinistra un **globo interattivo** (canvas + D3: terre a punti, paesi visitati evidenziati, arco tra le città in ordine di viaggio, trascinamento con inerzia, zoom); a destra le **schede delle città** con la copertina della pagina Notion. Cliccando una scheda o un punto del globo si apre il **popup** della città: titolo, descrizione, illustrazione (`poster.jpg`) e statistiche per categoria (locali, luoghi e monumenti, musei, parchi, negozi) con l'elenco dei posti.
+- **Pagina città (`itinerario/<Città>/`)** — statistiche del viaggio (giorni, tappe, km, passi, foto, temperatura media, grafico dei km per giorno) e una scheda unica con i **giorni come pulsanti** in alto; sotto, la **mappa** delle tappe (Leaflet, sfondo CARTO), l'**itinerario** del giorno con orari e note e le **foto** con miniature e ingrandimento.
+- **Itinerario in vendita** — le città con `"sale": true` in `itinerario_extra.json` mostrano il pulsante di acquisto. Il link Stripe (`STRIPE_URL`) e il prezzo (`PRICE`) si impostano in cima allo script di `_home.html` e `_citta.html`.
+
+### Da dove arrivano i dati
+
+`scripts/sync_itinerario.py` legge Notion e rigenera tutta la cartella. Lo lancia ogni notte `.github/workflows/sync-itinerario.yml`, e subito dopo ogni modifica allo script, a `itinerario_extra.json` o ai modelli; si può avviare anche a mano da **Actions → Aggiorna itinerari da Notion → Run workflow**. Usa il segreto `NOTION_TOKEN`: l'integrazione deve avere accesso alla pagina Travel Planner.
+
+1. **Destinations** — le città con `Status = Visited`, con le loro proprietà (notti, durata, tipo, preferita…) e la **copertina** della pagina.
+2. **Itinerary** annidato in ogni città — le tappe con `Status = Fatto`: data e ora, `Type` (che decide la categoria: Food → locali, Sightseeing → luoghi e monumenti, Museum → musei, Park → parchi, Shopping → negozi; Travel, Transport e Check-in sono spostamenti), `Notes` e il campo `Luogo` con le coordinate per la mappa.
+3. **Testi Storia / Paesaggio e territorio / Monumenti** scritti nella pagina della città, se presenti.
+4. **`scripts/itinerario_extra.json`** — ciò che Notion non ha: nome della cartella nell'URL, paese e coordinate della città, titolo e descrizione del viaggio, titoli, km, passi e temperature dei giorni, cartelle delle foto (repo `danieledemichele/Viaggio`), illustrazione del popup. **Per aggiungere una città** basta una nuova voce qui, oltre alla pagina su Notion.
+
+I dati vengono **incorporati dentro ogni pagina** (oltre che salvati in `viaggi.json` e `citta.json`): così le pagine si aprono anche direttamente dal disco, dove il browser blocca `fetch()`. Per questo `index.html` delle pagine non si modifica a mano: si modificano `_home.html` e `_citta.html` e lo script le rigenera.
+
+**Copertine**: i file caricati su Notion hanno link che scadono dopo pochi minuti, quindi lo script le scarica in `itinerario/<Città>/cover.*` a ogni esecuzione (se il download fallisce tiene quella già salvata). Le copertine esterne (es. Unsplash) si usano così come sono. **Coordinate**: se l'API non restituisce il campo `Luogo`, lo script riusa le coordinate dell'export precedente.
 
 ---
 
@@ -302,7 +341,7 @@ Modifica qui per cambiare velocemente look & feel.
            frame-ancestors 'self';">
 ```
 Se sposti CSS/JS in file esterni nel repo, puoi rimuovere `'unsafe-inline'` (da `style-src` e `script-src`) e rendere la policy più rigida.
-La CSP vale solo per la home: `libreria/`, `ripetizioni/`, `triennale/` e `tutorato/` caricano anche Tailwind, Google Fonts, Calendly, Tally e Google Maps.
+La CSP vale solo per la home: `libreria/`, `ripetizioni/`, `triennale/`, `tutorato/` e `itinerario/` caricano anche Tailwind, Google Fonts, Calendly, Tally, Google Maps, D3, Leaflet (da cdnjs) e lo sfondo mappe di CARTO.
 
 ---
 
@@ -330,6 +369,8 @@ La CSP vale solo per la home: `libreria/`, `ripetizioni/`, `triennale/` e `tutor
 - [ ] **Analytics** privacy-first (Plausible/Umami) senza cookie banner.
 - [x] GitHub **Actions**: sincronizzazione notturna delle materie da Notion.
 - [x] GitHub **Actions**: sincronizzazione notturna del tutorato da Notion (`tutorato/incontri.json` + appunti PDF).
+- [x] GitHub **Actions**: sincronizzazione notturna dei viaggi da Notion (`itinerario/`, copertine incluse).
+- [ ] **Itinerario**: note storiche per i monumenti e i luoghi visitati (proprietà "Storia" nell'Itinerary di Notion).
 - [ ] GitHub **Actions**: link-checker + report Lighthouse ad ogni push.
 - [ ] Automatizzare anche l'export di `libreria/data.json` con un Action (oggi lo script è esterno e il file si carica a mano).
 
