@@ -28,6 +28,7 @@
   "budget": [],
   "transport": [],
   "favorite": true,
+  "based": true,
   "intro": {
     "storia": "C'è un punto, affacciato sul golfo, dove il tempo sembra essersi depositato in strati visibili: è Cagliari. Tutto comincia con i Fenici, naviganti e mercanti che intorno all'VIII secolo a.C.",
     "paesaggio": "Basta salire fino al Castello per capire perché Cagliari sia una città che si racconta anche attraverso il suo paesaggio.",
@@ -60,6 +61,5 @@
         }
       ]
     }
-  ],
-  "based": true
+  ]
 }

@@ -31,6 +31,7 @@
       "budget": [],
       "transport": [],
       "favorite": true,
+      "based": true,
       "intro": {
         "storia": "C'è un punto, affacciato sul golfo, dove il tempo sembra essersi depositato in strati visibili: è Cagliari. Tutto comincia con i Fenici, naviganti e mercanti che intorno all'VIII secolo a.C.",
         "paesaggio": "Basta salire fino al Castello per capire perché Cagliari sia una città che si racconta anche attraverso il suo paesaggio.",
@@ -41,8 +42,7 @@
           "name": "Pizzeria Amalfi",
           "category": "locali"
         }
-      ],
-      "based": true
+      ]
     },
     {
       "name": "London",
@@ -80,6 +80,7 @@
         "Plane"
       ],
       "favorite": true,
+      "based": false,
       "intro": {},
       "places": [
         {
@@ -274,8 +275,7 @@
           "name": "Borough Market",
           "category": "negozi"
         }
-      ],
-      "based": false
+      ]
     }
   ],
   "upcoming": [
@@ -307,7 +307,7 @@
       "transport": [
         "Car"
       ],
-      "cover": ""
+      "cover": "https://images.unsplash.com/photo-1632660967293-ec569f27dfd0?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb"
     },
     {
       "name": "Vietnam",
@@ -340,7 +340,7 @@
       "transport": [
         "Plane"
       ],
-      "cover": ""
+      "cover": "https://images.unsplash.com/photo-1555921015-5532091f6026?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb"
     }
   ]
 }
