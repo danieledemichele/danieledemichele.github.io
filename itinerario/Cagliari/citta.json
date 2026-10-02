@@ -8,11 +8,15 @@
   "lat": 39.2238,
   "lng": 9.1217,
   "year": 2026,
+  "start": "2026-08-05",
   "dates": "Agosto 2026",
   "title": "Cagliari",
   "lede": "",
-  "cover": "",
+  "cover": "Cagliari/cover.webp",
   "sale": false,
+  "poster": "Cagliari/poster.jpg",
+  "ndays": 1,
+  "km": null,
   "nights": null,
   "duration": [
     "Weekend"
@@ -25,9 +29,9 @@
   "transport": [],
   "favorite": true,
   "intro": {
-    "storia": "C'è un punto, affacciato sul golfo, dove il tempo sembra essersi depositato in strati visibili: è Cagliari. Tutto comincia con i Fenici, che intorno all'VIII secolo a.C. fondano Karali.",
-    "paesaggio": "Dal Castello lo sguardo scivola verso il golfo degli Angeli, il Poetto e la Sella del Diavolo; alle spalle, gli stagni di Molentargius e Santa Gilla con i fenicotteri rosa.",
-    "monumenti": "Le torri dell'Elefante e di San Pancrazio, il Bastione di Saint Remy, la Cattedrale di Santa Maria, San Saturnino e il Santuario di Bonaria."
+    "storia": "C'è un punto, affacciato sul golfo, dove il tempo sembra essersi depositato in strati visibili: è Cagliari. Tutto comincia con i Fenici, naviganti e mercanti che intorno all'VIII secolo a.C.",
+    "paesaggio": "Basta salire fino al Castello per capire perché Cagliari sia una città che si racconta anche attraverso il suo paesaggio.",
+    "monumenti": "Camminare nel Castello significa muoversi dentro un racconto di pietra."
   },
   "places": [
     {
@@ -51,14 +55,10 @@
           "type": "🍽️ Food",
           "cat": "locali",
           "notes": "",
-          "lat": null,
-          "lng": null
+          "lat": 39.21927,
+          "lng": 9.11488
         }
       ]
     }
-  ],
-  "start": "2026-08-05",
-  "poster": "Cagliari/poster.jpg",
-  "ndays": 1,
-  "km": null
+  ]
 }

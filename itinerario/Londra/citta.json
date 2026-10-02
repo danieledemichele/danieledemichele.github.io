@@ -8,11 +8,15 @@
   "lat": 51.5074,
   "lng": -0.1278,
   "year": 2026,
+  "start": "2026-04-25",
   "dates": "25–30 aprile 2026",
   "title": "Londra, di casa in casa",
   "lede": "Sei giorni con base in zona Wood Green. Da lì, in metro ogni giorno verso un quartiere diverso: i graffiti di Shoreditch, i grattacieli della City, una gita a Oxford, il canale di Camden e Westminster, Mayfair e i parchi reali.",
-  "cover": "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/45.jpg",
+  "cover": "Londra/cover.png",
   "sale": true,
+  "poster": "Londra/poster.jpg",
+  "ndays": 6,
+  "km": 60.8,
   "nights": 5,
   "duration": [
     "One week"
@@ -860,9 +864,5 @@
         }
       ]
     }
-  ],
-  "start": "2026-04-25",
-  "poster": "Londra/poster.jpg",
-  "ndays": 6,
-  "km": 60.8
+  ]
 }

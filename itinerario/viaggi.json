@@ -11,11 +11,15 @@
       "lat": 39.2238,
       "lng": 9.1217,
       "year": 2026,
+      "start": "2026-08-05",
       "dates": "Agosto 2026",
       "title": "Cagliari",
       "lede": "",
-      "cover": "",
+      "cover": "Cagliari/cover.webp",
       "sale": false,
+      "poster": "Cagliari/poster.jpg",
+      "ndays": 1,
+      "km": null,
       "nights": null,
       "duration": [
         "Weekend"
@@ -28,20 +32,16 @@
       "transport": [],
       "favorite": true,
       "intro": {
-        "storia": "C'è un punto, affacciato sul golfo, dove il tempo sembra essersi depositato in strati visibili: è Cagliari. Tutto comincia con i Fenici, che intorno all'VIII secolo a.C. fondano Karali.",
-        "paesaggio": "Dal Castello lo sguardo scivola verso il golfo degli Angeli, il Poetto e la Sella del Diavolo; alle spalle, gli stagni di Molentargius e Santa Gilla con i fenicotteri rosa.",
-        "monumenti": "Le torri dell'Elefante e di San Pancrazio, il Bastione di Saint Remy, la Cattedrale di Santa Maria, San Saturnino e il Santuario di Bonaria."
+        "storia": "C'è un punto, affacciato sul golfo, dove il tempo sembra essersi depositato in strati visibili: è Cagliari. Tutto comincia con i Fenici, naviganti e mercanti che intorno all'VIII secolo a.C.",
+        "paesaggio": "Basta salire fino al Castello per capire perché Cagliari sia una città che si racconta anche attraverso il suo paesaggio.",
+        "monumenti": "Camminare nel Castello significa muoversi dentro un racconto di pietra."
       },
       "places": [
         {
           "name": "Pizzeria Amalfi",
           "category": "locali"
         }
-      ],
-      "start": "2026-08-05",
-      "poster": "Cagliari/poster.jpg",
-      "ndays": 1,
-      "km": null
+      ]
     },
     {
       "name": "London",
@@ -53,11 +53,15 @@
       "lat": 51.5074,
       "lng": -0.1278,
       "year": 2026,
+      "start": "2026-04-25",
       "dates": "25–30 aprile 2026",
       "title": "Londra, di casa in casa",
       "lede": "Sei giorni con base in zona Wood Green. Da lì, in metro ogni giorno verso un quartiere diverso: i graffiti di Shoreditch, i grattacieli della City, una gita a Oxford, il canale di Camden e Westminster, Mayfair e i parchi reali.",
-      "cover": "https://raw.githubusercontent.com/danieledemichele/Viaggio/main/Londra/day4/45.jpg",
+      "cover": "Londra/cover.png",
       "sale": true,
+      "poster": "Londra/poster.jpg",
+      "ndays": 6,
+      "km": 60.8,
       "nights": 5,
       "duration": [
         "One week"
@@ -269,11 +273,7 @@
           "name": "Borough Market",
           "category": "negozi"
         }
-      ],
-      "start": "2026-04-25",
-      "poster": "Londra/poster.jpg",
-      "ndays": 6,
-      "km": 60.8
+      ]
     }
   ]
 }
