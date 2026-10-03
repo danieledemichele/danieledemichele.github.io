@@ -1,0 +1,47 @@
+name: Pubblica il Worker di acquisto itinerari
+
+on:
+  workflow_dispatch:           # pulsante "Run workflow" nella scheda Actions
+  push:
+    branches: [main]
+    paths:
+      - _workers/itinerario-acquisto/**
+      - .github/workflows/deploy-acquisto.yml
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      # Senza i segreti di Cloudflare il job si ferma qui senza errori:
+      # il Worker si può sempre pubblicare a mano con `npx wrangler deploy`.
+      - name: Controlla i segreti
+        id: check
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          STRIPE_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+        run: |
+          if [ -z "$CF_TOKEN" ] || [ -z "$CF_ACCOUNT" ] || [ -z "$STRIPE_KEY" ]; then
+            echo "Mancano CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID o STRIPE_SECRET_KEY: salto il deploy."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy su Cloudflare
+        if: steps.check.outputs.ok == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: _workers/itinerario-acquisto
+          secrets: |
+            STRIPE_SECRET_KEY
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}

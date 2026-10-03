@@ -45,6 +45,8 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 │   ├── _home.html                # modello della home (non pubblicato: inizia con _)
 │   ├── _citta.html               # modello della pagina città (non pubblicato)
 │   ├── viaggi.json               # dati della home (generato da Notion)
+│   ├── acquisto.js               # vendita dei PDF: link Stripe, chiavi pubbliche, prezzi
+│   ├── grazie/index.html         # pagina di ritorno dopo il pagamento (download del PDF)
 │   ├── favicon-itinerario.svg / .ico / -16.png / -32.png / apple-touch-icon-itinerario.png
 │   └── <Città>/                  # una cartella per città, es. Londra/, Cagliari/
 │       ├── index.html            # pagina della città (generata da _citta.html)
@@ -55,11 +57,14 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 │   ├── sync_materie.py           # Notion → triennale/materie.json
 │   ├── sync_tutorato.py          # Notion → tutorato/incontri.json + tutorato/appunti/
 │   ├── sync_itinerario.py        # Notion → itinerario/ (pagine, JSON, copertine)
+│   ├── pdf_itinerario.py         # citta.json → _pdf/<Città>.pdf (il PDF in vendita, fuori da git)
 │   └── itinerario_extra.json     # dati dei viaggi che Notion non contiene
 ├── .github/workflows/
 │   ├── sync-materie.yml          # GitHub Action che lancia sync_materie.py
 │   ├── sync-tutorato.yml         # GitHub Action che lancia sync_tutorato.py
-│   └── sync-itinerario.yml       # GitHub Action che lancia sync_itinerario.py
+│   ├── sync-itinerario.yml       # GitHub Action che lancia sync_itinerario.py
+│   └── deploy-acquisto.yml       # pubblica il Worker di acquisto su Cloudflare
+├── _workers/itinerario-acquisto/ # Worker Cloudflare: checkout Stripe + download protetto (non pubblicato: inizia con _)
 ├── libreria/                     # vedi sezione "La Mia Libreria" più sotto
 │   ├── index.html
 │   ├── statistiche.html
@@ -174,7 +179,7 @@ Vetrina dei viaggi fatti, alimentata dal **Travel Planner** su Notion. Stesso st
 - **Dalla home**: voce "I miei viaggi" nei Progetti principali, sotto la Libreria.
 - **Home (`itinerario/index.html`)** — panoramica con i numeri dei viaggi; a sinistra un **globo interattivo** (canvas + D3: terre a punti, paesi visitati evidenziati, arco tra le città in ordine di viaggio, trascinamento con inerzia, zoom); a destra le **schede delle città** con la copertina della pagina Notion, **filtrabili per **stato** (a destra della barra: *Visitato*, *In pianificazione*, *Da visitare*, uno alla volta così l'elenco resta corto) e per **anno** (a sinistra, con gli anni dello stato scelto). Tra i visitati, in cima c'è la scheda **Based**, la città in cui vivo (Cagliari), con un segnaposto a forma di casa sul globo da cui partono gli archi verso ogni viaggio. Il globo ruota da solo e si ferma quando ci passi sopra col mouse; avvicinandoti a una città compare una mini scheda con copertina, date e numeri principali. Cliccando una scheda o un punto del globo si apre il **popup** della città: titolo, descrizione, illustrazione (`poster.jpg`) e statistiche per categoria (locali, luoghi e monumenti, musei, parchi, negozi) con l'elenco dei posti. Le mete in pianificazione e da visitare sono segnate sul globo con un cerchio tratteggiato; cliccandole il filtro passa al loro stato. I segnaposto fuori dal filtro attivo restano attenuati.
 - **Pagina città (`itinerario/<Città>/`)** — statistiche del viaggio (giorni, tappe, km, passi, foto, temperatura media, grafico dei km per giorno) e una scheda unica con i **giorni come pulsanti** in alto; sotto, la **mappa** delle tappe (Leaflet, sfondo OpenStreetMap: CARTO ora richiede una chiave API), l'**itinerario** del giorno con orari e note e le **foto** con miniature e ingrandimento.
-- **Itinerario in vendita** — le città con `"sale": true` in `itinerario_extra.json` mostrano il pulsante di acquisto. Il link Stripe (`STRIPE_URL`) e il prezzo (`PRICE`) si impostano in cima allo script di `_home.html` e `_citta.html`.
+- **Itinerario in vendita** — le città con `"sale": true` in `itinerario_extra.json` mostrano il pulsante «Acquista il PDF» (vedi sotto, *Vendita dei PDF*).
 
 ### Da dove arrivano i dati
 
@@ -188,6 +193,19 @@ Vetrina dei viaggi fatti, alimentata dal **Travel Planner** su Notion. Stesso st
 I dati vengono **incorporati dentro ogni pagina** (oltre che salvati in `viaggi.json` e `citta.json`): così le pagine si aprono anche direttamente dal disco, dove il browser blocca `fetch()`. Per questo `index.html` delle pagine non si modifica a mano: si modificano `_home.html` e `_citta.html` e lo script le rigenera.
 
 **Copertine**: i file caricati su Notion hanno link che scadono dopo pochi minuti, quindi lo script le scarica in `itinerario/<Città>/cover.*` a ogni esecuzione (se il download fallisce tiene quella già salvata). Le copertine esterne (es. Unsplash) si usano così come sono. **Coordinate**: se l'API non restituisce il campo `Luogo`, lo script riusa le coordinate dell'export precedente.
+
+
+### Vendita dei PDF
+
+Chi compra riceve l'itinerario in **PDF** (giornate, orari, schema dei percorsi, ogni posto collegato a Google Maps); la pagina del sito resta la vetrina gratuita.
+
+- **PDF** — `python scripts/pdf_itinerario.py Londra` lo genera in `_pdf/Londra.pdf` da `citta.json` (servono `playwright` e `pillow`). `_pdf/` è in `.gitignore`: il file non finisce mai nel repo né sul sito, perché il repo è pubblico.
+- **Pagamento** — `itinerario/acquisto.js` decide come si paga. Con `api` (URL del Worker) e `pk` (chiave pubblicabile Stripe) impostati, «Acquista» apre un **popup del sito con il checkout di Stripe incorporato**; se sono vuoti apre il **link di pagamento** Stripe (`link`) in una nuova scheda. Lì si impostano anche i prezzi mostrati (`prezzo`); il prezzo vero lo decide Stripe.
+- **Consegna** — Stripe rimanda sempre a `/itinerario/grazie/?session_id=…`. La pagina chiede al Worker se quella sessione è pagata e mostra il pulsante di download; il Worker legge il PDF dal bucket **R2** `itinerari` e lo consegna solo se Stripe conferma il pagamento. Il link resta valido, così chi ha comprato può riscaricare il file. Finché il Worker non è attivo la pagina dice che il PDF arriva via email (invio a mano).
+- **Worker** (`_workers/itinerario-acquisto/`) — `POST /checkout` crea la sessione incorporata (con i colori del sito), `GET /session` e `GET /download` verificano il pagamento. In `wrangler.toml`: `SITE_URL`, `ALLOWED_ORIGINS` e `PRODOTTI` (per ogni itinerario: id del prezzo Stripe, nome del file in R2, nome del download). Segreto: `STRIPE_SECRET_KEY`.
+- **Pubblicazione del Worker** — `.github/workflows/deploy-acquisto.yml` lo pubblica a ogni modifica della cartella, se su GitHub ci sono i segreti `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `STRIPE_SECRET_KEY`; altrimenti si salta e si usa `npx wrangler deploy` dalla cartella.
+
+**Primo avvio**: crea su Cloudflare il bucket R2 `itinerari` e caricaci `Londra.pdf`; aggiungi i tre segreti su GitHub (o pubblica a mano); copia l'URL del Worker e la chiave `pk_…` in `acquisto.js`. **Passaggio dalla prova alla vendita vera**: crea prodotto, prezzo e link di pagamento anche in modalità live, poi sostituisci in `wrangler.toml` l'id `price_…`, su GitHub `STRIPE_SECRET_KEY` (`sk_live_…`) e in `acquisto.js` `pk_live_…` e il link `buy.stripe.com/…` senza `test_`.
 
 ---
 
@@ -342,7 +360,8 @@ Modifica qui per cambiare velocemente look & feel.
            frame-ancestors 'self';">
 ```
 Se sposti CSS/JS in file esterni nel repo, puoi rimuovere `'unsafe-inline'` (da `style-src` e `script-src`) e rendere la policy più rigida.
-La CSP vale solo per la home: `libreria/`, `ripetizioni/`, `triennale/`, `tutorato/` e `itinerario/` caricano anche Tailwind, Google Fonts, Calendly, Tally, Google Maps, D3, Leaflet (da cdnjs) e lo sfondo mappe di OpenStreetMap.
+La CSP vale solo per la home: `libreria/`, `ripetizioni/`, `triennale/`, `tutorato/` e `itinerario/` caricano anche Tailwind, Google Fonts, Calendly, Tally, Google Maps, D3, Leaflet (da cdnjs) e lo sfondo mappe di OpenStreetMap; `itinerario/` carica Stripe.js da `js.stripe.com` solo quando si apre il pagamento.
+**Pagamenti**: i dati della carta restano nei riquadri di Stripe e non passano dal sito; la chiave segreta Stripe vive solo nel Worker (segreto Cloudflare / GitHub), mai nel repo. Il Worker accetta richieste dal browser solo da `danieledemichele.it` e consegna il PDF solo per sessioni che Stripe dà come pagate.
 
 ---
 
@@ -371,6 +390,8 @@ La CSP vale solo per la home: `libreria/`, `ripetizioni/`, `triennale/`, `tutora
 - [x] GitHub **Actions**: sincronizzazione notturna delle materie da Notion.
 - [x] GitHub **Actions**: sincronizzazione notturna del tutorato da Notion (`tutorato/incontri.json` + appunti PDF).
 - [x] GitHub **Actions**: sincronizzazione notturna dei viaggi da Notion (`itinerario/`, copertine incluse).
+- [x] Vendita dell'itinerario di Londra in PDF con Stripe (link di pagamento + checkout incorporato, download protetto dal Worker).
+- [ ] Invio automatico del PDF via email dopo il pagamento (oggi si scarica dalla pagina «grazie»).
 - [ ] GitHub **Actions**: link-checker + report Lighthouse ad ogni push.
 - [ ] Automatizzare anche l'export di `libreria/data.json` con un Action (oggi lo script è esterno e il file si carica a mano).
 
