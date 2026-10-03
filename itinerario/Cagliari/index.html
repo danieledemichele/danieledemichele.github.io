@@ -844,11 +844,11 @@ main{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;
 </div>
 
 <script id="page-data" type="application/json">{"name": "Cagliari", "slug": "Cagliari", "label": "Cagliari", "country": "Italia", "flag": "🇮🇹", "iso": "380", "lat": 39.2238, "lng": 9.1217, "year": 2026, "start": "2026-08-05", "dates": "Agosto 2026", "title": "Cagliari", "lede": "", "cover": "Cagliari/cover.webp", "sale": false, "poster": "Cagliari/poster.jpg", "ndays": 1, "km": null, "nights": null, "duration": ["Weekend"], "type": [], "season": ["Summer"], "budget": [], "transport": [], "favorite": true, "based": true, "intro": {"storia": "C'è un punto, affacciato sul golfo, dove il tempo sembra essersi depositato in strati visibili: è Cagliari. Tutto comincia con i Fenici, naviganti e mercanti che intorno all'VIII secolo a.C.", "paesaggio": "Basta salire fino al Castello per capire perché Cagliari sia una città che si racconta anche attraverso il suo paesaggio.", "monumenti": "Camminare nel Castello significa muoversi dentro un racconto di pietra."}, "places": [{"name": "Pizzeria Amalfi", "category": "locali"}], "days": [{"date": "2026-08-05", "title": "", "lede": "", "km": null, "steps": null, "temp": null, "photos": [], "stops": [{"time": "8.00 PM", "name": "Pizzeria Amalfi", "type": "🍽️ Food", "cat": "locali", "notes": "", "lat": 39.21927, "lng": 9.11488}]}]}</script>
+<!-- acquisto dei PDF: link Stripe, chiavi e prezzi sono in ../acquisto.js -->
+<script src="../acquisto.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* ===== CONFIGURAZIONE ===== */
-const STRIPE_URL = 'https://buy.stripe.com/INCOLLA_QUI_IL_TUO_LINK';
-const PRICE = '';
 /* Sfondo della mappa: OpenStreetMap standard (CARTO ora chiede una chiave API). */
 const TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const TILES_ATTR = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
@@ -930,11 +930,13 @@ function renderStatic(){
     });
   });
 
-  if(D.sale){
-    document.getElementById('offer').innerHTML = `<div class="offer"><div><div class="eyebrow">Itinerario disponibile</div>
-      <h3>Porta con te questo itinerario</h3><p>La versione completa da usare in viaggio: orari, tappe, mappe interattive e foto di ogni giornata.</p></div>
+  if(D.sale && window.Acquisto && Acquisto.disponibile(D.slug)){
+    const PRICE = Acquisto.prezzo(D.slug);
+    document.getElementById('offer').innerHTML = `<div class="offer"><div><div class="eyebrow">Itinerario in PDF</div>
+      <h3>Porta con te questo itinerario</h3><p>Tutte le giornate in un PDF da usare in viaggio: orari, tappe, schema dei percorsi e ogni posto collegato a Google Maps. Lo scarichi subito dopo il pagamento.</p></div>
       <div style="display:flex;align-items:center;gap:14px">${PRICE ? `<span style="font-family:var(--serif);font-size:22px;font-weight:700">${esc(PRICE)}</span>` : ''}
-      <a class="btn" href="${STRIPE_URL}" target="_blank" rel="noopener">Acquista l'itinerario →</a></div></div>`;
+      <a class="btn" href="#" data-acquista="${esc(D.slug)}" data-title="${esc(D.title)}" data-cover="${D.cover ? '../' + esc(D.cover) : ''}">Acquista il PDF →</a></div></div>`;
+    Acquisto.collega(document.getElementById('offer'));
   }
 }
 

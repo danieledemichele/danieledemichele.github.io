@@ -1,0 +1,29 @@
+# Worker che vende i PDF degli itinerari (checkout Stripe + download protetto).
+# Deploy: .github/workflows/deploy-acquisto.yml, oppure `npx wrangler deploy` da questa cartella.
+name = "itinerario-acquisto"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+SITE_URL = "https://www.danieledemichele.it"
+ALLOWED_ORIGINS = "https://www.danieledemichele.it,https://danieledemichele.it"
+# Un elemento per ogni itinerario in vendita: la chiave è la cartella in /itinerario/.
+# price: id del prezzo Stripe (price_… di prova finché si usano le chiavi di test)
+# file:  nome del PDF nel bucket R2; download: nome con cui lo scarica il cliente
+PRODOTTI = '''
+{
+  "Londra": {
+    "price": "price_1UMaLLLTTY7PqhodKDTFmOsJ",
+    "file": "Londra.pdf",
+    "download": "Itinerario-Londra-danieledemichele.pdf",
+    "nome": "Itinerario Londra, di casa in casa (PDF)"
+  }
+}
+'''
+
+[[r2_buckets]]
+binding = "ITINERARI"
+bucket_name = "itinerari"
+
+[observability]
+enabled = true
