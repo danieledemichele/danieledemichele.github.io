@@ -112,12 +112,13 @@ async function main(){
       actions: '<button class="btn btn-primary" type="button" onclick="location.reload()">Ricarica</button>'});
   }
   if(r.pagato && r.download){
+    if(r.itinerario) Acquisto.ricorda(r.itinerario, sid);   // sblocca la pagina della città in questo browser
     const tot = r.totale != null ? (r.totale / 100).toLocaleString('it-IT', {style: 'currency', currency: (r.valuta || 'eur').toUpperCase()}) : '';
     return show({state: 'Pagamento completato', cls: 'ok', title: 'Grazie, il tuo itinerario è pronto',
-      text: 'Scarica il PDF e salvalo sul telefono: ogni posto si apre su Google Maps con un tocco. Il pulsante resta valido, quindi puoi tenere il link di questa pagina per scaricarlo di nuovo.',
+      text: 'La pagina dell\'itinerario ora è completa su questo dispositivo. Scarica anche il volume in PDF e salvalo sul telefono: c\'è la storia di ogni luogo e ogni posto si apre su Google Maps con un tocco. Tieni il link di questa pagina: serve per scaricarlo di nuovo o per sbloccare l\'itinerario su un altro dispositivo.',
       details: [['Itinerario', r.nome || r.itinerario], ...(tot ? [['Totale', tot]] : []), ...(r.email ? [['Email', r.email]] : [])],
-      actions: `<a class="btn btn-primary" href="${esc(r.download)}">Scarica il PDF ↓</a><a class="btn btn-ghost" href="../${encodeURIComponent(r.itinerario || '')}/">Rivedi l'itinerario sul sito</a>`,
-      note: 'Il PDF è per uso personale: grazie per non condividerlo.'});
+      actions: `<a class="btn btn-primary" href="../${encodeURIComponent(r.itinerario || '')}/">Apri l'itinerario completo →</a><a class="btn btn-ghost" href="${esc(r.download)}">Scarica il volume PDF ↓</a>`,
+      note: 'Itinerario e volume sono per uso personale: grazie per non condividerli.'});
   }
   if(r.stato === 'open'){
     return show({state: 'Pagamento non completato', cls: 'warn', title: 'Il pagamento non è andato a buon fine',

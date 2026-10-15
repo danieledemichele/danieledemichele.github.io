@@ -5,6 +5,12 @@
  *                    crea una sessione di Checkout incorporata nel sito (popup)
  *   GET  /session?session_id=cs_…            → stato del pagamento per la pagina «grazie»
  *   GET  /download?session_id=cs_…           → il PDF, solo se la sessione risulta pagata
+ *   GET  /itinerario?session_id=cs_…         → l'itinerario completo (JSON) per sbloccare la
+ *                                              pagina della città, solo se la sessione risulta pagata
+ *
+ * Nel bucket R2 ci sono, per ogni città, <Città>.pdf (il volume) e <Città>/citta.json
+ * (l'itinerario completo, caricato dal workflow sync-itinerario.yml): sul sito pubblico
+ * c'è solo l'anteprima.
  *
  * Il PDF non è mai pubblico: sta nel bucket R2 (binding ITINERARI) e il Worker
  * lo consegna solo dopo aver chiesto a Stripe se quella sessione è stata pagata.
@@ -26,6 +32,7 @@ export default {
       if (url.pathname === '/checkout' && request.method === 'POST') return await checkout(request, env, cors);
       if (url.pathname === '/session' && request.method === 'GET') return await session(url, env, cors);
       if (url.pathname === '/download' && request.method === 'GET') return await download(url, env);
+      if (url.pathname === '/itinerario' && request.method === 'GET') return await itinerario(url, env, cors);
       if (url.pathname === '/') return json({ ok: true, servizio: 'itinerario-acquisto' }, 200, cors);
       return json({ error: 'Pagina non trovata.' }, 404, cors);
     } catch (e) {
@@ -93,6 +100,18 @@ async function download(url, env) {
       'content-disposition': `attachment; filename="${p.download || p.file}"`,
       'cache-control': 'private, no-store',
     },
+  });
+}
+
+async function itinerario(url, env, cors) {
+  const r = await verify(url.searchParams.get('session_id'), env);
+  if (r.error) return json({ error: r.error }, r.status, cors);
+  const { s, slug, p } = r;
+  if (s.payment_status !== 'paid' || !p) return json({ error: 'Il pagamento non risulta completato.' }, 402, cors);
+  const obj = await env.ITINERARI.get(`${slug}/citta.json`);
+  if (!obj) return json({ error: 'Itinerario non disponibile, scrivimi e te lo mando.' }, 404, cors);
+  return new Response(obj.body, {
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'private, no-store', ...cors },
   });
 }
 

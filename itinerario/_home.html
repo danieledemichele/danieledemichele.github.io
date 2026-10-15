@@ -331,12 +331,12 @@ function render(){
       <div class="offer">
         ${sale.cover ? `<img src="${esc(sale.cover)}" alt="">` : ''}
         <div><div class="eyebrow">Itinerario disponibile</div><h3>${esc(sale.title)}</h3>
-          <p>Il mio itinerario di ${esc(sale.label)} in PDF, da portare in viaggio: giorno per giorno con orari, tappe, schema dei percorsi e ogni posto collegato a Google Maps.</p></div>
+          <p>Il mio itinerario di ${esc(sale.label)} completo, giorno per giorno con orari, tappe, mappa e foto, più un piccolo volume in PDF con la storia di ogni luogo. Il primo giorno lo trovi gratis in anteprima.</p></div>
         <div class="buyside">${PRICE ? `<div class="price">${esc(PRICE)}</div>` : ''}
-          <a class="btn btn-primary" href="#" data-acquista="${esc(sale.slug)}" data-title="${esc(sale.title)}" data-cover="${esc(sale.cover || '')}">Acquista il PDF →</a>
-          <span class="fine">Pagamento sicuro su Stripe</span></div>
+          <button type="button" class="btn btn-primary" id="shop-go">Sblocca l'itinerario →</button>
+          <a class="fine" href="${CITY_HREF(sale)}">oppure guarda l'anteprima</a></div>
       </div>`;
-    Acquisto.collega(document.getElementById('shop'));
+    document.getElementById('shop-go').addEventListener('click', () => Acquisto.paywall({sub: 'Il primo giorno lo trovi gratis in anteprima.', slug: sale.slug, title: sale.title, cover: sale.cover || '', giorni: sale.ndays, tappe: sale.tot ? sale.tot.tappe : sale.places.length}));
   }
   const d = DATA.updated ? new Date(DATA.updated) : null;
   document.getElementById('updated').textContent = d ? 'Aggiornato il ' + d.toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'}) : '';
@@ -479,11 +479,11 @@ function openModal(c){
               <span class="nm">${CATS[k]}<span class="bar"><i style="width:${Math.round(l.length / max * 100)}%"></i></span></span>
               <span class="ct">${l.length}<small>${Math.round(l.length / c.places.length * 100)}%</small></span>
             </button>
-            <ul class="names" id="names-${k}" hidden>${l.map(p => `<li>${esc(p.name)}</li>`).join('')}</ul>`).join('')
+            <ul class="names" id="names-${k}" hidden>${l.filter(p => p.name).map(p => `<li>${esc(p.name)}</li>`).join('')}${l.some(p => !p.name) ? `<li class="muted">${l.filter(p => p.name).length ? '+ ' : ''}${l.filter(p => !p.name).length} nell'itinerario completo</li>` : ''}</ul>`).join('')
           : '<p class="muted" style="margin:0">Nessun posto segnato.</p>'}
         </div>
-        <div class="sh-foot"><p>Mappa, tappe giorno per giorno e foto del viaggio.</p>
-          <a class="btn btn-primary" href="${CITY_HREF(c)}">Apri l'itinerario completo →</a></div>
+        <div class="sh-foot"><p>${c.locked ? 'Il primo giorno è in anteprima gratuita: mappa, tappe e foto.' : 'Mappa, tappe giorno per giorno e foto del viaggio.'}</p>
+          <a class="btn btn-primary" href="${CITY_HREF(c)}">${c.locked ? 'Apri l\'anteprima →' : 'Apri l\'itinerario completo →'}</a></div>
       </div>
     </div>`;
   sheet.querySelectorAll('.cat').forEach(b => b.addEventListener('click', () => {

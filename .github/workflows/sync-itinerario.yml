@@ -11,6 +11,7 @@ on:
       - scripts/itinerario_extra.json
       - itinerario/_home.html
       - itinerario/_citta.html
+      - scripts/pdf_itinerario.py
       - .github/workflows/sync-itinerario.yml
 
 permissions:
@@ -39,9 +40,33 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
         run: python scripts/sync_itinerario.py
 
+      # Itinerari in vendita: il sito pubblico ha solo l'anteprima. L'itinerario completo
+      # (_privato/<Città>/citta.json) e il volume PDF vanno nel bucket R2 letto dal Worker
+      # di acquisto. Senza i segreti di Cloudflare il passo si salta senza errori.
+      - name: Carica itinerari completi e volumi nel bucket R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Mancano i segreti di Cloudflare: salto il caricamento su R2."
+            exit 0
+          fi
+          shopt -s nullglob
+          files=(_privato/*/citta.json)
+          [ ${#files[@]} -eq 0 ] && { echo "Nessun itinerario in vendita."; exit 0; }
+          pip install --quiet playwright pillow
+          python -m playwright install --with-deps chromium > /dev/null
+          for f in "${files[@]}"; do
+            slug=$(basename "$(dirname "$f")")
+            npx --yes wrangler@4 r2 object put "itinerari/$slug/citta.json" --file "$f" --content-type application/json --remote
+            python scripts/pdf_itinerario.py "$slug"
+            npx --yes wrangler@4 r2 object put "itinerari/$slug.pdf" --file "_pdf/$slug.pdf" --content-type application/pdf --remote
+          done
+
       - name: Salva le modifiche (solo se qualcosa è cambiato)
         run: |
-          if [ -z "$(git status --porcelain -- itinerario)" ]; then
+          if [ -z "$(git status --porcelain -- itinerario scripts/coordinate.json)" ]; then
             echo "Nessuna modifica da Notion."
             exit 0
           fi
@@ -49,16 +74,18 @@ jobs:
           git config user.email "41898341+github-actions[bot]@users.noreply.github.com"
           mkdir -p "$RUNNER_TEMP/itinerario"
           cp -r itinerario/. "$RUNNER_TEMP/itinerario/"
+          cp scripts/coordinate.json "$RUNNER_TEMP/coordinate.json"
           # Se nel frattempo qualcuno ha modificato il repo, riparte dall'ultima versione e riprova.
           for tentativo in 1 2 3; do
             git fetch --quiet origin "$GITHUB_REF_NAME"
             git reset --quiet --hard "origin/$GITHUB_REF_NAME"
             cp -r "$RUNNER_TEMP/itinerario/." itinerario/
-            if [ -z "$(git status --porcelain -- itinerario)" ]; then
+            cp "$RUNNER_TEMP/coordinate.json" scripts/coordinate.json
+            if [ -z "$(git status --porcelain -- itinerario scripts/coordinate.json)" ]; then
               echo "Il repo è già aggiornato."
               exit 0
             fi
-            git add -A -- itinerario
+            git add -A -- itinerario scripts/coordinate.json
             git commit --quiet -m "Itinerari: aggiornamento automatico da Notion"
             if git push --quiet origin "HEAD:$GITHUB_REF_NAME"; then
               echo "Itinerari aggiornati."

@@ -805,6 +805,25 @@ main{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;
 .btn{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:600;padding:10px 16px;border-radius:12px;text-decoration:none;background:var(--accent);color:#fff}
 .btn:hover{background:var(--accent-h)}
 
+/* anteprima e paywall (itinerari in vendita) */
+.tab.locked span{color:var(--sub)}
+.tab.locked small svg{flex-shrink:0}
+.tab.locked[aria-selected="true"] span{color:#fff}
+.lockli{list-style:none}
+.ghost{filter:blur(3px);opacity:.75;pointer-events:none;user-select:none}
+.ghost .stop{cursor:default}
+.ghost .bar{display:block;height:11px;border-radius:6px;background:var(--line2);margin-top:4px}
+.ghost .bar.s{height:8px;margin-top:7px;background:var(--line)}
+.lockcard{margin:6px 20px 18px;padding:16px;border:1px solid color-mix(in srgb,var(--accent) 35%,var(--line2));background:var(--accent-bg);border-radius:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.lockcard .eyebrow{display:flex;align-items:center;gap:6px}
+.lockcard h3{font-size:18px;line-height:1.25}
+.lockcard p{margin:0;font-size:13px;color:var(--ink2)}
+button.btn{border:0;cursor:pointer}
+.maplock{position:absolute;inset:0;z-index:600;display:grid;place-items:center;padding:20px;background:color-mix(in srgb,var(--bg) 50%,transparent);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.maplock div{background:var(--paper);border:1px solid var(--line2);border-radius:16px;padding:14px 16px;max-width:280px;text-align:center;font-size:13px;color:var(--ink2);box-shadow:0 8px 24px rgba(28,25,23,.12)}
+.maplock b{display:block;font-family:var(--serif);font-size:16px;color:var(--ink);margin-bottom:4px}
+.unlocked{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--badge);background:var(--badge-bg);padding:3px 9px;border-radius:6px}
+
 /* lightbox */
 .lb{position:fixed;inset:0;z-index:2000;background:rgba(10,10,12,.92);display:flex;align-items:center;justify-content:center}
 .lb img{max-width:92vw;max-height:86vh;object-fit:contain;border-radius:6px}
@@ -827,7 +846,7 @@ main{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;
   <section class="trip" aria-label="Itinerario del viaggio">
     <div class="tabs" id="days" role="tablist" aria-label="Viste del viaggio"></div>
     <div class="tripbody" id="tripbody">
-      <div class="mapwrap"><div id="map" role="region" aria-label="Mappa delle tappe"></div><div class="mapnote" id="mapnote" hidden>Sfondo della mappa non disponibile</div></div>
+      <div class="mapwrap"><div id="map" role="region" aria-label="Mappa delle tappe"></div><div class="maplock" id="maplock" hidden></div><div class="mapnote" id="mapnote" hidden>Sfondo della mappa non disponibile</div></div>
       <div class="daycard" id="daycard" role="tabpanel"></div>
       <div class="photos" id="photos"></div>
     </div>
@@ -870,6 +889,8 @@ function longDate(iso){
 }
 
 let D = null, sel = 'all', map = null, layer = null, markers = [], photoList = [], pIdx = 0;
+const LOCK = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+let paywallShown = false;
 
 /* I dati sono incorporati nella pagina dallo script di export: così la pagina
    funziona anche aperta dal disco, dove il browser blocca fetch(). */
@@ -883,12 +904,26 @@ async function load(){
     try{ D = await (await fetch('citta.json', {cache:'no-store'})).json(); }catch(e){}
   }
   if(!D){ document.getElementById('hero').innerHTML = '<p class="muted">Non riesco a caricare questo itinerario.</p>'; return; }
+  // Itinerario in vendita: la pagina contiene solo l'anteprima. Se in questo browser
+  // c'è un acquisto, il Worker restituisce l'itinerario completo.
+  if(D.locked && window.Acquisto){
+    const full = await Acquisto.sblocca(D.slug);
+    if(full && full.days){ D = {...full, unlocked: true}; }
+  }
+  if(D.locked) sel = '0';
   document.title = D.label;
   D.days.forEach((d,i) => { d.i = i; let n = 0; d.stops.forEach(s => { s.num = (s.lat != null) ? ++n : null; }); });
   renderStatic();
   initMap();
   select(sel);
 }
+
+function paywall(){
+  if(!window.Acquisto) return;
+  paywallShown = true;
+  Acquisto.paywall({slug: D.slug, title: D.title, cover: D.cover ? '../' + D.cover : '', giorni: D.days.length, tappe: D.tot && D.tot.tappe});
+}
+const lockedDays = () => D.days.filter(d => d.locked);
 
 function renderStatic(){
   document.getElementById('crumb').textContent = `${D.flag || ''} ${D.label} · ${D.country}`;
@@ -898,10 +933,10 @@ function renderStatic(){
     ${D.lede ? `<p>${esc(D.lede)}</p>` : ''}`;
 
   const stops = D.days.flatMap(d => d.stops);
-  const places = stops.filter(s => s.cat !== 'spostamenti');
+  const places = D.tot ? {length: D.tot.tappe} : stops.filter(s => s.cat !== 'spostamenti');
   const km = D.days.reduce((a,d) => a + (d.km || 0), 0);
   const steps = D.days.reduce((a,d) => a + (d.steps || 0), 0);
-  const photos = D.days.reduce((a,d) => a + d.photos.length, 0);
+  const photos = D.tot ? D.tot.foto : D.days.reduce((a,d) => a + d.photos.length, 0);
   const temps = D.days.map(d => d.temp).filter(t => t != null);
   const tiles = [
     [D.days.length, D.days.length === 1 ? 'Giorno' : 'Giorni'],
@@ -909,7 +944,7 @@ function renderStatic(){
     km ? [fmt(Math.round(km*10)/10) + ' km', 'Percorsi a piedi'] : null,
     steps ? [fmt(steps), 'Passi'] : null,
     photos ? [photos, 'Foto'] : null,
-    temps.length ? [Math.round(temps.reduce((a,b)=>a+b,0)/temps.length) + '°C', 'Temperatura media'] : [new Set(places.map(p => p.cat)).size, 'Categorie']
+    temps.length ? [Math.round(temps.reduce((a,b)=>a+b,0)/temps.length) + '°C', 'Temperatura media'] : [new Set(stops.map(p => p.cat)).size, 'Categorie']
   ].filter(Boolean);
   const kmDays = D.days.filter(d => d.km);
   document.getElementById('statsbox').innerHTML = `
@@ -920,23 +955,30 @@ function renderStatic(){
 
   document.getElementById('days').innerHTML =
     `<button type="button" role="tab" class="tab" data-d="all" id="day-all"><small><i></i>${D.days.length} giorni</small><span>Tutto il viaggio</span></button>` +
-    D.days.map(d => `<button type="button" role="tab" class="tab" data-d="${d.i}" id="day-${d.i}" style="--dc:${dayVar(d.i)}"><small><i></i>${dayLabel(d.date)}</small><span>${esc(d.title || 'Giorno ' + (d.i + 1))}</span></button>`).join('');
+    D.days.map(d => `<button type="button" role="tab" class="tab${d.locked ? ' locked' : ''}" data-d="${d.i}" id="day-${d.i}" style="--dc:${dayVar(d.i)}"${d.locked ? ' aria-label="' + esc((d.title || '') + ', nell\'itinerario completo') + '"' : ''}><small>${d.locked ? LOCK : '<i></i>'}${dayLabel(d.date)}</small><span>${esc(d.title || 'Giorno ' + (d.i + 1))}</span></button>`).join('');
   const tabs = [...document.querySelectorAll('.tab')];
   tabs.forEach((b, k) => {
-    b.addEventListener('click', () => select(b.dataset.d));
+    b.addEventListener('click', () => { select(b.dataset.d); if(b.classList.contains('locked')) paywall(); });
     b.addEventListener('keydown', e => {
       const m = {ArrowRight: 1, ArrowLeft: -1}[e.key]; if(!m) return;
       e.preventDefault(); const n = tabs[(k + m + tabs.length) % tabs.length]; n.focus(); select(n.dataset.d);
     });
   });
 
-  if(D.sale && window.Acquisto && Acquisto.disponibile(D.slug)){
+  if(D.unlocked){
+    const dl = window.Acquisto ? Acquisto.download(D.slug) : '';
+    document.getElementById('crumb').insertAdjacentHTML('afterend', ' <span class="unlocked">Itinerario completo</span>');
+    if(dl) document.getElementById('offer').innerHTML = `<div class="offer"><div><div class="eyebrow">Il tuo volume</div>
+      <h3>${esc(D.title)}, in PDF</h3><p>La storia di ogni luogo, cosa cercare sul posto e le mappe dei giorni, da tenere sul telefono durante il viaggio.</p></div>
+      <a class="btn" href="${esc(dl)}">Scarica il volume ↓</a></div>`;
+  } else if(D.locked && window.Acquisto && Acquisto.disponibile(D.slug)){
     const PRICE = Acquisto.prezzo(D.slug);
-    document.getElementById('offer').innerHTML = `<div class="offer"><div><div class="eyebrow">Itinerario in PDF</div>
-      <h3>Porta con te questo itinerario</h3><p>Tutte le giornate in un PDF da usare in viaggio: orari, tappe, schema dei percorsi e ogni posto collegato a Google Maps. Lo scarichi subito dopo il pagamento.</p></div>
+    const n = lockedDays().length;
+    document.getElementById('offer').innerHTML = `<div class="offer"><div><div class="eyebrow">Itinerario completo</div>
+      <h3>Sblocca le altre ${n} giornate e il volume in PDF</h3><p>Orari, tappe, mappa e foto di tutto il viaggio su questa pagina, più un piccolo volume da portare in viaggio con la storia di ogni luogo.</p></div>
       <div style="display:flex;align-items:center;gap:14px">${PRICE ? `<span style="font-family:var(--serif);font-size:22px;font-weight:700">${esc(PRICE)}</span>` : ''}
-      <a class="btn" href="#" data-acquista="${esc(D.slug)}" data-title="${esc(D.title)}" data-cover="${D.cover ? '../' + esc(D.cover) : ''}">Acquista il PDF →</a></div></div>`;
-    Acquisto.collega(document.getElementById('offer'));
+      <button type="button" class="btn" id="offer-go">Sblocca l'itinerario →</button></div></div>`;
+    document.getElementById('offer-go').addEventListener('click', paywall);
   }
 }
 
@@ -1041,15 +1083,20 @@ function select(key){
   const head = one ? `
       <div class="when"><i></i>${longDate(one.date)}</div>
       <h2>${esc(one.title || dayLabel(one.date))}</h2>
-      <div class="chips">${[one.stops.filter(s => s.cat !== 'spostamenti').length + ' tappe', one.km && fmt(one.km) + ' km', one.steps && fmt(one.steps) + ' passi', one.temp != null && one.temp + '°C', one.photos.length && one.photos.length + ' foto'].filter(Boolean).map(c => `<span class="chip">${c}</span>`).join('')}</div>
+      <div class="chips">${[(one.locked ? one.nposti : one.stops.filter(s => s.cat !== 'spostamenti').length) + ' tappe', one.km && fmt(one.km) + ' km', one.steps && fmt(one.steps) + ' passi', one.temp != null && one.temp + '°C', (one.locked ? one.nfoto : one.photos.length) && (one.locked ? one.nfoto : one.photos.length) + ' foto'].filter(Boolean).map(c => `<span class="chip">${c}</span>`).join('')}</div>
       ${one.lede ? `<p>${esc(one.lede)}</p>` : ''}` : `
       <div class="when"><i></i>${esc(D.dates || '')}</div>
       <h2>Tutto il viaggio</h2>
-      <p>${D.days.length} giorni e ${D.days.flatMap(d => d.stops).filter(s => s.cat !== 'spostamenti').length} tappe. Scegli un giorno per seguirne il percorso sulla mappa.</p>`;
+      <p>${D.days.length} giorni e ${D.tot ? D.tot.tappe : D.days.flatMap(d => d.stops).filter(s => s.cat !== 'spostamenti').length} tappe. ${D.locked ? 'Il primo giorno è in anteprima gratuita.' : 'Scegli un giorno per seguirne il percorso sulla mappa.'}</p>`;
   card.innerHTML = `<div class="dayhead">${head}</div><ol class="stops" id="stops"></ol>`;
   const ol = document.getElementById('stops');
   days.forEach(d => {
     if(!one){ const sep = document.createElement('li'); sep.className = 'daysep'; sep.style.setProperty('--dc', dayVar(d.i)); sep.textContent = dayLabel(d.date) + (d.title ? ' · ' + d.title : ''); ol.appendChild(sep); }
+    if(d.locked){
+      if(one){ ol.insertAdjacentHTML('beforeend', lockHtml(true)); }
+      else { const li = document.createElement('li'); li.className = 'muted'; li.style.cssText = 'padding:4px 20px 8px;font-size:12.5px;display:flex;gap:6px;align-items:center'; li.innerHTML = `${LOCK} ${d.nposti} tappe nell'itinerario completo`; ol.appendChild(li); }
+      return;
+    }
     if(!d.stops.length){ const li = document.createElement('li'); li.className = 'muted'; li.style.cssText = 'padding:10px 20px;font-size:13px'; li.textContent = 'Nessuna tappa segnata.'; ol.appendChild(li); }
     d.stops.forEach(s => {
       const li = document.createElement('li');
@@ -1061,16 +1108,49 @@ function select(key){
       li.appendChild(b); ol.appendChild(li);
     });
   });
-  drawMap(days);
+  // in fondo all'anteprima: le prossime tappe sfocate e l'invito a sbloccare
+  if(D.locked && (!one || !one.locked)){
+    ol.insertAdjacentHTML('beforeend', lockHtml(false));
+    watchTeaser();
+  }
+  ol.querySelectorAll('[data-sblocca]').forEach(b => b.addEventListener('click', paywall));
+  drawMap(days.filter(d => !d.locked));
+  const ml = document.getElementById('maplock');
+  ml.hidden = !(one && one.locked);
+  if(one && one.locked) ml.innerHTML = `<div><b>${esc(one.title || dayLabel(one.date))}</b>Il percorso di questo giorno sulla mappa è nell'itinerario completo.<br><button type="button" class="btn" style="margin-top:10px" data-sblocca>Sblocca l'itinerario</button></div>`;
+  ml.querySelectorAll('[data-sblocca]').forEach(b => b.addEventListener('click', paywall));
   photoList = days.flatMap(d => d.photos);
   pIdx = 0;
   renderPhotos(one);
+}
+
+/* righe sfocate (senza testi veri) e riquadro per sbloccare */
+function lockHtml(dayLocked){
+  const n = lockedDays().length, t = lockedDays().reduce((a, d) => a + (d.nposti || 0), 0);
+  const ghost = [62, 48, 70].map((w, k) => `<li><div class="stop"><span class="t">--:--</span><span class="n">${k + 1}</span><span class="name"><span class="bar" style="width:${w}%"></span><span class="bar s" style="width:${w - 22}%"></span></span></div></li>`).join('');
+  return `<li class="lockli" id="teaser"><ol class="stops ghost" aria-hidden="true" style="padding:0;overflow:visible">${ghost}</ol>
+    <div class="lockcard"><div class="eyebrow">${LOCK} Itinerario completo</div>
+      <h3>${dayLocked ? 'Le tappe di questo giorno sono nell\'itinerario completo' : `Il viaggio continua per altri ${n} giorni`}</h3>
+      <p>${t} tappe con orari, note, mappa e foto, più il volume in PDF con la storia di ogni luogo.</p>
+      <button type="button" class="btn" data-sblocca>Sblocca l'itinerario${window.Acquisto && Acquisto.prezzo(D.slug) ? ' · ' + esc(Acquisto.prezzo(D.slug)) : ''}</button></div></li>`;
+}
+/* quando chi legge arriva in fondo all'anteprima si apre il popup di pagamento (una volta) */
+let teaserObs = null;
+function watchTeaser(){
+  if(teaserObs) teaserObs.disconnect();
+  const el = document.getElementById('teaser');
+  if(!el || paywallShown || !('IntersectionObserver' in window)) return;
+  teaserObs = new IntersectionObserver(es => {
+    if(es.some(e => e.isIntersecting) && !paywallShown){ teaserObs.disconnect(); setTimeout(paywall, 350); }
+  }, {threshold: .35});
+  teaserObs.observe(el);
 }
 
 /* ===== FOTO ===== */
 function renderPhotos(one){
   const box = document.getElementById('photos');
   const label = one ? (one.title || dayLabel(one.date)) : 'tutto il viaggio';
+  if(one && one.locked){ box.innerHTML = `<div class="nophotos"><span>${LOCK} ${one.nfoto ? one.nfoto + ' foto' : 'Le foto'} di questo giorno nell'itinerario completo.</span></div>`; return; }
   if(!photoList.length){ box.innerHTML = `<div class="nophotos">Nessuna foto per ${esc(label)}.</div>`; return; }
   box.innerHTML = `<div class="car"><div class="car-track" id="track">${photoList.map((u,i) => `<div class="car-slide"><img src="${esc(u)}" alt="Foto ${i+1} di ${photoList.length}" loading="lazy" data-i="${i}"></div>`).join('')}</div>
     <button type="button" class="car-arrow car-prev" id="cp" aria-label="Foto precedente">‹</button>

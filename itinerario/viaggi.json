@@ -116,166 +116,171 @@
           "category": "luoghi"
         },
         {
-          "name": "22 Bishopsgate",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Sky Garden",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "The Gherkin",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Passeggiata tra King William St e Gracechurch St",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "London Bridge",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Saïd Business School",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "New Theatre Oxford",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "St Michael at the North Gate",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Santander Work Café",
+          "name": null,
           "category": "locali"
         },
         {
-          "name": "Oxford Castle",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Nef Istanbul",
+          "name": null,
           "category": "locali"
         },
         {
-          "name": "Magdalen Bridge",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Oxford Botanic Garden",
+          "name": null,
           "category": "parchi"
         },
         {
-          "name": "High Street e Queen's College",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Radcliffe Camera",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Bodleian Library",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Weston Library",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Trinity College",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Itsu, Cornmarket St",
+          "name": null,
           "category": "locali"
         },
         {
-          "name": "Camden High St",
+          "name": null,
           "category": "negozi"
         },
         {
-          "name": "Regent's Canal",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Trafalgar Square e Nelson's Column",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "The National Gallery",
+          "name": null,
           "category": "musei"
         },
         {
-          "name": "St Martin-in-the-Fields",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Caffè Nero",
+          "name": null,
           "category": "locali"
         },
         {
-          "name": "Northumberland Ave verso il Tamigi",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Hungerford Bridge e Golden Jubilee Bridges",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Jubilee Gardens e The Queen's Walk",
+          "name": null,
           "category": "parchi"
         },
         {
-          "name": "London Eye",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Westminster Bridge e Big Ben",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Nike Town, Oxford Circus",
+          "name": null,
           "category": "negozi"
         },
         {
-          "name": "Oxford Street",
+          "name": null,
           "category": "negozi"
         },
         {
-          "name": "Disney Store",
+          "name": null,
           "category": "negozi"
         },
         {
-          "name": "Mercato di Mayfair",
+          "name": null,
           "category": "negozi"
         },
         {
-          "name": "Itsu, Oxford Street",
+          "name": null,
           "category": "locali"
         },
         {
-          "name": "Hyde Park",
+          "name": null,
           "category": "parchi"
         },
         {
-          "name": "Wellington Arch",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Green Park",
+          "name": null,
           "category": "parchi"
         },
         {
-          "name": "Buckingham Palace e Queen Victoria Memorial",
+          "name": null,
           "category": "luoghi"
         },
         {
-          "name": "Borough Market",
+          "name": null,
           "category": "negozi"
         }
-      ]
+      ],
+      "locked": true,
+      "tot": {
+        "tappe": 48,
+        "foto": 86
+      }
     }
   ],
   "upcoming": [

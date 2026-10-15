@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
 """
-Impagina l'itinerario di una città in un PDF da vendere.
+Impagina il volume di viaggio di una città: un piccolo libro in PDF da vendere.
 
     python scripts/pdf_itinerario.py Londra            → _pdf/Londra.pdf
     python scripts/pdf_itinerario.py Londra --fonts DIR
 
-Legge itinerario/<Città>/citta.json (lo stesso export che alimenta il sito),
-costruisce una pagina HTML pensata per la stampa e la trasforma in PDF con
-Chromium (Playwright). Il PDF finisce in _pdf/, che è fuori dal sito e fuori
-da git: va caricato a mano nel bucket R2 letto dal Worker di acquisto.
+Legge l'itinerario completo da _privato/<Città>/citta.json (lo scrive
+sync_itinerario.py; sul sito pubblico c'è solo l'anteprima), con i testi del
+volume: la sottopagina "Volume" della città su Notion (introduzione, linea del
+tempo, introduzioni dei giorni) e le colonne Storia, Da cercare e Anno storico
+delle tappe. Costruisce una pagina HTML pensata per la stampa e la trasforma in
+PDF con Chromium (Playwright). Il PDF finisce in _pdf/, fuori dal sito e fuori
+da git: il workflow lo carica nel bucket R2 letto dal Worker di acquisto.
+
+Struttura: copertina · il viaggio in breve · la città in breve con la linea del
+tempo · per ogni giorno l'introduzione storica del quartiere, lo schema del
+percorso con gli orari e le schede dei luoghi (storia e cosa cercare sul posto)
+· indice dei posti.
 
 Requisiti: pip install playwright pillow  (e un Chromium per Playwright).
 I caratteri arrivano da Google Fonts; con --fonts si possono usare file
@@ -146,7 +154,7 @@ def build_html(c, fonts):
 <section class="page cover">
   {f'<img class="cv" src="{cover}" alt="">' if cover else ''}
   <div class="cv-body">
-    <div class="eyebrow">Itinerario · {esc(c["country"])}</div>
+    <div class="eyebrow">Volume di viaggio · {esc(c["country"])}</div>
     <h1>{esc(c["title"])}</h1>
     <p class="dates">{esc(c["dates"])}</p>
     <p class="lede">{esc(c.get("lede"))}</p>
@@ -167,13 +175,26 @@ def build_html(c, fonts):
       <span class="ix-n">{sum(1 for s in d["stops"] if s["cat"] != "spostamenti")} tappe</span></li>''' for i, d in enumerate(days))
     out.append(f'''
 <section class="page">
-  <div class="eyebrow">Come usare questa guida</div>
+  <div class="eyebrow">Come usare questo volume</div>
   <h2>Il viaggio in breve</h2>
-  <p class="body">Ogni giorno ha uno schema del percorso, gli orari in cui ho fatto ogni tappa e una nota pratica.
+  <p class="body">Ogni giorno si apre con la storia del quartiere, lo schema del percorso e gli orari in cui ho fatto ogni tappa.
+  Seguono le schede dei luoghi: quando sei sul posto, leggi la storia e cerca il dettaglio indicato in fondo alla scheda.
   Toccando il nome di un posto si apre su Google Maps, così puoi seguire l'itinerario direttamente dal telefono.
   Gli orari sono quelli del mio viaggio: usali come ritmo, non come tabella di marcia.</p>
   <ol class="index">{rows}</ol>
   <div class="legend">{"".join(f'<span class="chip c-{k}">{v}</span>' for k, v in CAT.items())}</div>
+</section>''')
+
+    # ---- la città in breve: introduzione e linea del tempo
+    vol = c.get("volume") or {}
+    if vol.get("intro") or vol.get("timeline"):
+        tl = "".join(f'<li><b>{esc(t["anno"])}</b><span>{esc(t["testo"])}</span></li>' for t in vol.get("timeline", []))
+        out.append(f'''
+<section class="page">
+  <div class="eyebrow">Prima di partire</div>
+  <h2>{esc(vol.get("intro_titolo") or c["label"] + " in breve")}</h2>
+  <div class="prose">{"".join(f"<p>{esc(p)}</p>" for p in vol.get("intro", []))}</div>
+  {f'<h3 class="tl-h">Linea del tempo</h3><ol class="timeline">{tl}</ol>' if tl else ''}
 </section>''')
 
     # ---- un capitolo per giorno
@@ -198,16 +219,38 @@ def build_html(c, fonts):
         <div><div class="nm">{name} <span class="chip c-{s["cat"]}">{CAT.get(s["cat"], s["cat"])}</span></div>
           {f'<div class="nt">{esc(s["notes"])}</div>' if s.get("notes") else ''}</div></li>''')
         out.append(f'''
-<section class="page day" style="--dc:{col}">
+<section class="page day{' hascards' if any(x.get('storia') for x in d['stops']) else ''}" style="--dc:{col}">
   <div class="dayhead">
     <div class="eyebrow" style="color:{col}">Giorno {i + 1} · {esc(long_date(d["date"]))}</div>
     <h2>{esc(d["title"])}</h2>
     {f'<p class="body">{esc(d.get("lede"))}</p>' if d.get("lede") else ''}
     {f'<p class="meta">{meta}</p>' if meta else ''}
   </div>
+  {f'<div class="story"><div class="eyebrow" style="color:{col}">Un po\' di storia</div>{"".join(f"<p>{esc(p)}</p>" for p in (vol.get("giorni") or {}).get(d["title"], "").split(chr(10)+chr(10)) if p)}</div>' if (vol.get("giorni") or {}).get(d["title"]) else ''}
   <div class="visual{' nophoto' if not photos else ''}">{route_svg(d["stops"], col)}
     {f'<div class="photos">{"".join(f"<img src={chr(34)}{p}{chr(34)} alt={chr(34)}{chr(34)}>" for p in photos)}</div>' if photos else ''}</div>
   <ol class="stops">{"".join(items)}</ol>
+</section>''')
+        # schede dei luoghi con la nota storica
+        cards, n = [], 0
+        for s in d["stops"]:
+            if s["cat"] != "spostamenti":
+                n += 1
+            if not s.get("storia"):
+                continue
+            link = maps_link(s)
+            name = f'<a href="{link}">{esc(s["name"])}</a>' if link else esc(s["name"])
+            cards.append(f'''<article class="card">
+      <header><span class="no" style="background:{col}">{n}</span><h3>{name}</h3>{f'<span class="yr">{esc(s["anno"])}</span>' if s.get("anno") else ''}</header>
+      <p>{esc(s["storia"])}</p>
+      {f'<div class="look"><b>Da cercare</b> {esc(s["cercare"])}</div>' if s.get("cercare") else ''}
+    </article>''')
+        if cards:
+            out.append(f'''
+<section class="page cards" style="--dc:{col}">
+  <div class="eyebrow" style="color:{col}">Giorno {i + 1} · {esc(d["title"])}</div>
+  <h2>I luoghi</h2>
+  {"".join(cards)}
 </section>''')
 
     # ---- tutti i posti per categoria
@@ -227,7 +270,8 @@ def build_html(c, fonts):
   <div class="eyebrow">Indice</div>
   <h2>Tutti i posti</h2>
   <div class="groups">{"".join(groups)}</div>
-  <p class="fine">Questo itinerario è per uso personale: grazie per non condividerlo.<br>
+  <p class="fine">Le note storiche sono state scritte e verificate su fonti pubbliche (siti ufficiali dei luoghi, enti di tutela, enciclopedie) nell'ottobre 2026: orari, aperture e opere esposte possono cambiare.<br>
+  Questo volume è per uso personale: grazie per non condividerlo.<br>
   Domande o correzioni? Scrivimi da danieledemichele.it</p>
 </section>''')
 
@@ -264,6 +308,10 @@ h1 {{ font-size:34pt }} h2 {{ font-size:22pt }} h3 {{ font-size:12.5pt }}
 .c-locali {{ background:#fbeae4; color:#9a3412 }} .c-luoghi {{ background:#e6effa; color:#1f5f9a }}
 .c-musei {{ background:#f0e9fa; color:#5b3a92 }} .c-parchi {{ background:#e6f2ea; color:#2e6b42 }}
 .c-negozi {{ background:#fbf1dc; color:#8a5a0c }}
+.page.day.hascards {{ break-after:auto }}
+.cards > .eyebrow, .cards > h2 {{ break-after:avoid }}
+.page.day + .cards {{ margin-top:8mm }}
+.card .yr, .facts b {{ font-variant-numeric:lining-nums }}
 .dayhead {{ display:flex; flex-direction:column; gap:6px; border-left:4px solid var(--dc); padding-left:12px }}
 .meta {{ margin:0; font-size:9pt; color:var(--sub); font-variant-numeric:tabular-nums }}
 .route {{ width:100%; height:auto; font-family:var(--sans); break-inside:avoid }}
@@ -288,6 +336,26 @@ h1 {{ font-size:34pt }} h2 {{ font-size:22pt }} h3 {{ font-size:12.5pt }}
 .grp li {{ display:flex; justify-content:space-between; gap:8px; padding:3px 0; border-bottom:1px solid var(--line); font-size:9.5pt }}
 .grp li span {{ color:var(--sub); font-size:8.5pt; white-space:nowrap }}
 .fine {{ margin-top:auto; font-size:8.5pt; color:var(--sub) }}
+.prose {{ columns:2; column-gap:9mm; color:var(--ink2); font-size:10pt }}
+.prose p {{ margin:0 0 3mm; text-align:justify; hyphens:auto }}
+.prose p:first-child::first-letter {{ font-family:var(--serif); font-size:30pt; float:left; line-height:.9; margin:2px 6px 0 0; color:var(--accent) }}
+.tl-h {{ margin-top:4mm }}
+.timeline {{ list-style:none; margin:0; padding:0 0 0 4mm; border-left:2px solid var(--line) }}
+.timeline li {{ display:grid; grid-template-columns:20mm 1fr; gap:6px; padding:4px 0; position:relative; break-inside:avoid; font-size:9.5pt }}
+.timeline li::before {{ content:""; position:absolute; left:-5.6mm; top:9px; width:8px; height:8px; border-radius:50%; background:var(--accent) }}
+.timeline b {{ font-family:var(--serif); font-size:11pt; color:var(--accent); font-variant-numeric:lining-nums tabular-nums }}
+.timeline span {{ color:var(--ink2) }}
+.story {{ background:var(--panel); border-radius:12px; padding:10px 14px; break-inside:avoid }}
+.story p {{ margin:4px 0 0; font-size:9.5pt; color:var(--ink2); text-align:justify; hyphens:auto }}
+.cards {{ gap:9px }}
+.card {{ border:1px solid var(--line); border-radius:12px; padding:10px 13px; break-inside:avoid; display:flex; flex-direction:column; gap:5px }}
+.card header {{ display:flex; align-items:center; gap:8px }}
+.card h3 {{ font-size:12.5pt; flex:1 }}
+.card .no {{ flex-shrink:0 }}
+.card .yr {{ font-size:8pt; font-weight:700; color:var(--dc); border:1px solid var(--dc); border-radius:999px; padding:1px 8px; white-space:nowrap; font-variant-numeric:tabular-nums }}
+.card p {{ margin:0; font-size:9.5pt; color:var(--ink2); text-align:justify; hyphens:auto }}
+.look {{ font-size:9pt; background:var(--panel); border-left:3px solid var(--dc); padding:5px 9px; border-radius:0 8px 8px 0 }}
+.look b {{ font-size:7.5pt; letter-spacing:.08em; text-transform:uppercase; color:var(--dc); margin-right:4px }}
 </style></head><body>{"".join(out)}</body></html>'''
 
 
@@ -299,7 +367,12 @@ def main():
     ap.add_argument("--html", action="store_true", help="salva anche l'HTML intermedio")
     a = ap.parse_args()
 
-    c = json.load(open(os.path.join(ROOT, "itinerario", a.slug, "citta.json"), encoding="utf-8"))
+    # l'itinerario completo (con i testi del volume) è in _privato/; sul sito c'è solo l'anteprima
+    src = os.path.join(ROOT, "_privato", a.slug, "citta.json")
+    if not os.path.exists(src):
+        src = os.path.join(ROOT, "itinerario", a.slug, "citta.json")
+        print(f"  attenzione: manca _privato/{a.slug}/citta.json, uso {src} (potrebbe essere solo l'anteprima)", file=sys.stderr)
+    c = json.load(open(src, encoding="utf-8"))
     out = a.out or os.path.join(ROOT, "_pdf", f"{a.slug}.pdf")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     page = build_html(c, a.fonts)
