@@ -60,12 +60,15 @@ Layout a due colonne: **card profilo** a sinistra (cover, avatar, dropdown socia
 │   ├── pdf_itinerario.py         # _privato/<Città>/citta.json → _pdf/<Città>.pdf (il volume in vendita, fuori da git)
 │   ├── volume_latex.py           # lo stesso volume in LaTeX (XeLaTeX): impaginazioni «taccuino» A5 e «atlante» A4
 │   ├── volume/fonts/             # Playfair Display per il volume LaTeX (licenza OFL)
+│   ├── volume/mappe/             # sfondi OpenStreetMap delle mappe dei giorni (aree.json + <Città>-<giorno>.json)
+│   ├── mappe_volume.py           # scarica le mappe da Overpass (lo lancia mappe-volume.yml)
 │   ├── coordinate.json           # coordinate delle tappe (chiave = hash del nome), riusate dallo script
 │   └── itinerario_extra.json     # dati dei viaggi che Notion non contiene
 ├── .github/workflows/
 │   ├── sync-materie.yml          # GitHub Action che lancia sync_materie.py
 │   ├── sync-tutorato.yml         # GitHub Action che lancia sync_tutorato.py
 │   ├── sync-itinerario.yml       # GitHub Action che lancia sync_itinerario.py
+│   ├── mappe-volume.yml          # scarica le mappe del volume da OpenStreetMap quando cambiano le aree
 │   └── deploy-acquisto.yml       # pubblica il Worker di acquisto su Cloudflare
 ├── _workers/itinerario-acquisto/ # Worker Cloudflare: checkout Stripe + download protetto (non pubblicato: inizia con _)
 ├── libreria/                     # vedi sezione "La Mia Libreria" più sotto
@@ -205,7 +208,7 @@ I dati vengono **incorporati dentro ogni pagina** (oltre che salvati in `viaggi.
 
 Chi compra sblocca la **pagina completa** della città (tutte le giornate con orari, note, mappa e foto) e riceve il **volume in PDF**: copertina, il viaggio in breve, la città in breve con la linea del tempo, e per ogni giorno l'introduzione storica del quartiere, lo schema del percorso con gli orari e le schede dei luoghi (storia, anno, cosa cercare sul posto), più l'indice dei posti. Ogni posto si apre su Google Maps.
 
-- **Volume in LaTeX (in prova)** — `python scripts/volume_latex.py Londra --stile taccuino|atlante` genera `_pdf/Londra-<stile>.pdf` con XeLaTeX: *taccuino* A5 a una colonna da tenere in tasca, *atlante* A4 a due colonne con copertina illustrata e linea del tempo orizzontale. Le foto vengono scaricate in `_pdf/foto/`, raddrizzate e ritagliate in proporzione esatta. Servono TeX Live (con `texlive-lang-italian` per la sillabazione), il font Inter e Pillow. Quando si sceglie l'impaginazione, il workflow passerà a questo script.
+- **Volume in LaTeX (in prova)** — `python scripts/volume_latex.py Londra --stile taccuino|atlante` genera `_pdf/Londra-<stile>.pdf` con XeLaTeX: *taccuino* A5 a una colonna da tenere in tasca, *atlante* A4 a due colonne con copertina illustrata e linea del tempo orizzontale. Le foto vengono scaricate in `_pdf/foto/`, raddrizzate e ritagliate in proporzione esatta. Le **mappe dei giorni** hanno lo sfondo OpenStreetMap (strade, Tamigi, parchi, ferrovie) disegnato da `scripts/volume/mappe/<Città>-<giorno>.json`: le aree dei giorni sono in `aree.json` e il workflow `mappe-volume.yml` scarica i dati da Overpass e li salva semplificati (© OpenStreetMap contributors, ODbL). Senza quei file la mappa torna allo schema del solo percorso. Servono TeX Live (con `texlive-lang-italian` per la sillabazione), il font Inter e Pillow. Quando si sceglie l'impaginazione, il workflow passerà a questo script.
 - **Volume PDF** — `python scripts/pdf_itinerario.py Londra` lo genera in `_pdf/Londra.pdf` da `_privato/Londra/citta.json` (servono `playwright` e `pillow`; con `--fonts DIR` usa i font locali). `_pdf/` e `_privato/` sono in `.gitignore`: niente finisce nel repo né sul sito, perché il repo è pubblico. Il workflow lo rigenera e lo carica su R2 da solo.
 - **Pagamento** — `itinerario/acquisto.js` decide come si paga. Con `api` (URL del Worker) e `pk` (chiave pubblicabile Stripe) impostati, «Acquista» apre un **popup del sito con il checkout di Stripe incorporato**; se sono vuoti apre il **link di pagamento** Stripe (`link`) in una nuova scheda. Lì si impostano anche i prezzi mostrati (`prezzo`); il prezzo vero lo decide Stripe.
 - **Consegna** — Stripe rimanda sempre a `/itinerario/grazie/?session_id=…`. La pagina chiede al Worker se quella sessione è pagata, ricorda il codice d'acquisto nel browser (`localStorage`) e mostra «Apri l'itinerario completo» e il download del volume. La pagina della città, trovando il codice, chiede al Worker l'itinerario completo e si sblocca; su un altro dispositivo basta riaprire il link della pagina «grazie»; il Worker legge il PDF dal bucket **R2** `itinerari` e lo consegna solo se Stripe conferma il pagamento. Il link resta valido, così chi ha comprato può riscaricare il file. Finché il Worker non è attivo la pagina dice che il PDF arriva via email (invio a mano).

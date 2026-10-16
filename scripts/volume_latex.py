@@ -162,6 +162,108 @@ def route_tikz(stops, color, w, h):
 \\end{{tikzpicture}}"""
 
 
+MAPPE = os.path.join(ROOT, "scripts", "volume", "mappe")
+
+
+def map_pdf(slug, i, stops, color, w, h):
+    """Mappa del giorno (w×h cm) in PDF vettoriale: sfondo OpenStreetMap da
+    scripts/volume/mappe/<slug>-<i>.json (strade, acqua, verde, ferrovie), percorso
+    tratteggiato e tappe numerate. Restituisce il percorso del PDF o None."""
+    src = os.path.join(MAPPE, f"{slug}-{i}.json")
+    if not os.path.exists(src):
+        return None
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Polygon as MPoly, FancyArrow
+    from matplotlib.path import Path as MPath
+    from matplotlib.patches import PathPatch
+    matplotlib.rcParams.update({"pdf.fonttype": 42, "font.family": ["Inter", "DejaVu Sans"]})
+    m = json.load(open(src, encoding="utf-8"))
+    pts, n = [], 0
+    for s in stops:
+        if s["cat"] != "spostamenti":
+            n += 1
+            if s.get("lat") is not None:
+                pts.append((n, s))
+    if len(pts) < 2:
+        return None
+    lat0 = sum(s["lat"] for _, s in pts) / len(pts)
+    kx, ky = math.cos(math.radians(lat0)) * 111_320, 110_540
+    P = lambda lon, lat: (lon * kx, lat * ky)
+    xs = [s["lng"] * kx for _, s in pts]; ys = [s["lat"] * ky for _, s in pts]
+    # riquadro: le tappe con un margine, nelle proporzioni del box
+    aspect = w / h
+    cw, ch = max(max(xs) - min(xs), 250) * 1.22, max(max(ys) - min(ys), 250) * 1.22
+    if cw / ch < aspect: cw = ch * aspect
+    else: ch = cw / aspect
+    cx, cy = (max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2
+    x0, x1, y0, y1 = cx - cw / 2, cx + cw / 2, cy - ch / 2, cy + ch / 2
+    span_km = cw / 1000
+    fig = plt.figure(figsize=(w / 2.54, h / 2.54))
+    ax = fig.add_axes([0, 0, 1, 1]); ax.set_axis_off()
+    ax.set_xlim(x0, x1); ax.set_ylim(y0, y1); ax.set_aspect("equal")
+    fig.patch.set_facecolor("#F3EEE6"); ax.set_facecolor("#F3EEE6")
+    ax.add_patch(plt.Rectangle((x0, y0), cw, ch, color="#F3EEE6", zorder=0))
+
+    def poly(pp, fc, z):
+        verts, codes = [], []
+        for ring in [pp["esterno"]] + pp.get("buchi", []):
+            r = [P(*c) for c in ring]
+            verts += r; codes += [MPath.MOVETO] + [MPath.LINETO] * (len(r) - 2) + [MPath.CLOSEPOLY]
+        ax.add_patch(PathPatch(MPath(verts, codes), facecolor=fc, edgecolor="none", zorder=z))
+    for pp in m.get("verde", []): poly(pp, "#DCE6CC", 1)
+    for pp in m.get("acqua", []): poly(pp, "#C3D9E6", 2)
+    lw = 1 if span_km < 3 else 0.8
+    for ln in m.get("ferrovie", []):
+        q = [P(*c) for c in ln]; ax.plot(*zip(*q), color="#B8AFA3", lw=0.6 * lw, ls=(0, (3, 2)), zorder=3)
+    for ln in m["strade"].get("secondarie", []):
+        q = [P(*c) for c in ln]; ax.plot(*zip(*q), color="#FFFFFF", lw=0.9 * lw, solid_capstyle="round", zorder=4)
+    for ln in m["strade"].get("principali", []):
+        q = [P(*c) for c in ln]; ax.plot(*zip(*q), color="#D9CFC1", lw=2.4 * lw, solid_capstyle="round", zorder=5)
+    for ln in m["strade"].get("principali", []):
+        q = [P(*c) for c in ln]; ax.plot(*zip(*q), color="#FFFFFF", lw=1.5 * lw, solid_capstyle="round", zorder=6)
+    col = "#" + color
+    # sposta un po' le tappe sovrapposte (in metri, rispetto alla scala del riquadro)
+    Q = [list(P(s["lng"], s["lat"])) for _, s in pts]
+    r = cw / (w * 10) * 4.2                      # ~4 mm sulla carta, in metri
+    for a_ in range(len(Q)):
+        for b_ in range(a_):
+            if math.dist(Q[a_], Q[b_]) < r:
+                ang = 0.9 * (a_ + 1)
+                Q[a_][0] += r * math.cos(ang); Q[a_][1] += r * math.sin(ang)
+    ax.plot([q[0] for q in Q], [q[1] for q in Q], color=col, lw=1.6, ls=(0, (2.6, 1.8)), alpha=.9, zorder=8, solid_capstyle="round")
+    for (k, _), (x, y) in zip(pts, Q):
+        ax.scatter([x], [y], s=88, color=col, edgecolors="white", linewidths=1.1, zorder=9)
+        ax.text(x, y, str(k), ha="center", va="center_baseline", fontsize=5.6, fontweight="bold", color="white", zorder=10)
+    # scala e nord
+    target = cw / 4
+    nice = min([50, 100, 200, 250, 500, 1000, 2000, 5000], key=lambda v: abs(v - target))
+    bx, by = x0 + cw * 0.04, y0 + ch * 0.06
+    ax.add_patch(plt.Rectangle((bx - cw * 0.012, by - ch * 0.03), nice + cw * 0.03, ch * 0.11, color="white", alpha=.75, zorder=11, lw=0))
+    ax.plot([bx, bx + nice], [by, by], color="#44403C", lw=1.6, zorder=12, solid_capstyle="butt")
+    ax.text(bx, by + ch * 0.02, f"{nice // 1000} km" if nice >= 1000 else f"{nice} m", fontsize=5.5, color="#44403C", va="bottom", zorder=12)
+    nx, ny = x1 - cw * 0.05, y1 - ch * 0.08
+    ax.add_patch(FancyArrow(nx, ny - ch * 0.07, 0, ch * 0.06, width=cw * 0.004, head_width=cw * 0.02, head_length=ch * 0.03, color="#44403C", zorder=12))
+    ax.text(nx, ny - ch * 0.1, "N", fontsize=5.5, fontweight="bold", color="#44403C", ha="center", va="top", zorder=12)
+    ax.text(x1 - cw * 0.012, y0 + ch * 0.015, "© OpenStreetMap contributors", fontsize=4.2, color="#78716C", ha="right", va="bottom", zorder=12)
+    out = os.path.join(ROOT, "_pdf", "mappe", f"{slug}-{i}-{w:.1f}x{h:.1f}.pdf")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    fig.savefig(out, facecolor=fig.get_facecolor())
+    plt.close(fig)
+    return out
+
+
+def day_map(c, i, d, color, w, h):
+    """Mappa del giorno con lo sfondo OpenStreetMap; se manca, lo schema in TikZ."""
+    pdf = map_pdf(c["slug"], i, d["stops"], color, w, h)
+    if not pdf:
+        return route_tikz(d["stops"], color, w, h)
+    return (f"\\begin{{tikzpicture}}\\clip[rounded corners=3mm] (0,0) rectangle ({w},{h});"
+            f"\\node[anchor=south west,inner sep=0pt] at (0,0) {{\\includegraphics[width={w}cm,height={h}cm]{{{pdf}}}}};"
+            f"\\end{{tikzpicture}}")
+
+
 def numbered_stops(d):
     """(numero, tappa) con il numero delle sole tappe che non sono spostamenti."""
     out, n = [], 0
@@ -247,7 +349,7 @@ def taccuino(c):
     days = c["days"]
     n_luoghi = sum(1 for d in days for n, s in numbered_stops(d) if n)
     poster = os.path.join(ROOT, "itinerario", c["poster"]) if c.get("poster") else None
-    cover = photo(poster, 0.78, 1100) if poster and os.path.exists(poster) else None
+    cover = photo(poster, 896 / 1400, 1100) if poster and os.path.exists(poster) else None  # illustrazione intera, senza tagli
     T = [preamble("a5paper", "inner=17mm,outer=14mm,top=17mm,bottom=19mm,headsep=5mm,footskip=9mm", "9.5pt" if False else "10pt")]
     T.append(rf"""
 \pagestyle{{fancy}}\fancyhf{{}}
@@ -261,17 +363,16 @@ def taccuino(c):
 \pagecolor{{paper}}
 \begin{{tikzpicture}}[remember picture,overlay]
 \fill[paper] (current page.south west) rectangle (current page.north east);
-{f"\\node[anchor=north,inner sep=0pt] (cv) at ($(current page.north)+(0,-14mm)$) {{\\includegraphics[width=104mm]{{{cover}}}}};" if cover else ""}
-\end{{tikzpicture}}\par
-\vspace*{{{'124mm' if cover else '40mm'}}}
-\begin{{center}}
-\eyebrow{{Volume di viaggio · {tex(c['country'])}}}\par\vspace{{2mm}}
-{{\display\bfseries\fontsize{{25}}{{28}}\selectfont {tex(c['title'])}\par}}
-\vspace{{1mm}}{{\sffamily\fontsize{{9}}{{11}}\selectfont\color{{accent}} {tex(c['dates'])}\par}}
-\vspace{{3mm}}\meta{{{len(days)} giorni · {n_luoghi} tappe · {str(c.get('km') or '').replace('.', ',')} km a piedi}}
-\end{{center}}
-\vfill
-\begin{{center}}\meta{{di Daniele De Michele · danieledemichele.it}}\end{{center}}
+{f"\\node[anchor=north,inner sep=0pt,draw=line,line width=0.4pt] at ($(current page.north)+(0,-11mm)$) {{\\includegraphics[width=86mm]{{{cover}}}}};" if cover else ""}
+\node[anchor=north,inner sep=0pt] at ($(current page.north)+(0,-{'150' if cover else '60'}mm)$) {{\begin{{minipage}}{{120mm}}\centering
+\eyebrow{{Volume di viaggio · {tex(c['country'])}}}\par\vspace{{1.6mm}}
+{{\display\bfseries\fontsize{{22}}{{25}}\selectfont {tex(c['title'])}\par}}
+\vspace{{1mm}}{{\sffamily\fontsize{{8.5}}{{10}}\selectfont\color{{accent}} {tex(c['dates'])}\par}}
+\vspace{{1.6mm}}\meta{{{len(days)} giorni · {n_luoghi} tappe · {str(c.get('km') or '').replace('.', ',')} km a piedi}}\par
+\end{{minipage}}}};
+\node[anchor=south,inner sep=0pt] at ($(current page.south)+(0,9mm)$) {{\begin{{minipage}}{{120mm}}\centering\meta{{di Daniele De Michele · danieledemichele.it}}\end{{minipage}}}};
+\end{{tikzpicture}}
+\null
 \newpage\nopagecolor
 """)
     # come usare + indice
@@ -338,7 +439,7 @@ Ogni giorno si apre con una foto e la storia del quartiere; segue il percorso co
 {f"\\vspace{{1mm}}{{\\fontsize{{9.5}}{{12.5}}\\selectfont\\justifying {tex(hist)}\\par}}" if hist else ''}
 {"\\newpage" if (pics or has_cards) else "\\vspace{6mm}"}
 """)
-        rt = route_tikz(d["stops"], col, 11.7, 7.2)
+        rt = day_map(c, i, d, col, 11.7, 7.6)
         T.append(rf"""
 \eyebrow[c{col}]{{{"Il percorso" if rt else "Orari"}}}\par
 {rt}
@@ -426,10 +527,10 @@ def atlante(c):
         W = 170.0
         nodes = []
         for j, t in enumerate(tl):
-            x = 3 + j * (W - 6) / max(1, k - 1)
+            x = 14 + j * (W - 28) / max(1, k - 1)   # 14 mm = metà della didascalia: resta dentro i margini
             up = j % 2 == 0
             nodes.append(rf"\fill[accent] ({x:.1f}mm,0) circle (1.3mm);\draw[line,line width=.6pt] ({x:.1f}mm,{'1.6' if up else '-1.6'}mm) -- ({x:.1f}mm,{'9' if up else '-9'}mm);"
-                         rf"\node[anchor={'south' if up else 'north'},inner sep=1pt] at ({x:.1f}mm,{'9.5' if up else '-9.5'}mm) {{\begin{{minipage}}{{27mm}}\centering{{\display\bfseries\fontsize{{11}}{{12}}\selectfont\color{{accent}}{tex(t['anno'])}}}\\{{\sffamily\fontsize{{6.8}}{{8.4}}\selectfont\color{{ink2}}{tex(t['testo'])}}}\end{{minipage}}}};")
+                         rf"\node[anchor={'south' if up else 'north'},inner sep=1pt] at ({x:.1f}mm,{'9.5' if up else '-9.5'}mm) {{\begin{{minipage}}{{26mm}}\centering{{\display\bfseries\fontsize{{11}}{{12}}\selectfont\color{{accent}}{tex(t['anno'])}}}\\{{\sffamily\fontsize{{6.8}}{{8.4}}\selectfont\color{{ink2}}{tex(t['testo'])}}}\end{{minipage}}}};")
         T.append(rf"""
 \giorno{{{tex(vol.get('intro_titolo') or c['label'] + ' in breve')}}}
 \eyebrow{{Prima di partire}}\par
@@ -471,7 +572,7 @@ def atlante(c):
 {f"\\eyebrow[c{col}]{{Un po' di storia}}\\par{{\\fontsize{{9.5}}{{12.6}}\\selectfont\\justifying {tex(hist)}\\par}}" if hist else ''}
 \end{{minipage}}\hfill
 \begin{{minipage}}[t]{{0.47\linewidth}}
-{(f"\\eyebrow[c{col}]{{Il percorso}}\\par" + chr(10) + route_tikz(d['stops'], col, 8.1, 6.4)) if route_tikz(d['stops'], col, 8.1, 6.4) else ''}
+{(f"\\eyebrow[c{col}]{{Il percorso}}\\par" + chr(10) + day_map(c, i, d, col, 8.1, 6.6)) if route_tikz(d['stops'], col, 8.1, 6.6) else ''}
 \end{{minipage}}
 {"\\newpage" if (hero or any(n and x.get("storia") for n, x in numbered_stops(d))) else "\\par\\vspace{6mm}"}
 \eyebrow[c{col}]{{Orari del giorno}}\par\vspace{{1mm}}
@@ -492,14 +593,17 @@ def atlante(c):
             link = maps(s)
             name = f"\\href{{{url(link)}}}{{{tex(s['name'])}}}" if link else tex(s["name"])
             m = " · ".join(x for x in [s.get("time") and f"ore {s['time']}", CAT.get(s["cat"], "")] if x)
+            m = " · ".join(x for x in [s.get("time") and f"ore {s['time']}", CAT.get(s["cat"], ""), s.get("anno")] if x)
             cards.append(rf"""
-\begin{{tcolorbox}}[enhanced,breakable=false,colback=white,colframe=line,boxrule=0.5pt,arc=2.5mm,left=3.5mm,right=3.5mm,top=2.5mm,bottom=2.5mm]
+\needspace{{9\baselineskip}}
 \label{{luogo-{i}-{n}}}
-{{\sffamily\bfseries\fontsize{{7}}{{9}}\selectfont\color{{c{col}}}{n}\quad\MakeUppercase{{{tex(m)}}}\hfill{{\display\bfseries\fontsize{{13}}{{13}}\selectfont {tex(s.get('anno'))}}}\par}}\vspace{{0.6mm}}
-{{\display\bfseries\fontsize{{13.5}}{{15.5}}\selectfont {name}\par}}\vspace{{0.8mm}}
-{{\fontsize{{9}}{{11.8}}\selectfont\justifying {tex(s['storia'])}\par}}
+\noindent\begin{{tabularx}}{{\linewidth}}{{@{{}}p{{7mm}}X@{{}}}}
+\tikz[baseline=-0.8ex]\node[circle,fill=c{col},inner sep=0pt,minimum size=5.6mm,text=white,font=\sffamily\bfseries\fontsize{{8}}{{9}}\selectfont]{{{n}}}; &
+{{\display\bfseries\fontsize{{13.5}}{{15.5}}\selectfont {name}}}\newline\meta{{{tex(m)}}}
+\end{{tabularx}}\par\vspace{{-1mm}}
+{{\fontsize{{9.5}}{{12.4}}\selectfont\justifying {tex(s['storia'])}\par}}
 {f"\\begin{{cercare}}{{c{col}}}{tex(s['cercare'])}\\end{{cercare}}" if s.get('cercare') else ''}
-\end{{tcolorbox}}""")
+\vspace{{3.5mm}}""")
         if cards:
             T.append(rf"""
 \vspace{{4mm}}
