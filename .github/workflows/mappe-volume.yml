@@ -1,0 +1,43 @@
+name: Scarica le mappe del volume
+
+# Scarica da OpenStreetMap (Overpass) lo sfondo delle mappe dei giorni del volume PDF
+# e lo salva in scripts/volume/mappe/. Parte quando cambiano le aree o lo script.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/volume/mappe/aree.json
+      - scripts/mappe_volume.py
+      - .github/workflows/mappe-volume.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mappe-volume
+  cancel-in-progress: false
+
+jobs:
+  mappe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Scarica le mappe
+        run: |
+          pip install --quiet shapely
+          python scripts/mappe_volume.py
+      - name: Salva le mappe
+        run: |
+          if [ -z "$(git status --porcelain -- scripts/volume/mappe)" ]; then echo "Nessuna mappa nuova."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898341+github-actions[bot]@users.noreply.github.com"
+          git add scripts/volume/mappe
+          git commit -m "Volume: mappe scaricate da OpenStreetMap"
+          git pull --rebase --quiet origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
